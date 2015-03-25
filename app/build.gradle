@@ -1,0 +1,9 @@
+apply plugin: 'groovy'
+
+dependencies {
+	compile 'org.codehaus.groovy:groovy:2.4.0'
+    compile 'org.codehaus.groovy:groovy-swing:2.4.0'
+    compile 'org.codehaus.groovy:groovy-xml:2.4.0'
+    compile project(':api')
+	runtime project(':services')
+}

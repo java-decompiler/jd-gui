@@ -1,0 +1,11 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+
+dependencies {
+	compile 'org.codehaus.groovy:groovy:2.4.0'
+    compile 'org.codehaus.groovy:groovy-swing:2.4.0'
+    compile 'org.codehaus.groovy:groovy-xml:2.4.0'
+    compile 'com.fifesoft:rsyntaxtextarea:2.5.6'
+    compile files('lib/jd-core-0.7.1.jar')
+	compile project(':api')
+}

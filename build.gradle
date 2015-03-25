@@ -1,0 +1,60 @@
+apply plugin: 'java'
+apply plugin: 'distribution'
+
+// Common configuration //
+allprojects {
+	version='1.0.0'
+
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+
+	tasks.withType(JavaCompile) {
+		sourceCompatibility = '1.7'
+		targetCompatibility = '1.7'
+	}
+	tasks.withType(GroovyCompile) {
+		sourceCompatibility = '1.7'
+		targetCompatibility = '1.7'
+	}
+	
+	repositories {
+		mavenCentral()
+	}
+}
+
+// 'cleanIdea' task extension //
+task fullCleanIdea {
+	new File(project.name + '.iws').delete()
+	ant.delete(dir: 'out')
+}
+fullCleanIdea.mustRunAfter cleanIdea
+
+// All in one JAR //
+subprojects.each { subproject -> 
+	evaluationDependsOn(subproject.path) 
+}
+
+jar {
+  dependsOn subprojects.tasks['classes']
+  manifest {
+    attributes 'Main-Class': 'jd.gui.App', 'SplashScreen-Image': 'images/Icon_java_128.png'
+  }
+  def deps = []
+  subprojects.each { subproject ->
+    from subproject.sourceSets.main.output.classesDir
+    from subproject.sourceSets.main.output.resourcesDir
+	deps += subproject.configurations.compile
+  }
+  from { deps.unique().collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+// Distribution for OSX //
+distributions {
+	osx {
+		contents {
+			into('JD-GUI.app/Contents/Resources/Java') {
+				from { fileTree('build/libs') { include 'jd-gui-*.jar' } }
+			}
+		}
+	}
+}

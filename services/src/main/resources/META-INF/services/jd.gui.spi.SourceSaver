@@ -1,0 +1,5 @@
+jd.gui.service.sourcesaver.ClassFileSourceSaverProvider
+jd.gui.service.sourcesaver.DirectorySourceSaverProvider
+jd.gui.service.sourcesaver.FileSourceSaverProvider
+jd.gui.service.sourcesaver.PackageSourceSaverProvider
+jd.gui.service.sourcesaver.ZipFileSourceSaverProvider

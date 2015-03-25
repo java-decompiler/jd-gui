@@ -1,0 +1,29 @@
+# Java
+*.class
+
+# JD-GUI
+jd-gui.cfg
+
+# Idea
+.idea/
+out/
+*.ipr
+*.iml
+*.iws
+
+# Eclipse
+.settings/
+classes/
+.classpath
+.project
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# Gradle
+.gradle/
+build/
