@@ -9,6 +9,8 @@ import groovy.swing.SwingBuilder
 import jd.gui.api.API
 import jd.gui.model.configuration.Configuration
 
+import javax.swing.JDialog
+import javax.swing.JOptionPane
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
@@ -72,5 +74,10 @@ class SaveAllSourcesView {
         swing.doLater {
             saveAllSourcesDialog.visible = false
         }
+    }
+
+    void showActionFailedDialog() {
+        JOptionPane.showMessageDialog(
+            swing.saveAllSourcesDialog, '"Save All Sources" action failed.', 'Error', JOptionPane.ERROR_MESSAGE)
     }
 }
