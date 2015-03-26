@@ -29,12 +29,12 @@ class ClassFileLoaderProvider extends AbstractFileLoaderProvider {
             def path = file.path
 
             while (! path.endsWith(pathSuffix)) {
-                int index = pathSuffix.indexOf(File.separatorChar)
+                int index = pathSuffix.indexOf(File.separator)
 
                 if (index == -1) {
                     pathSuffix = ''
                 } else {
-                    pathSuffix = pathSuffix.substring(index)
+                    pathSuffix = pathSuffix.substring(index+1)
                 }
             }
 

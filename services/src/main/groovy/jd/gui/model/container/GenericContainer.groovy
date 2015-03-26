@@ -94,7 +94,23 @@ class GenericContainer implements Container {
         }
 
         protected Collection<Container.Entry> loadChildrenFromDirectoryEntry() {
-            return Files.newDirectoryStream(fsPath).collect { Path subPath -> new Entry(this, subPath, null) }.sort()
+            DirectoryStream<Path> stream = null
+
+            try {
+                def children = new ArrayList<Container.Entry>()
+                int parentNameCount = fsPath.nameCount
+                stream = Files.newDirectoryStream(fsPath)
+
+                for (def subPath : stream) {
+                    if (subPath.nameCount > parentNameCount) {
+                        children.add(new Entry(this, subPath, null))
+                    }
+                }
+
+                return children.sort()
+            } finally {
+                stream?.close()
+            }
         }
 
         protected Collection<Container.Entry> loadChildrenFromFileEntry() {
