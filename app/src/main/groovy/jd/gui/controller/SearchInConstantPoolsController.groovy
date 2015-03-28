@@ -312,7 +312,7 @@ class SearchInConstantPoolsController implements IndexesChangeListener {
     @CompileStatic
     static Map<String, Collection<Container.Entry>> matchWithString(String pattern, Map<String, Collection<Container.Entry>> index) {
         def p = createPattern(pattern)
-        return index.findAll { String key, entries -> p.matcher(key).find() }
+        return index.findAll { String key, entries -> p.matcher(key).matches() }
     }
 
     /**
