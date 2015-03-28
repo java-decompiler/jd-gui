@@ -273,6 +273,8 @@ class ClassFilePage
         def fragment = uri.fragment
         def query = uri.query
 
+        textArea.highlighter.clearMarkAllHighlights()
+
         if (fragment) {
             int index = fragment.indexOf('?')
 
@@ -384,7 +386,6 @@ class ClassFilePage
 
         if (ranges) {
             textArea.markAllHighlightColor = searchHighlightColor
-            textArea.highlighter.clearMarkAllHighlights()
             textArea.markAll(ranges)
             setCaretPositionAndCenter(ranges.sort().get(0))
         }
