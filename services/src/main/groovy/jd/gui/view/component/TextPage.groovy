@@ -16,11 +16,13 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rsyntaxtextarea.Theme
+import org.fife.ui.rsyntaxtextarea.folding.FoldManager
 import org.fife.ui.rtextarea.RTextScrollPane
 import org.fife.ui.rtextarea.SearchContext
 import org.fife.ui.rtextarea.SearchEngine
 
 import javax.swing.*
+import javax.swing.text.BadLocationException
 import java.awt.*
 import java.awt.datatransfer.StringSelection
 import java.awt.event.KeyEvent
@@ -97,6 +99,63 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
     }
 
     String getSyntaxStyle() { SyntaxConstants.SYNTAX_STYLE_NONE }
+
+    /**
+     * @see org.fife.ui.rsyntaxtextarea.RSyntaxUtilities#selectAndPossiblyCenter
+     * Force center and do not select
+     */
+    void setCaretPositionAndCenter(DocumentRange range) {
+        int start = range.startOffset
+        int end = range.endOffset
+        boolean foldsExpanded = false
+        FoldManager fm = textArea.foldManager
+
+        if (fm.isCodeFoldingSupportedAndEnabled()) {
+            foldsExpanded = fm.ensureOffsetNotInClosedFold(start)
+            foldsExpanded |= fm.ensureOffsetNotInClosedFold(end)
+        }
+
+        if (foldsExpanded == false) {
+            try {
+                Rectangle r = textArea.modelToView(start)
+
+                if (r) { // Visible
+                    if (end != start) {
+                        r = r.union(textArea.modelToView(end))
+                    }
+
+                    Rectangle visible = textArea.visibleRect
+
+                    visible.@x = r.@x - (visible.@width - r.@width) / 2 as int
+                    visible.@y = r.@y - (visible.@height - r.@height) / 2 as int
+
+                    Rectangle bounds = textArea.bounds
+                    Insets i = textArea.insets
+                    bounds.@x = i.left
+                    bounds.@y = i.top
+                    bounds.@width -= i.left + i.right
+                    bounds.@height -= i.top + i.bottom
+
+                    if (visible.@x < bounds.@x) {
+                        visible.@x = bounds.@x
+                    }
+                    if (visible.@x + visible.@width > bounds.@x + bounds.@width) {
+                        visible.@x = bounds.@x + bounds.@width - visible.@width
+                    }
+                    if (visible.@y < bounds.@y) {
+                        visible.@y = bounds.@y
+                    }
+                    if (visible.@y + visible.@height > bounds.@y + bounds.@height) {
+                        visible.@y = bounds.@y + bounds.@height - visible.@height
+                    }
+
+                    textArea.scrollRectToVisible(visible)
+                    textArea.caretPosition = start
+                }
+            } catch (BadLocationException ignore) {
+            }
+        }
+    }
 
     // --- ContentCopyable --- //
     void copy() {

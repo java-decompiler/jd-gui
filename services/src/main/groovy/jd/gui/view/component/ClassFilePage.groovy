@@ -18,7 +18,6 @@ import jd.gui.util.decompiler.ClassFileSourcePrinter
 import jd.gui.util.decompiler.ContainerLoader
 import jd.gui.util.decompiler.GuiPreferences
 import org.fife.ui.rsyntaxtextarea.DocumentRange
-import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 
 import javax.swing.text.DefaultCaret
@@ -338,10 +337,10 @@ class ClassFilePage
                         }
                     }
 
-                    boolean t = (highlightFlags.indexOf('t') != -1)
-                    boolean f = (highlightFlags.indexOf('f') != -1)
-                    boolean m = (highlightFlags.indexOf('m') != -1)
-                    boolean c = (highlightFlags.indexOf('c') != -1)
+                    boolean t = (highlightFlags.indexOf('t') != -1) // Highlight types
+                    boolean f = (highlightFlags.indexOf('f') != -1) // Highlight fields
+                    boolean m = (highlightFlags.indexOf('m') != -1) // Highlight methods
+                    boolean c = (highlightFlags.indexOf('c') != -1) // Highlight constructors
 
                     if (highlightFlags.indexOf('d') != -1) {
                         // Highlight declarations
@@ -380,12 +379,7 @@ class ClassFilePage
             textArea.markAllHighlightColor = searchHighlightColor
             textArea.highlighter.clearMarkAllHighlights()
             textArea.markAll(ranges)
-
-            ranges.sort()
-
-            def first = ranges[0]
-            RSyntaxUtilities.selectAndPossiblyCenter(textArea, first, false)
-            textArea.caretPosition = first.startOffset
+            setCaretPositionAndCenter(ranges.sort().get(0))
         }
     }
 

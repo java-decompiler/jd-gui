@@ -37,6 +37,7 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
     Tree tree
     TabbedPanel tabbedPanel
     List<PageChangeListener> pageChangedListeners = []
+    boolean listenerEnabled = true
 
     TreeTabbedPanel(API api, URI uri) {
         this.api = api
@@ -48,20 +49,7 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
         tree.expandsSelectedPaths = true
         tree.cellRenderer = new TreeNodeRenderer()
         tree.addTreeSelectionListener(new TreeSelectionListener() {
-            void valueChanged(TreeSelectionEvent e) {
-                def path = tree.lastSelectedPathComponent
-                if (path) {
-                    showPage(path)
-                }
-            }
-        })
-        tree.addMouseListener(new MouseAdapter() {
-            void mouseClicked(MouseEvent e) {
-                TreePath path = tree.getPathForLocation(e.x, e.y)
-                if (path) {
-                    showPage(path.lastPathComponent)
-                }
-            }
+            void valueChanged(TreeSelectionEvent e) { showPage(tree.lastSelectedPathComponent) }
         })
         tree.addTreeExpansionListener(new TreeExpansionListener() {
             void treeExpanded(TreeExpansionEvent e) {
@@ -93,67 +81,78 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
     }
 
     protected <T extends DefaultMutableTreeNode & UriGettable> void showPage(T node) {
-        // Search base tree node
-        def uri = node.uri
+        if (node) {
+            // Search base tree node
+            def uri = node.uri
 
-        if ((uri.fragment == null) && (uri.query == null)) {
-            showPage(uri, uri, node)
-        } else {
-            def baseUri = new URI(uri.scheme, uri.host, uri.path, null)
-            def baseNode = node
+            if ((uri.fragment == null) && (uri.query == null)) {
+                showPage(uri, uri, node)
+            } else {
+                def baseUri = new URI(uri.scheme, uri.host, uri.path, null)
+                def baseNode = node
 
-            while (!baseNode?.uri.equals(baseUri)) {
-                baseNode = baseNode.parent
-            }
-
-            if (baseNode?.uri.equals(baseUri)) {
-                showPage(uri, baseUri, baseNode)
+                while (!baseNode?.uri.equals(baseUri)) {
+                    baseNode = baseNode.parent
+                }
+                if (baseNode?.uri.equals(baseUri)) {
+                    showPage(uri, baseUri, baseNode)
+                }
             }
         }
     }
 
     protected boolean showPage(URI uri, URI baseUri, DefaultMutableTreeNode baseNode) {
-        def page = tabbedPanel.showPage(baseUri)
+        try {
+            // Disable tabbedPane.changeListener
+            listenerEnabled = false
 
-        if ((page == null) && (baseNode instanceof PageCreator)) {
-            page = baseNode.createPage(api)
-            page.putClientProperty('node', baseNode)
-            page.putClientProperty('preferences-stamp', Integer.valueOf(api.preferences.hashCode()))
-            page.putClientProperty('collectionOfIndexes-stamp', Integer.valueOf(api.collectionOfIndexes.hashCode()))
+            def page = tabbedPanel.showPage(baseUri)
 
-            def path = baseUri.path
-            def label = path.substring(path.lastIndexOf('/')+1)
-            def data = baseNode.userObject
+            if ((page == null) && (baseNode instanceof PageCreator)) {
+                page = baseNode.createPage(api)
+                page.putClientProperty('node', baseNode)
+                page.putClientProperty('preferences-stamp', Integer.valueOf(api.preferences.hashCode()))
+                page.putClientProperty('collectionOfIndexes-stamp', Integer.valueOf(api.collectionOfIndexes.hashCode()))
 
-            if (data instanceof TreeNodeData) {
-                tabbedPanel.addPage(label, data.icon, data.tip, page)
-            } else {
-                tabbedPanel.addPage(label, null, null, page)
+                def path = baseUri.path
+                def label = path.substring(path.lastIndexOf('/')+1)
+                def data = baseNode.userObject
+
+                if (data instanceof TreeNodeData) {
+                    tabbedPanel.addPage(label, data.icon, data.tip, page)
+                } else {
+                    tabbedPanel.addPage(label, null, null, page)
+                }
             }
-        }
 
-        if (page instanceof UriOpenable) {
-            api.addURI(uri)
-            page.openUri(uri)
-        }
+            if (page instanceof UriOpenable) {
+                api.addURI(uri)
+                page.openUri(uri)
+            }
 
-        return (page != null)
+            return (page != null)
+        } finally {
+            // Enable tabbedPane.changeListener
+            listenerEnabled = true
+        }
     }
 
     void pageChanged() {
-        def page = tabbedPanel.tabbedPane.selectedComponent
-        // Synchronize tree
-        if (page) {
-            def node = page.getClientProperty('node')
-            // Select tree node
-            tree.selectionPath = node.path
-            tree.scrollPathToVisible(tree.selectionPath)
-        } else {
-            tree.clearSelection()
-        }
-        // Fire page changed event
-        for (def listener : pageChangedListeners) {
-            listener.pageChanged(page)
+        if (listenerEnabled) {
+            def page = tabbedPanel.tabbedPane.selectedComponent
+            // Synchronize tree
+            if (page) {
+                def node = page.getClientProperty('node')
+                // Select tree node
+                tree.selectionPath = node.path
+                tree.scrollPathToVisible(tree.selectionPath)
+            } else {
+                tree.clearSelection()
+            }
+            // Fire page changed event
+            for (def listener : pageChangedListeners) {
+                listener.pageChanged(page)
+            }
         }
     }
 
