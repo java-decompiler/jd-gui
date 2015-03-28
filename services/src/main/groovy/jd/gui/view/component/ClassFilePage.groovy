@@ -19,10 +19,14 @@ import jd.gui.util.decompiler.ContainerLoader
 import jd.gui.util.decompiler.GuiPreferences
 import org.fife.ui.rsyntaxtextarea.DocumentRange
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
+import org.fife.ui.rsyntaxtextarea.folding.FoldManager
 
+import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultCaret
 import java.awt.Color
+import java.awt.Insets
 import java.awt.Point
+import java.awt.Rectangle
 import java.util.regex.Pattern
 
 class ClassFilePage
@@ -350,7 +354,8 @@ class ClassFilePage
                             if (!highlightScope || declaration.type.equals(highlightScope)) {
                                 if ((t && declaration.isAType()) || (c && declaration.isAConstructor())) {
                                     matchAndAddDocumentRange(pattern, getMostInnerTypeName(declaration.type), declaration.startPosition, declaration.endPosition, ranges)
-                                } else if ((f && declaration.isAField()) || (m && declaration.isAMethod())) {
+                                }
+                                if ((f && declaration.isAField()) || (m && declaration.isAMethod())) {
                                     matchAndAddDocumentRange(pattern, declaration.name, declaration.startPosition, declaration.endPosition, ranges)
                                 }
                             }
@@ -359,14 +364,16 @@ class ClassFilePage
 
                     if (highlightFlags.indexOf('r') != -1) {
                         // Highlight references
-                        for (def hyperlink : hyperlinks.entrySet()) {
-                            ReferenceData reference = hyperlink.reference as ReferenceData
+                        for (def entry : hyperlinks.entrySet()) {
+                            def hyperlink = entry.value
+                            def reference = hyperlink.reference as ReferenceData
 
                             if (!highlightScope || reference.owner.equals(highlightScope)) {
                                 if ((t && reference.isAType()) || (c && reference.isAConstructor())) {
-                                    matchAndAddDocumentRange(pattern, getMostInnerTypeName(reference.type), reference.startPosition, reference.endPosition, ranges)
-                                } else if ((f && reference.isAField()) || (m && reference.isAMethod())) {
-                                    matchAndAddDocumentRange(pattern, reference.name, reference.startPosition, reference.endPosition, ranges)
+                                    matchAndAddDocumentRange(pattern, getMostInnerTypeName(reference.type), hyperlink.startPosition, hyperlink.endPosition, ranges)
+                                }
+                                if ((f && reference.isAField()) || (m && reference.isAMethod())) {
+                                    matchAndAddDocumentRange(pattern, reference.name, hyperlink.startPosition, hyperlink.endPosition, ranges)
                                 }
                             }
                         }
