@@ -27,3 +27,7 @@ target/
 # Gradle
 .gradle/
 build/
+
+# WinMerge
+*.bak
+

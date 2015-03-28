@@ -36,8 +36,8 @@ class SaveAllSourcesController implements SourcesSavable.Controller, SourcesSava
         // Show
         this.saveAllSourcesView.show(file)
         // Execute background task
-        executor.submit(new Callable<Void>() {
-            Void call() throws Exception {
+        executor.execute(new Runnable() {
+            void run() {
                 int fileCount = savable.fileCount
                 int quotient = (fileCount / 100)
 
@@ -56,10 +56,15 @@ class SaveAllSourcesController implements SourcesSavable.Controller, SourcesSava
                 def path = Paths.get(file.toURI())
                 Files.deleteIfExists(path)
 
-                savable.save(api, this as SourcesSavable.Controller, this as SourcesSavable.Listener, path)
+                try {
+                    savable.save(api, this as SourcesSavable.Controller, this as SourcesSavable.Listener, path)
+                } catch (Exception e) {
+                    saveAllSourcesView.showActionFailedDialog()
+                    cancel = true
+                }
 
                 if (cancel) {
-                    Files.delete(path)
+                    Files.deleteIfExists(path)
                 }
 
                 saveAllSourcesView.hide()

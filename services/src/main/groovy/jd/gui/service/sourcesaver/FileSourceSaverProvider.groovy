@@ -12,6 +12,7 @@ import jd.gui.spi.SourceSaver
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import java.util.regex.Pattern
 
 class FileSourceSaverProvider implements SourceSaver {
@@ -28,7 +29,7 @@ class FileSourceSaverProvider implements SourceSaver {
         listener.pathSaved(path)
 
         entry.inputStream.withStream { InputStream is ->
-            Files.copy(is, path)
+            Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING)
         }
     }
 }
