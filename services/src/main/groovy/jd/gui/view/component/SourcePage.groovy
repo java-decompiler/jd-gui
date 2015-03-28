@@ -279,7 +279,13 @@ abstract class SourcePage extends HyperlinkPage {
         }
 
         protected void paintLineNumber(Graphics g, FontMetrics metrics, int x, int y, int lineNumber) {
-            int sourceLineNumber = lineNumberMap ? lineNumberMap[lineNumber] : lineNumber
+            int sourceLineNumber
+
+            if (lineNumberMap) {
+                sourceLineNumber = (lineNumber < lineNumberMap.length) ? lineNumberMap[lineNumber] : 0
+            } else {
+                sourceLineNumber = lineNumber
+            }
 
             if (sourceLineNumber != 0) {
                 String number = Integer.toString(sourceLineNumber)
