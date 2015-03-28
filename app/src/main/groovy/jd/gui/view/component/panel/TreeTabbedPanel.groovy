@@ -25,10 +25,7 @@ import javax.swing.event.TreeExpansionListener
 import javax.swing.event.TreeSelectionEvent
 import javax.swing.event.TreeSelectionListener
 import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.TreePath
 import java.awt.*
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.util.List
 
 class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageChangeable, PageClosable {
@@ -37,7 +34,7 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
     Tree tree
     TabbedPanel tabbedPanel
     List<PageChangeListener> pageChangedListeners = []
-    boolean listenerEnabled = true
+    boolean updateTreeMenu = true
 
     TreeTabbedPanel(API api, URI uri) {
         this.api = api
@@ -104,7 +101,7 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
     protected boolean showPage(URI uri, URI baseUri, DefaultMutableTreeNode baseNode) {
         try {
             // Disable tabbedPane.changeListener
-            listenerEnabled = false
+            updateTreeMenu = false
 
             def page = tabbedPanel.showPage(baseUri)
 
@@ -133,13 +130,14 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
             return (page != null)
         } finally {
             // Enable tabbedPane.changeListener
-            listenerEnabled = true
+            updateTreeMenu = true
         }
     }
 
     void pageChanged() {
-        if (listenerEnabled) {
-            def page = tabbedPanel.tabbedPane.selectedComponent
+        def page = tabbedPanel.tabbedPane.selectedComponent
+
+        if (updateTreeMenu) {
             // Synchronize tree
             if (page) {
                 def node = page.getClientProperty('node')
@@ -149,10 +147,10 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
             } else {
                 tree.clearSelection()
             }
-            // Fire page changed event
-            for (def listener : pageChangedListeners) {
-                listener.pageChanged(page)
-            }
+        }
+        // Fire page changed event
+        for (def listener : pageChangedListeners) {
+            listener.pageChanged(page)
         }
     }
 
