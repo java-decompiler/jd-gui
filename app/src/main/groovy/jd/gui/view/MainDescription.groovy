@@ -50,7 +50,7 @@ actions {
 		mnemonic:'x',
 		accelerator:'alt X',
 		shortDescription:'Quit this program',
-		closure:{ mainFrame.dispose() }
+		closure:{ System.exit(0) }
 	)
     action(
         id:'copyAction',
