@@ -34,6 +34,8 @@ class LogPage extends HyperlinkPage implements UriGettable, ContentSavable, Inde
         parseLine(content, index, content.size())
         // Display
         setText(content)
+        // Show hyperlinks
+        indexesChanged(api.collectionOfIndexes)
     }
 
     protected void parseLine(String content, int index, int eol) {
@@ -62,8 +64,8 @@ class LogPage extends HyperlinkPage implements UriGettable, ContentSavable, Inde
             def typeAndMethodNames = text.substring(hyperlinkData.startPosition, hyperlinkData.endPosition)
             int lastDotIndex = typeAndMethodNames.lastIndexOf('.')
             def methodName = typeAndMethodNames.substring(lastDotIndex+1)
-            def typeName = typeAndMethodNames.substring(0, lastDotIndex).replace('.', '/')
-            def entries = collectionOfIndexes?.collect { it.getIndex('typeDeclarations')?.get(typeName) }.flatten().grep { it!=null }
+            def internalTypeName = typeAndMethodNames.substring(0, lastDotIndex).replace('.', '/')
+            def entries = collectionOfIndexes?.collect { it.getIndex('typeDeclarations')?.get(internalTypeName) }.flatten().grep { it!=null }
 
             int leftParenthesisIndex = hyperlinkData.endPosition + 1
             int rightParenthesisIndex = text.indexOf(')', leftParenthesisIndex)
@@ -71,8 +73,8 @@ class LogPage extends HyperlinkPage implements UriGettable, ContentSavable, Inde
 
             if (lineNumberOrNativeMethodFlag.equals('Native Method')) {
                 // Example: at java.security.AccessController.doPrivileged(Native Method)
-                lastDotIndex = typeName.lastIndexOf('/')
-                def shortTypeName = typeName.substring(lastDotIndex+1)
+                lastDotIndex = internalTypeName.lastIndexOf('/')
+                def shortTypeName = internalTypeName.substring(lastDotIndex+1)
                 api.openURI(x, y, entries, null, shortTypeName + '-' + methodName + '-(?)?')
             } else {
                 // Example: at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:294)
@@ -109,8 +111,8 @@ class LogPage extends HyperlinkPage implements UriGettable, ContentSavable, Inde
             def entryData = entry.value as LogHyperlinkData
             def typeAndMethodNames = text.substring(entryData.startPosition, entryData.endPosition)
             int lastDotIndex = typeAndMethodNames.lastIndexOf('.')
-            def typeName = typeAndMethodNames.substring(0, lastDotIndex).replace('.', '/')
-            boolean enabled = collectionOfIndexes.find { it.getIndex('typeDeclarations')?.get(typeName) } != null
+            def internalTypeName = typeAndMethodNames.substring(0, lastDotIndex).replace('.', '/')
+            boolean enabled = collectionOfIndexes.find { it.getIndex('typeDeclarations')?.get(internalTypeName) } != null
 
             if (entryData.enabled != enabled) {
                 entryData.enabled = enabled

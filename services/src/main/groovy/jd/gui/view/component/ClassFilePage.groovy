@@ -19,14 +19,10 @@ import jd.gui.util.decompiler.ContainerLoader
 import jd.gui.util.decompiler.GuiPreferences
 import org.fife.ui.rsyntaxtextarea.DocumentRange
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
-import org.fife.ui.rsyntaxtextarea.folding.FoldManager
 
-import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultCaret
 import java.awt.Color
-import java.awt.Insets
 import java.awt.Point
-import java.awt.Rectangle
 import java.util.regex.Pattern
 
 class ClassFilePage
@@ -54,11 +50,11 @@ class ClassFilePage
 
     static {
         // Early class loading
-        def internalPath = ClassFilePage.class.name.replace('.', '/')
+        def internalTypeName = ClassFilePage.class.name.replace('.', '/')
         def preferences = new GuiPreferences()
         def loader = new Loader() {
             DataInputStream load(String internalTypePath) throws LoaderException {
-                return new DataInputStream(ClassFilePage.class.classLoader.getResourceAsStream(internalPath + '.class'))
+                return new DataInputStream(ClassFilePage.class.classLoader.getResourceAsStream(internalTypeName + '.class'))
             }
             boolean canLoad(String internalTypePath) { false }
         }
@@ -70,7 +66,7 @@ class ClassFilePage
             void append(char c) {}
             void append(String s) {}
         }
-        DECOMPILER.decompile(preferences, loader, printer, internalPath)
+        DECOMPILER.decompile(preferences, loader, printer, internalTypeName)
     }
 
     ClassFilePage(API api, Container.Entry entry) {
@@ -91,7 +87,6 @@ class ClassFilePage
             declarations.clear()
             typeDeclarations.clear()
             strings.clear()
-
             // Init preferences
             def p = new GuiPreferences()
             p.setUnicodeEscape(getPreferenceValue(preferences, ESCAPE_UNICODE_CHARACTERS, false))
@@ -101,18 +96,14 @@ class ClassFilePage
             p.setRealignmentLineNumber(getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, false))
 
             setShowMisalignment(p.realignmentLineNumber)
-
             // Init loader
             def loader = new ContainerLoader(entry)
-
             // Init printer
             def printer = new Printer(p)
-
             // Decompile class file
             DECOMPILER.decompile(p, loader, printer, entry.path)
 
             setText(printer.toString())
-
             // Show hyperlinks
             indexesChanged(api.collectionOfIndexes)
         } catch (Exception ignore) {
@@ -286,7 +277,7 @@ class ClassFilePage
                 }
             } else {
                 // Unknown descriptor ==> Select all and scroll to the first one
-                def prefix = fragment.substring(0, fragment.lastIndexOf('-' + 1))
+                def prefix = fragment.substring(0, fragment.lastIndexOf('-') + 1)
                 boolean method = (fragment.charAt(index - 1) == '(')
                 int prefixLength = prefix.size()
 

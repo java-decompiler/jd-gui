@@ -5,6 +5,7 @@
 
 package jd.gui.view.component
 
+import groovy.transform.CompileStatic
 import jd.gui.api.API
 import jd.gui.api.feature.ContentSavable
 import jd.gui.api.feature.IndexesChangeListener
@@ -31,29 +32,30 @@ class ManifestFilePage extends HyperlinkPage implements UriGettable, ContentSava
         if (startLineIndex != -1) {
             // Example: Main-Class: jd.gui.App
             int startIndex = skipSeparators(text, startLineIndex + 'Main-Class:'.size())
-            int endIndex = searchEndIndexForValue(text, startLineIndex, startIndex)
+            int endIndex = searchEndIndexOfValue(text, startLineIndex, startIndex)
             def typeName = text.substring(startIndex, endIndex)
-            int lastDotIndex = typeName.lastIndexOf('.')
-            def shortTypeName = typeName.substring(lastDotIndex+1)
-            addHyperlink(new ManifestHyperlinkData(startIndex, endIndex, shortTypeName + '-main-(Ljava/lang/String;)V'))
+            def internalTypeName = typeName.replace('.', '/')
+            addHyperlink(new ManifestHyperlinkData(startIndex, endIndex, internalTypeName + '-main-([Ljava/lang/String;)V'))
         }
 
         startLineIndex = text.indexOf('Premain-Class:')
         if (startLineIndex != -1) {
             // Example: Premain-Class: packge.JavaAgent
             int startIndex = skipSeparators(text, startLineIndex + 'Premain-Class:'.size())
-            int endIndex = searchEndIndexForValue(text, startLineIndex, startIndex)
+            int endIndex = searchEndIndexOfValue(text, startLineIndex, startIndex)
             def typeName = text.substring(startIndex, endIndex)
-            int lastDotIndex = typeName.lastIndexOf('.')
-            def shortTypeName = typeName.substring(lastDotIndex+1)
+            def internalTypeName = typeName.replace('.', '/')
             // Undefined parameters : 2 candidate methods
             // http://docs.oracle.com/javase/6/docs/api/java/lang/instrument/package-summary.html
-            addHyperlink(new ManifestHyperlinkData(startIndex, endIndex, shortTypeName + '-premain-(?)?'))
+            addHyperlink(new ManifestHyperlinkData(startIndex, endIndex, internalTypeName + '-premain-(?)?'))
         }
         // Display
         setText(text)
+        // Show hyperlinks
+        indexesChanged(api.collectionOfIndexes)
     }
 
+    @CompileStatic
     int skipSeparators(String text, int index) {
         int length = text.size()
 
@@ -70,7 +72,8 @@ class ManifestFilePage extends HyperlinkPage implements UriGettable, ContentSava
         return index
     }
 
-    int searchEndIndexForValue(String text, int startLineIndex, int startIndex) {
+    @CompileStatic
+    int searchEndIndexOfValue(String text, int startLineIndex, int startIndex) {
         int length = text.size()
         int index = startIndex
 
@@ -117,12 +120,11 @@ class ManifestFilePage extends HyperlinkPage implements UriGettable, ContentSava
             int offset = textArea.viewToModel(new Point(x-location.x as int, y-location.y as int))
             def uri = entry.uri
             api.addURI(new URI(uri.scheme, uri.authority, uri.path, 'position=' + offset, null))
-
             // Open link
             def text = getText()
             def textLink = getValue(text, hyperlinkData.startPosition, hyperlinkData.endPosition)
-            def typeName = textLink.replace('.', '/')
-            def entries = collectionOfIndexes?.collect { it.getIndex('typeDeclarations')?.get(typeName) }.flatten().grep { it!=null }
+            def internalTypeName = textLink.replace('.', '/')
+            def entries = collectionOfIndexes?.collect { it.getIndex('typeDeclarations')?.get(internalTypeName) }.flatten().grep { it!=null }
             def rootUri = entry.container.root.uri.toString()
             def sameContainerEntries = entries?.grep { it.uri.toString().startsWith(rootUri) }
 
@@ -159,8 +161,8 @@ class ManifestFilePage extends HyperlinkPage implements UriGettable, ContentSava
         for (def entry : hyperlinks.entrySet()) {
             def entryData = entry.value as ManifestHyperlinkData
             def textLink = getValue(text, entryData.startPosition, entryData.endPosition)
-            def typeName = textLink.replace('.', '/')
-            boolean enabled = collectionOfIndexes.find { it.getIndex('typeDeclarations')?.get(typeName) } != null
+            def internalTypeName = textLink.replace('.', '/')
+            boolean enabled = collectionOfIndexes.find { it.getIndex('typeDeclarations')?.get(internalTypeName) } != null
 
             if (entryData.enabled != enabled) {
                 entryData.enabled = enabled
