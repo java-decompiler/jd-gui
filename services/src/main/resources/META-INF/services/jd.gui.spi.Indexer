@@ -2,5 +2,4 @@ jd.gui.service.indexer.DirectoryIndexerProvider
 jd.gui.service.indexer.ClassFileIndexerProvider
 jd.gui.service.indexer.MetainfServiceFileIndexerProvider
 jd.gui.service.indexer.TextFileIndexerProvider
-jd.gui.service.indexer.XmlFileIndexerProvider
 jd.gui.service.indexer.ZipFileIndexerProvider

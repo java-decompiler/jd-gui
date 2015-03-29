@@ -322,15 +322,15 @@ class ClassFilePage
 
                     if (highlightFlags.indexOf('s') != -1) {
                         // Highlight strings
-                        def patternForString = Pattern.compile('^"' + regexp)
+                        def patternForString = Pattern.compile(regexp)
 
                         for (def data : strings) {
                             if (!highlightScope || data.owner.equals(highlightScope)) {
                                 def matcher = patternForString.matcher(data.text)
+                                int offset = data.startPosition
 
-                                if (matcher.find()) {
-                                    int offset = data.startPosition
-                                    ranges.add(new DocumentRange(offset + matcher.start() + 1, offset + matcher.end()))
+                                while(matcher.find()) {
+                                    ranges.add(new DocumentRange(offset + matcher.start(), offset + matcher.end()))
                                 }
                             }
                         }

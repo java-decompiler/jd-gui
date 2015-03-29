@@ -30,57 +30,58 @@ class XmlFileIndexerProvider implements Indexer {
     @CompileStatic
     void index(API api, Container.Entry entry, Indexes indexes) {
         def index = indexes.getIndex('strings')
+        def set = new HashSet<String>()
         def reader
 
         try {
             reader = factory.createXMLStreamReader(entry.inputStream)
 
-            index.get(reader.version).add(entry)
-            index.get(reader.encoding).add(entry)
-            index.get(reader.characterEncodingScheme).add(entry)
+            set.add(reader.version)
+            set.add(reader.encoding)
+            set.add(reader.characterEncodingScheme)
 
             while (reader.hasNext()) {
                 switch (reader.next()) {
                     case XMLStreamConstants.START_ELEMENT:
-                        index.get(reader.localName).add(entry)
+                        set.add(reader.localName)
                         for (int i = reader.attributeCount - 1; i >= 0; i--) {
-                            index.get(reader.getAttributeLocalName(i)).add(entry)
-                            index.get(reader.getAttributeValue(i)).add(entry)
+                            set.add(reader.getAttributeLocalName(i))
+                            set.add(reader.getAttributeValue(i))
                         }
                         for (int i = reader.namespaceCount - 1; i >= 0; i--) {
-                            index.get(reader.getNamespacePrefix(i)).add(entry)
-                            index.get(reader.getNamespaceURI(i)).add(entry)
+                            set.add(reader.getNamespacePrefix(i))
+                            set.add(reader.getNamespaceURI(i))
                         }
                         break
                     case XMLStreamConstants.PROCESSING_INSTRUCTION:
-                        index.get(reader.getPITarget()).add(entry)
-                        index.get(reader.getPIData()).add(entry)
+                        set.add(reader.getPITarget())
+                        set.add(reader.getPIData())
                         break
                     case XMLStreamConstants.START_DOCUMENT:
-                        index.get(reader.version).add(entry)
-                        index.get(reader.encoding).add(entry)
-                        index.get(reader.characterEncodingScheme).add(entry)
+                        set.add(reader.version)
+                        set.add(reader.encoding)
+                        set.add(reader.characterEncodingScheme)
                         break
                     case XMLStreamConstants.ENTITY_REFERENCE:
-                        index.get(reader.localName).add(entry)
-                        index.get(reader.text).add(entry)
+                        set.add(reader.localName)
+                        set.add(reader.text)
                         break
                     case XMLStreamConstants.ATTRIBUTE:
-                        index.get(reader.prefix).add(entry)
-                        index.get(reader.namespaceURI).add(entry)
-                        index.get(reader.localName).add(entry)
-                        index.get(reader.text).add(entry)
+                        set.add(reader.prefix)
+                        set.add(reader.namespaceURI)
+                        set.add(reader.localName)
+                        set.add(reader.text)
                         break
                     case XMLStreamConstants.COMMENT:
                     case XMLStreamConstants.DTD:
                     case XMLStreamConstants.CDATA:
                     case XMLStreamConstants.CHARACTERS:
-                        index.get(reader.text.trim()).add(entry)
+                        set.add(reader.text.trim())
                         break
                     case XMLStreamConstants.NAMESPACE:
                         for (int i = reader.namespaceCount - 1; i >= 0; i--) {
-                            index.get(reader.getNamespacePrefix(i)).add(entry)
-                            index.get(reader.getNamespaceURI(i)).add(entry)
+                            set.add(reader.getNamespacePrefix(i))
+                            set.add(reader.getNamespaceURI(i))
                         }
                         break
                 }
@@ -88,6 +89,12 @@ class XmlFileIndexerProvider implements Indexer {
         } catch (Exception ignore) {
         } finally {
             reader?.close()
+        }
+
+        for (def string : set) {
+            if (string) {
+                index.get(string).add(entry)
+            }
         }
     }
 }

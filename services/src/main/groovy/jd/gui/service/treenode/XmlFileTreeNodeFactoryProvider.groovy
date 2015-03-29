@@ -33,7 +33,7 @@ class XmlFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
         public <T extends JComponent & UriGettable> T createPage(API api) {
             return new TextFileTreeNodeFactoryProvider.Page(entry) {
                 String getSyntaxStyle() {
-                    SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE
+                    SyntaxConstants.SYNTAX_STYLE_XML
                 }
             }
         }

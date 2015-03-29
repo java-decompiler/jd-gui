@@ -193,6 +193,8 @@ class SearchInConstantPoolsController implements IndexesChangeListener {
         def matchTypeEntriesWithStringClosure = { s, index -> matchTypeEntriesWithString(s, index) }
         def matchWithCharClosure = { c, index -> matchWithChar(c, index) }
         def matchWithStringClosure = { s, index -> matchWithString(s, index) }
+        def matchStringWithCharClosure = { c, index -> matchStringWithChar(c, index) }
+        def matchStringWithStringClosure = { s, index -> matchStringWithString(s, index) }
 
         if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_TYPE) != 0) {
             if (declarations)
@@ -233,7 +235,7 @@ class SearchInConstantPoolsController implements IndexesChangeListener {
         if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_STRING) != 0) {
             if (declarations || references)
                 match(indexes, 'strings', pattern,
-                        matchWithCharClosure, matchWithStringClosure, matchingEntries)
+                        matchStringWithCharClosure, matchStringWithStringClosure, matchingEntries)
         }
     }
 
@@ -313,6 +315,22 @@ class SearchInConstantPoolsController implements IndexesChangeListener {
     static Map<String, Collection<Container.Entry>> matchWithString(String pattern, Map<String, Collection<Container.Entry>> index) {
         def p = createPattern(pattern)
         return index.findAll { String key, entries -> p.matcher(key).matches() }
+    }
+
+    @CompileStatic
+    static Map<String, Collection<Container.Entry>> matchStringWithChar(char c, Map<String, Collection<Container.Entry>> index) {
+        if ((c == '*') || (c == '?')) {
+            return Collections.emptyMap()
+        } else {
+            def p = Pattern.compile(String.valueOf(c))
+            return index.findAll { String key, entries -> p.matcher(key).find() }
+        }
+    }
+
+    @CompileStatic
+    static Map<String, Collection<Container.Entry>> matchStringWithString(String pattern, Map<String, Collection<Container.Entry>> index) {
+        def p = createPattern(pattern)
+        return index.findAll { String key, entries -> p.matcher(key).find() }
     }
 
     /**
