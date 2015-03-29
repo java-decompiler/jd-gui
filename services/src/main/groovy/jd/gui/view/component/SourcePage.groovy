@@ -81,6 +81,7 @@ abstract class SourcePage extends HyperlinkPage {
         return max
     }
 
+    @CompileStatic
     int getTextAreaLineNumber(int sourceLineNumber) {
         int textAreaLineNumber = 1
         int greatestLowerSourceLineNumber = 0
@@ -91,7 +92,7 @@ abstract class SourcePage extends HyperlinkPage {
             if (sln <= sourceLineNumber) {
                 if (greatestLowerSourceLineNumber < sln) {
                     greatestLowerSourceLineNumber = sln
-                    textAreaLineNumber = lineNumberMap[i]
+                    textAreaLineNumber = i
                 }
             }
         }

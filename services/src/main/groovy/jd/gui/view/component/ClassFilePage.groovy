@@ -252,7 +252,9 @@ class ClassFilePage
     void goToLineNumber(int lineNumber) {
         int textAreaLineNumber = getTextAreaLineNumber(lineNumber)
         if (textAreaLineNumber > 0) {
-            textArea.caretPosition = textArea.getLineStartOffset(textAreaLineNumber-1)
+            int start = textArea.getLineStartOffset(textAreaLineNumber-1)
+            int end = textArea.getLineEndOffset(textAreaLineNumber-1)
+            setCaretPositionAndCenter(new DocumentRange(start, end))
         }
     }
 

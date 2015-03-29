@@ -119,42 +119,57 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
             try {
                 Rectangle r = textArea.modelToView(start)
 
-                if (r) { // Visible
-                    if (end != start) {
-                        r = r.union(textArea.modelToView(end))
-                    }
-
-                    Rectangle visible = textArea.visibleRect
-
-                    visible.@x = r.@x - (visible.@width - r.@width) / 2 as int
-                    visible.@y = r.@y - (visible.@height - r.@height) / 2 as int
-
-                    Rectangle bounds = textArea.bounds
-                    Insets i = textArea.insets
-                    bounds.@x = i.left
-                    bounds.@y = i.top
-                    bounds.@width -= i.left + i.right
-                    bounds.@height -= i.top + i.bottom
-
-                    if (visible.@x < bounds.@x) {
-                        visible.@x = bounds.@x
-                    }
-                    if (visible.@x + visible.@width > bounds.@x + bounds.@width) {
-                        visible.@x = bounds.@x + bounds.@width - visible.@width
-                    }
-                    if (visible.@y < bounds.@y) {
-                        visible.@y = bounds.@y
-                    }
-                    if (visible.@y + visible.@height > bounds.@y + bounds.@height) {
-                        visible.@y = bounds.@y + bounds.@height - visible.@height
-                    }
-
-                    textArea.scrollRectToVisible(visible)
-                    textArea.caretPosition = start
+                if (r) {
+                    // Visible
+                    setCaretPositionAndCenter(start, end, r)
+                } else {
+                    // Not visible yet
+                    SwingUtilities.invokeLater(new Runnable() {
+                        void run() {
+                            r = textArea.modelToView(start)
+                            if (r) {
+                                setCaretPositionAndCenter(start, end, r)
+                            }
+                        }
+                    })
                 }
             } catch (BadLocationException ignore) {
             }
         }
+    }
+
+    protected void setCaretPositionAndCenter(int start, int end, Rectangle r) {
+        if (end != start) {
+            r = r.union(textArea.modelToView(end))
+        }
+
+        Rectangle visible = textArea.visibleRect
+
+        visible.@x = r.@x - (visible.@width - r.@width) / 2 as int
+        visible.@y = r.@y - (visible.@height - r.@height) / 2 as int
+
+        Rectangle bounds = textArea.bounds
+        Insets i = textArea.insets
+        bounds.@x = i.left
+        bounds.@y = i.top
+        bounds.@width -= i.left + i.right
+        bounds.@height -= i.top + i.bottom
+
+        if (visible.@x < bounds.@x) {
+            visible.@x = bounds.@x
+        }
+        if (visible.@x + visible.@width > bounds.@x + bounds.@width) {
+            visible.@x = bounds.@x + bounds.@width - visible.@width
+        }
+        if (visible.@y < bounds.@y) {
+            visible.@y = bounds.@y
+        }
+        if (visible.@y + visible.@height > bounds.@y + bounds.@height) {
+            visible.@y = bounds.@y + bounds.@height - visible.@height
+        }
+
+        textArea.scrollRectToVisible(visible)
+        textArea.caretPosition = start
     }
 
     // --- ContentCopyable --- //
