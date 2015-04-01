@@ -199,7 +199,15 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
         }
 
         def u = uri.toString()
-        def child = node.children().find { u.startsWith(it.uri.toString()) }
+        def child = node.children().find {
+            def childU = it.uri.toString()
+
+            if (u.length() > childU.length()) {
+                return u.startsWith(childU) && (u.charAt(childU.length()) == '/')
+            } else {
+                return u.equals(childU)
+            }
+        }
 
         if (child) {
             if (u.equals(child.uri.toString())) {
