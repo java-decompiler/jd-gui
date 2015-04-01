@@ -34,8 +34,10 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
     Tree tree
     TabbedPanel tabbedPanel
     List<PageChangeListener> pageChangedListeners = []
-    boolean updateTreeMenuFlag = true
-    boolean openUriFlag = true
+    // Flags to prevent the event cascades
+    boolean updateTreeMenuEnabled = true
+    boolean openUriEnabled = true
+    boolean treeNodeChangedEnabled = true
 
     TreeTabbedPanel(API api, URI uri) {
         this.api = api
@@ -79,10 +81,10 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
     }
 
     protected <T extends DefaultMutableTreeNode & UriGettable> void treeNodeChanged(T node) {
-        if (node) {
+        if (treeNodeChangedEnabled && node) {
             try {
                 // Disable tabbedPane.changeListener
-                updateTreeMenuFlag = false
+                updateTreeMenuEnabled = false
 
                 // Search base tree node
                 def uri = node.uri
@@ -102,7 +104,7 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
                 }
             } finally {
                 // Enable tabbedPane.changeListener
-                updateTreeMenuFlag = true
+                updateTreeMenuEnabled = true
             }
         }
     }
@@ -127,7 +129,7 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
             }
         }
 
-        if (openUriFlag && page instanceof UriOpenable) {
+        if (openUriEnabled && page instanceof UriOpenable) {
             api.addURI(uri)
             page.openUri(uri)
         }
@@ -138,11 +140,11 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
     void pageChanged() {
         try {
             // Disable highlight
-            openUriFlag = false
+            openUriEnabled = false
 
             def page = tabbedPanel.tabbedPane.selectedComponent
 
-            if (updateTreeMenuFlag) {
+            if (updateTreeMenuEnabled) {
                 // Synchronize tree
                 if (page) {
                     def node = page.getClientProperty('node')
@@ -159,7 +161,7 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
             }
         } finally {
             // Enable highlight
-            openUriFlag = true
+            openUriEnabled = true
         }
     }
 
@@ -170,7 +172,25 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
     boolean openUri(URI uri) {
         def baseUri = new URI(uri.scheme, uri.host, uri.path, null)
         def baseNode = searchTreeNode(baseUri, tree.model.root)
-        return baseNode && showPage(uri, baseUri, baseNode)
+
+        if (baseNode && showPage(uri, baseUri, baseNode)) {
+            def node = searchTreeNode(uri, baseNode)
+            if (node) {
+                try {
+                    // Disable tree node changed listener
+                    treeNodeChangedEnabled = false
+                    // Select tree node
+                    tree.selectionPath = node.path
+                    tree.scrollPathToVisible(tree.selectionPath)
+                } finally {
+                    // Enable tree node changed listener
+                    treeNodeChangedEnabled = true
+                }
+            }
+            return true
+        } else {
+            return false
+        }
     }
 
     protected DefaultMutableTreeNode searchTreeNode(URI uri, DefaultMutableTreeNode node) {

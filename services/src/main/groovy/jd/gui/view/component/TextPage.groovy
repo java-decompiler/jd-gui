@@ -273,7 +273,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
                 if (position.isNumber()) {
                     int pos = position.toInteger()
                     if (textArea.document.length > pos) {
-                        RSyntaxUtilities.selectAndPossiblyCenter(textArea, new DocumentRange(pos, pos), false)
+                        setCaretPositionAndCenter(new DocumentRange(pos, pos))
                         return true
                     }
                 }

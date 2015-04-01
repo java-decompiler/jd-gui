@@ -27,6 +27,8 @@ import jd.gui.service.platform.PlatformService
 
 class MainTabbedPanel extends TabbedPanel implements UriOpenable, PageChangeListener {
     List<PageChangeListener> pageChangedListeners = []
+    // Flag to prevent the event cascades
+    boolean pageChangedListenersEnabled = true
 
 	void create() {
 		Color bg = darker(background)
@@ -38,15 +40,16 @@ class MainTabbedPanel extends TabbedPanel implements UriOpenable, PageChangeList
         tabbedPane = createTabPanel()
         tabbedPane.addChangeListener(new ChangeListener() {
             void stateChanged(ChangeEvent e) {
-                def page = tabbedPane.selectedComponent?.getClientProperty('currentPage')
+                if (pageChangedListenersEnabled) {
+                    def page = tabbedPane.selectedComponent?.getClientProperty('currentPage')
 
-                if (page == null) {
-                    page = tabbedPane.selectedComponent
-                }
-
-                // Notify all container pages are closeClosure
-                for (def listener : pageChangedListeners) {
-                    listener.pageChanged(page)
+                    if (page == null) {
+                        page = tabbedPane.selectedComponent
+                    }
+                    // Fire page changed event
+                    for (def listener : pageChangedListeners) {
+                        listener.pageChanged(page)
+                    }
                 }
             }
         })
@@ -121,20 +124,31 @@ class MainTabbedPanel extends TabbedPanel implements UriOpenable, PageChangeList
 
     // --- URIOpener --- //
     boolean openUri(URI uri) {
-        def page = showPage(uri)
-        if (page) {
-            if (page instanceof UriOpenable) {
-                page.openUri(uri)
+        try {
+            // Disable page changed event
+            pageChangedListenersEnabled = false
+            // Search & display main tab
+            def page = showPage(uri)
+            if (page) {
+                if (page instanceof UriOpenable) {
+                    // Enable page changed event
+                    pageChangedListenersEnabled = true
+                    // Search & display sub tab
+                    page.openUri(uri)
+                }
+                return true
+            } else {
+                return false
             }
-            return true
-        } else {
-            return false
+        } finally {
+            // Enable page changed event
+            pageChangedListenersEnabled = true
         }
     }
 
     // --- PageChangedListener --- //
     public <T extends JComponent & UriGettable> void pageChanged(T page) {
-        // Store active page for current tabbed pane
+        // Store active page for current sub tabbed pane
         tabbedPane.selectedComponent?.putClientProperty('currentPage', page)
         // Forward event
         for (def listener : pageChangedListeners) {
