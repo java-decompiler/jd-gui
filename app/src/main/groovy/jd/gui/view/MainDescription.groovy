@@ -185,15 +185,6 @@ frame(
             menuItem(openTypeAction)
             menuItem(openTypeHierarchyAction)
             separator()
-            menuItem() {
-                action(
-                    name:'Quick Outline...',
-                    accelerator:shortcut('shift O'),
-                    enabled:false,
-                    closure:{ println("clicked on the Save menu item!") }
-                )
-            }
-            separator()
             menuItem(goToAction)
             separator()
             menuItem(backwardAction)

@@ -108,7 +108,6 @@ class ClassFilePage
             indexesChanged(api.collectionOfIndexes)
         } catch (Exception ignore) {
             setText('// INTERNAL ERROR //')
-            ignore.printStackTrace()
         }
 
         maximumLineNumber = getMaximumSourceLineNumber()
@@ -400,7 +399,7 @@ class ClassFilePage
     }
 
     // --- FocusedTypeGettable --- //
-    String getFocusedTypeName() { typeDeclarations.floorEntry(textArea.caretPosition)?.value.type }
+    String getFocusedTypeName() { typeDeclarations.floorEntry(textArea.caretPosition)?.value?.type }
 
     Container.Entry getEntry() { entry }
 

@@ -30,7 +30,7 @@ Option:
             def swing = new SwingBuilder()
             swing.lookAndFeel(configuration.lookAndFeel)
 
-            // Create main controller ans show main frame
+            // Create main controller and show main frame
             new MainController(swing, configuration).with {
 				show()
 				openFiles(args.collect { new File(it) })
