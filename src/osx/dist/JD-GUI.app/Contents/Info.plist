@@ -1,76 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>		<string>English</string>
-	<key>CFBundleExecutable</key>				<string>universalJavaApplicationStub.sh</string>
-	<key>CFBundleName</key>						<string>JD-GUI</string>
-	<key>CFBundleGetInfoString</key>			<string>JD-GUI version 1.0.0, Copyright 2008-2015 Emmanuel Dupuy</string>
-	<key>CFBundleIconFile</key>					<string>jd-gui.icns</string>
-	<key>CFBundleIdentifier</key>				<string>jd.jd-gui</string>
-	<key>CFBundleInfoDictionaryVersion</key>	<string>6.0</string>
-	<key>CFBundlePackageType</key>				<string>APPL</string>
-	<key>CFBundleLongVersionString</key>		<string>1.0.0, Copyright 2008-2015 Emmanuel Dupuy</string>
-	<key>CFBundleShortVersionString</key>		<string>1.0.0</string>
-	<key>CSResourcesFileMapped</key>			<true/>
-	<key>LSRequiresCarbon</key>					<true/>
-	<key>NSHumanReadableCopyright</key>			<string>Copyright 2008-2015 Emmanuel Dupuy</string>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>class</string>
-			</array>
-			<key>CFBundleTypeName</key>          <string>Class File</string>
-			<key>CFBundleTypeRole</key>          <string>Viewer</string>
-			<key>LSIsAppleDefaultForType</key>   <true/>
-			<key>LSTypeIsPackage</key>           <false/>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>jar</string>
-			</array>
-			<key>CFBundleTypeName</key>          <string>Jar File</string>
-			<key>CFBundleTypeRole</key>          <string>Viewer</string>
-			<key>LSIsAppleDefaultForType</key>   <true/>
-			<key>LSTypeIsPackage</key>           <false/>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>zip</string>
-			</array>
-			<key>CFBundleTypeName</key>          <string>Zip File</string>
-			<key>CFBundleTypeRole</key>          <string>Viewer</string>
-			<key>LSIsAppleDefaultForType</key>   <true/>
-			<key>LSTypeIsPackage</key>           <false/>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>log</string>
-				<string>txt</string>
-			</array>
-			<key>CFBundleTypeName</key>          <string>Log File</string>
-			<key>CFBundleTypeRole</key>          <string>Viewer</string>
-			<key>LSIsAppleDefaultForType</key>   <true/>
-			<key>LSTypeIsPackage</key>           <false/>
-		</dict>
-	</array>
-	<key>Java</key>
 	<dict>
-		<key>MainClass</key>					<string>jd.gui.App</string>
-		<key>JVMVersion</key>					<string>1.6+</string>
-		<key>ClassPath</key>					<string>$JAVAROOT/jd-gui-1.0.0.jar</string>
-		<key>WorkingDirectory</key>				<string>$JAVAROOT</string>
-		<key>Properties</key>
+		<key>CFBundleDevelopmentRegion</key>		<string>English</string>
+		<key>CFBundleExecutable</key>				<string>universalJavaApplicationStub</string>
+		<key>CFBundleName</key>						<string>JD-GUI</string>
+		<key>CFBundleGetInfoString</key>			<string>JD-GUI version 1.0.0, Copyright 2008-2015 Emmanuel Dupuy</string>
+		<key>CFBundleIconFile</key>					<string>jd-gui.icns</string>
+		<key>CFBundleIdentifier</key>				<string>jd.jd-gui</string>
+		<key>CFBundleInfoDictionaryVersion</key>	<string>6.0</string>
+		<key>CFBundlePackageType</key>				<string>APPL</string>
+		<key>CFBundleLongVersionString</key>		<string>1.0.0, Copyright 2008-2015 Emmanuel Dupuy</string>
+		<key>CFBundleShortVersionString</key>		<string>1.0.0</string>
+		<key>CSResourcesFileMapped</key>			<true/>
+		<key>LSRequiresCarbon</key>					<true/>
+		<key>NSHumanReadableCopyright</key>			<string>Copyright 2008-2015 Emmanuel Dupuy</string>
+		<key>CFBundleDocumentTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>class</string>
+				</array>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>CFBundleTypeName</key>			<string>Class File</string>
+				<key>LSIsAppleDefaultForType</key>	<true/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>jar</string>
+				</array>
+				<key>CFBundleTypeName</key>			<string>Jar File</string>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>	<true/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>zip</string>
+				</array>
+				<key>CFBundleTypeName</key>			<string>Zip File</string>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>	<true/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>log</string>
+					<string>txt</string>
+				</array>
+				<key>CFBundleTypeName</key>			<string>Log File</string>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>	<true/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+		</array>
+		<key>JavaX</key>
 		<dict>
-			<key>apple.laf.useScreenMenuBar</key>
-			<string>true</string>
+			<key>MainClass</key>					<string>jd.gui.App</string>
+			<key>JVMVersion</key>					<string>1.7+</string>
+			<key>ClassPath</key>					<string>$JAVAROOT/jd-gui-1.0.0.jar</string>
+			<key>WorkingDirectory</key>				<string>$JAVAROOT</string>
+			<key>Properties</key>
+			<dict>
+				<key>apple.laf.useScreenMenuBar</key>
+				<string>true</string>
+			</dict>
+			<key>VMOptions</key>				<string>-Xms512m</string>
 		</dict>
-		<key>JVMOptions</key>					<string>-Xms512m</string>
-	</dict>	
-</dict>
+	</dict>
 </plist>
