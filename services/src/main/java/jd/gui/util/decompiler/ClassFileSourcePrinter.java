@@ -13,22 +13,15 @@ public abstract class ClassFileSourcePrinter implements Printer
     protected static final String NEWLINE = "\n";
 
     protected int maxLineNumber = 0;
-    protected int majorVersion = 0;
-    protected int minorVersion = 0;
-
     protected int indentationCount;
     protected boolean display;
 
-    protected abstract boolean isShowLineNumbers();
     protected abstract boolean getRealignmentLineNumber();
     protected abstract boolean isShowPrefixThis();
     protected abstract boolean isUnicodeEscape();
 
     protected abstract void append(char c);
     protected abstract void append(String s);
-
-    public int getMajorVersion() { return majorVersion; }
-    public int getMinorVersion() { return minorVersion; }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 
@@ -109,11 +102,9 @@ public abstract class ClassFileSourcePrinter implements Printer
     }
 
     public void start(int maxLineNumber, int majorVersion, int minorVersion) {
-        this.majorVersion = majorVersion;
-        this.minorVersion = minorVersion;
         this.indentationCount = 0;
         this.display = true;
-        this.maxLineNumber = isShowLineNumbers() ? maxLineNumber : 0;
+        this.maxLineNumber = maxLineNumber;
     }
 
     public void end() {}

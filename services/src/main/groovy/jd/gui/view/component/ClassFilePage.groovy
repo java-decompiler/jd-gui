@@ -33,7 +33,6 @@ class ClassFilePage
     protected static final String OMIT_THIS_PREFIX = 'ClassFileViewerPreferences.omitThisPrefix'
     protected static final String REALIGN_LINE_NUMBERS = 'ClassFileViewerPreferences.realignLineNumbers'
     protected static final String DISPLAY_DEFAULT_CONSTRUCTOR = 'ClassFileViewerPreferences.displayDefaultConstructor'
-    protected static final String DISPLAY_LINE_NUMBERS = 'ClassFileViewerPreferences.displayLineNumbers'
 
     protected static final Decompiler DECOMPILER = new DecompilerImpl()
 
@@ -59,7 +58,6 @@ class ClassFilePage
             boolean canLoad(String internalTypePath) { false }
         }
         def printer = new ClassFileSourcePrinter() {
-            boolean isShowLineNumbers() { false }
             boolean getRealignmentLineNumber() { false }
             boolean isShowPrefixThis() { false }
             boolean isUnicodeEscape() { false }
@@ -92,7 +90,6 @@ class ClassFilePage
             p.setUnicodeEscape(getPreferenceValue(preferences, ESCAPE_UNICODE_CHARACTERS, false))
             p.setShowPrefixThis(! getPreferenceValue(preferences, OMIT_THIS_PREFIX, false));
             p.setShowDefaultConstructor(getPreferenceValue(preferences, DISPLAY_DEFAULT_CONSTRUCTOR, false))
-            p.setShowLineNumbers(getPreferenceValue(preferences, DISPLAY_LINE_NUMBERS, true))
             p.setRealignmentLineNumber(getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, false))
 
             setShowMisalignment(p.realignmentLineNumber)
@@ -416,7 +413,6 @@ class ClassFilePage
     @CompileStatic
     class Printer extends ClassFileSourcePrinter {
         protected StringBuffer stringBuffer
-        protected boolean showLineNumbers
         protected boolean realignmentLineNumber
         protected boolean showPrefixThis
         protected boolean unicodeEscape
@@ -424,14 +420,12 @@ class ClassFilePage
 
         Printer(GuiPreferences preferences) {
             this.stringBuffer = new StringBuffer(10*1024)
-            this.showLineNumbers = preferences.isShowLineNumbers()
             this.realignmentLineNumber = preferences.getRealignmentLineNumber()
             this.showPrefixThis = preferences.isShowPrefixThis()
             this.unicodeEscape = preferences.isUnicodeEscape()
             this.referencesCache = new HashMap<>()
         }
 
-        boolean isShowLineNumbers() { showLineNumbers }
         boolean getRealignmentLineNumber() { realignmentLineNumber }
         boolean isShowPrefixThis() { showPrefixThis }
         boolean isUnicodeEscape() { unicodeEscape }
