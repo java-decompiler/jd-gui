@@ -134,7 +134,7 @@ class MainTabbedPanel extends TabbedPanel implements UriOpenable, PageChangeList
                     // Enable page changed event
                     pageChangedListenersEnabled = true
                     // Search & display sub tab
-                    page.openUri(uri)
+                    return page.openUri(uri)
                 }
                 return true
             } else {

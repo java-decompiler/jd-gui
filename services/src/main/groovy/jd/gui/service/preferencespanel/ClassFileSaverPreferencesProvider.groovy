@@ -35,7 +35,7 @@ class ClassFileSaverPreferencesProvider extends JPanel implements PreferencesPan
         omitThisPrefixCheckBox = new JCheckBox("Omit the prefix 'this' if possible")
         realignLineNumbersCheckBox = new JCheckBox('Realign line numbers')
         writeDefaultConstructorCheckBox = new JCheckBox('Write default constructor')
-        writeLineNumbersCheckBox = new JCheckBox('Write line numbers')
+        writeLineNumbersCheckBox = new JCheckBox('Write original line numbers')
         writeMetadataCheckBox = new JCheckBox('Write metadata')
 
         add(escapeUnicodeCharactersCheckBox)
