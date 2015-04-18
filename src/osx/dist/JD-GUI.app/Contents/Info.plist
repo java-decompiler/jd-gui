@@ -61,7 +61,7 @@
 		</array>
 		<key>JavaX</key>
 		<dict>
-			<key>MainClass</key>					<string>jd.gui.App</string>
+			<key>MainClass</key>					<string>jd.gui.OsxApp</string>
 			<key>JVMVersion</key>					<string>1.7+</string>
 			<key>ClassPath</key>					<string>$JAVAROOT/jd-gui-1.0.0.jar</string>
 			<key>WorkingDirectory</key>				<string>$JAVAROOT</string>

@@ -13,6 +13,7 @@ import javax.swing.JOptionPane
 import jd.gui.controller.MainController
 
 class App {
+    static MainController controller
 
 	static void main(String[] args) {
 		if (args.contains("-h")) {
@@ -31,10 +32,9 @@ Option:
             swing.lookAndFeel(configuration.lookAndFeel)
 
             // Create main controller and show main frame
-            new MainController(swing, configuration).with {
-				show()
-				openFiles(args.collect { new File(it) })
-			}
+            controller = new MainController(swing, configuration)
+            controller.show()
+            controller.openFiles(args.collect { new File(it) })
 		}
 	}
 }

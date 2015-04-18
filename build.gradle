@@ -20,6 +20,11 @@ allprojects {
 	repositories {
 		mavenCentral()
 	}
+	
+	configurations {
+		provided
+		compile.extendsFrom provided
+	}
 }
 
 // 'cleanIdea' task extension //
@@ -35,17 +40,17 @@ subprojects.each { subproject ->
 }
 
 jar {
-  dependsOn subprojects.tasks['classes']
-  manifest {
-    attributes 'Main-Class': 'jd.gui.App', 'SplashScreen-Image': 'images/Icon_java_128.png'
-  }
-  def deps = []
-  subprojects.each { subproject ->
-    from subproject.sourceSets.main.output.classesDir
-    from subproject.sourceSets.main.output.resourcesDir
-	deps += subproject.configurations.compile
-  }
-  from { deps.unique().collect { it.isDirectory() ? it : zipTree(it) } }
+	dependsOn subprojects.tasks['classes']
+	manifest {
+		attributes 'Main-Class': 'jd.gui.App', 'SplashScreen-Image': 'images/Icon_java_128.png'
+	}
+	def deps = []
+	subprojects.each { subproject ->
+		from subproject.sourceSets.main.output.classesDir
+		from subproject.sourceSets.main.output.resourcesDir
+		deps += subproject.configurations.runtime - subproject.configurations.provided
+	}
+	from { deps.unique().collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 // Distribution for OSX //
