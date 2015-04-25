@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>${JAR_FILE}</jar>
+  <outfile>jd-gui.exe</outfile>
+  <errTitle>JD-GUI Windows Wrapper</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <customProcName>false</customProcName>
+  <stayAlive>false</stayAlive>
+  <manifest></manifest>
+  <icon>${ICON}</icon>
+  <versionInfo>
+    <fileVersion>${VERSION}.0</fileVersion>
+    <txtFileVersion>${VERSION}</txtFileVersion>
+    <fileDescription>JD-GUI</fileDescription>
+    <copyright>JD-GUI (C) 2008-2015 Emmanuel Dupuy</copyright>
+    <productVersion>${VERSION}.0</productVersion>
+    <txtProductVersion>${VERSION}</txtProductVersion>
+    <productName>JD-GUI</productName>
+    <internalName>jd-gui</internalName>
+    <originalFilename>jd-gui.exe</originalFilename>
+  </versionInfo>
+  <jre>
+    <minVersion>1.7.0</minVersion>
+  </jre>
+</launch4jConfig>

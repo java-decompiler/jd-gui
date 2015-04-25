@@ -22,10 +22,17 @@ generate _"build/libs/jd-gui-x.y.z.jar"_
 > gradle build installOsxDist
 ```
 generate _"build/install/jd-gui-osx/JD-GUI.app"_
+```
+> iexplore http://sourceforge.net/projects/launch4j/files/launch4j-3/3.7/launch4j-3.7-win32.zip/download
+> unzip launch4j-3.7-win32.zip
+> gradle -DLAUNCH4J_HOME=.../path/to/launch4j-3.7-win32 launch4j installWindowsDist
+```
+generate _"build/install/jd-gui-windows/jd-gui.exe"_
 
 ##How to launch JD-GUI ?
 - Double-click on _"jd-gui-x.y.z.jar"_
-- Double-click on _"JD-GUI"_ application under OSX
+- Double-click on _"JD-GUI"_ application from Mac OSX
+- Double-click on _"jd-gui.exe"_ application from Windows
 - Execute _"java -jar jd-gui-x.y.z.jar"_ or _"java -classpath jd-gui-x.y.z.jar jd.gui.App"_
 
 ##How to use JD-GUI ?
@@ -47,6 +54,7 @@ generate Eclipse project
 ```
 launch JD-GUI with your extensions
 
-##Uninstallation
-- Delete "jd-gui-x.y.z.jar" and "jd-gui.cfg".
-- Drag and drop "JD-GUI" application into the trash.
+##How to uninstall JD-GUI ?
+- Java: Delete "jd-gui-x.y.z.jar" and "jd-gui.cfg".
+- Mac OSX: Drag and drop "JD-GUI" application into the trash.
+- Windows: Delete "jd-gui.exe" and "jd-gui.cfg".

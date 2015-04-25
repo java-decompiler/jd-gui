@@ -7,6 +7,10 @@ Gradle - Apache License 2.0
 JD-Core Java Release - GPLv3
 RSyntaxTextArea - Modified BSD license
 
-JD-GUI OSX distribution:
+JD-GUI Mac OSX distribution:
 
 universalJavaApplicationStub - MIT License
+
+JD-GUI Windows distribution:
+
+Launch4j - MIT License

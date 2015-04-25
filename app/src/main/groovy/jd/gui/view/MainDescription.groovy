@@ -154,7 +154,7 @@ actions {
 frame(
         id:'mainFrame',
         title:'Java Decompiler',
-        iconImage:Toolkit.defaultToolkit.getImage(getClass().classLoader.getResource('images/Icon_java_128.png')),
+        iconImage:Toolkit.defaultToolkit.getImage(getClass().classLoader.getResource('images/jd_icon_128.png')),
         minimumSize:[Constants.MINIMAL_WIDTH, Constants.MINIMAL_HEIGHT],
         defaultCloseOperation:WindowConstants.EXIT_ON_CLOSE) {
     menuBar {
@@ -248,7 +248,7 @@ dialog(
                     border:lineBorder(color:Color.BLACK),
                     background:Color.WHITE) {
                 borderLayout()
-                label(icon:imageIcon(resource:'/images/Icon_java_64.png'), border:emptyBorder(15), constraints:BorderLayout.WEST)
+                label(icon:imageIcon(resource:'/images/jd_icon_64.png'), border:emptyBorder(15), constraints:BorderLayout.WEST)
                 vbox(border:emptyBorder([15,0,15,15]), constraints:BorderLayout.EAST) {
                     hbox {
                         label(text: 'Java Decompiler', font:UIManager.getFont('Label.font').deriveFont(Font.BOLD, 14))

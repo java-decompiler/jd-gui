@@ -29,7 +29,7 @@ allprojects {
 
 // 'cleanIdea' task extension //
 task fullCleanIdea {
-	new File(project.name + '.iws').delete()
+	file(project.name + '.iws').delete()
 	ant.delete(dir: 'out')
 }
 fullCleanIdea.mustRunAfter cleanIdea
@@ -42,7 +42,7 @@ subprojects.each { subproject ->
 jar {
 	dependsOn subprojects.tasks['classes']
 	manifest {
-		attributes 'Main-Class': 'jd.gui.App', 'SplashScreen-Image': 'images/Icon_java_128.png'
+		attributes 'Main-Class': 'jd.gui.App', 'SplashScreen-Image': 'images/jd_icon_128.png'
 	}
 	def deps = []
 	subprojects.each { subproject ->
@@ -53,13 +53,42 @@ jar {
 	from { deps.unique().collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
+// Windows wrapper configuration to generate "jd-gui.exe" //
+task launch4jConfig(type: Copy) {
+    from 'src/launch4j/resources/config/launch4j.xml'
+    into 'build/launch4j'
+    expand(
+		JAR_FILE: project.jar.archivePath,
+		VERSION: project.version,
+		ICON: file('src/launch4j/resources/images/jd-gui.ico')
+	)
+}
+
+task launch4j(type: Exec, dependsOn: [':jar', ':launch4jConfig']) {
+	def launch4jCfg = file('build/launch4j/launch4j.xml')
+	def launch4jExe = System.properties['LAUNCH4J_HOME'] + '/launch4j.exe'
+	commandLine 'cmd', '/c', launch4jExe, launch4jCfg
+	doFirst {
+		if (new File(launch4jExe).exists() == false) {
+			errorOutput.println "ERROR: 'LAUNCH4J_HOME' not defined or invalid. Launch4j (http://launch4j.sourceforge.net) is required to generare 'jd-gui.exe'."
+		}
+	}
+}
+
 // Distribution for OSX //
 distributions {
 	osx {
 		contents {
 			into('JD-GUI.app/Contents/Resources/Java') {
-				from { fileTree('build/libs') { include 'jd-gui-*.jar' } }
+				from jar.archivePath
 			}
+			from 'LICENSE', 'NOTICE', 'README.md'
+		}
+	}
+	windows {
+		contents {
+			from 'build/launch4j/jd-gui.exe'
+			from 'LICENSE', 'NOTICE', 'README.md'
 		}
 	}
 }
