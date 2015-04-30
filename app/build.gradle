@@ -6,4 +6,5 @@ dependencies {
     compile 'org.codehaus.groovy:groovy-xml:2.4.0'
     provided 'com.yuvimasory:orange-extensions:1.3.0'
     compile project(':api')
+    runtime project(':services')
 }
