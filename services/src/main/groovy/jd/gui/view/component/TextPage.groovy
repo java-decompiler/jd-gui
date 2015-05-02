@@ -34,8 +34,9 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
     protected static final ImageIcon collapsedIcon = new ImageIcon(TextPage.class.classLoader.getResource('images/plus.png'))
     protected static final ImageIcon expandedIcon = new ImageIcon(TextPage.class.classLoader.getResource('images/minus.png'))
 
-    protected static final Color doubleClickHighlightColor = Color.GREEN
-    protected static final Color searchHighlightColor = Color.YELLOW
+    protected static final Color doubleClickHighlightColor = new Color(0x66ff66)
+    protected static final Color searchHighlightColor = new Color(0xffff66)
+    protected static final Color selectHighlightColor = new Color(0xF49810)
 
     protected RSyntaxTextArea textArea
     protected RTextScrollPane scrollPane
@@ -86,7 +87,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
         gutter.foldIndicatorForeground = gutter.borderColor
 
         add(scrollPane, BorderLayout.CENTER)
-        //add(new ErrorStrip(rTextArea), BorderLayout.LINE_END)
+        add(new ErrorStrip(textArea), BorderLayout.LINE_END)
     }
 
     protected RSyntaxTextArea newRSyntaxTextArea() { new RSyntaxTextArea() }
@@ -281,7 +282,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
                 def highlightFlags = parameters.get('highlightFlags')
 
                 if ((highlightFlags.indexOf('s') != -1) && parameters.containsKey('highlightPattern')) {
-                    textArea.markAllHighlightColor = searchHighlightColor
+                    textArea.markAllHighlightColor = selectHighlightColor
                     textArea.caretPosition = 0
 
                     // Highlight all
