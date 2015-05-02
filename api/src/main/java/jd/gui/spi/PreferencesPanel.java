@@ -15,6 +15,8 @@ public interface PreferencesPanel {
 
     public void init(Color errorBackgroundColor);
 
+    public boolean isActivated();
+
     public void loadPreferences(Map<String, String> preferences);
 
     public void savePreferences(Map<String, String> preferences);

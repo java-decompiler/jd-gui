@@ -9,5 +9,5 @@ import jd.gui.spi.PreferencesPanel
 
 @Singleton(lazy = true)
 class PreferencesPanelService {
-    final List<PreferencesPanel> providers = ServiceLoader.load(PreferencesPanel).toList()
+    final List<PreferencesPanel> providers = ServiceLoader.load(PreferencesPanel).toList().grep { it.isActivated() }
 }

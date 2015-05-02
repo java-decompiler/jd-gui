@@ -286,7 +286,10 @@ class MainController implements API {
     }
 
     void onPreferences() {
-        preferencesController.show({ checkPreferencesChange(currentPage) })
+        preferencesController.show({
+            checkPreferencesChange(currentPage)
+            mainView.preferencesChanged(preferences)
+        })
     }
 	
     void onCurrentPageChanged(JComponent page) {

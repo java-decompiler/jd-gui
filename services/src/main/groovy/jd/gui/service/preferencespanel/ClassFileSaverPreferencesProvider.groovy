@@ -52,6 +52,8 @@ class ClassFileSaverPreferencesProvider extends JPanel implements PreferencesPan
 
     public void init(Color errorBackgroundColor) {}
 
+    public boolean isActivated() { true }
+
     void loadPreferences(Map<String, String> preferences) {
         escapeUnicodeCharactersCheckBox.selected = 'true'.equals(preferences.get(ESCAPE_UNICODE_CHARACTERS))
         omitThisPrefixCheckBox.selected = 'true'.equals(preferences.get(OMIT_THIS_PREFIX))

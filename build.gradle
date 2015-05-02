@@ -40,17 +40,45 @@ subprojects.each { subproject ->
 }
 
 jar {
-	dependsOn subprojects.tasks['classes']
-	manifest {
-		attributes 'Main-Class': 'jd.gui.App', 'SplashScreen-Image': 'images/jd_icon_128.png'
-	}
+	dependsOn subprojects.tasks['jar']
+
 	def deps = []
 	subprojects.each { subproject ->
 		from subproject.sourceSets.main.output.classesDir
 		from subproject.sourceSets.main.output.resourcesDir
 		deps += subproject.configurations.runtime - subproject.configurations.provided
 	}
-	from { deps.unique().collect { it.isDirectory() ? it : zipTree(it) } }
+	subprojects.each { subproject ->
+		deps -= subproject.jar.archivePath
+	}
+	deps = deps.unique().collect { it.isDirectory() ? it : zipTree(it) }
+	
+	manifest { 
+		attributes 'Main-Class': 'jd.gui.App', 'SplashScreen-Image': 'images/jd_icon_128.png'
+	}
+	from deps
+	exclude 'META-INF/services/jd.gui.spi.*'
+	duplicatesStrategy DuplicatesStrategy.EXCLUDE
+	doFirst {
+		// Create temporary directory
+		def tmpSpiDir = file('build/tmp/spi')
+		tmpSpiDir.deleteDir()
+		tmpSpiDir.mkdirs()		
+		// Copy and merge SPI config files
+		subprojects.each { subproject ->
+			def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + File.separator + 'META-INF' + File.separator + 'services')	
+			if (servicesDir.exists()) {
+				servicesDir.eachFile { source ->
+					def target = file(tmpSpiDir.path + File.separator + source.name)
+					target << source.text
+				}
+			}
+		}
+		// Add to JAR file
+		into('META-INF/services') {
+			from tmpSpiDir
+		}
+	}
 }
 
 // Windows wrapper configuration to generate "jd-gui.exe" //
@@ -75,7 +103,7 @@ task launch4j(type: Exec, dependsOn: [':jar', ':launch4jConfig']) {
 	}
 }
 
-// Distribution for OSX //
+// Distributions for OSX and Windows //
 distributions {
 	osx {
 		contents {

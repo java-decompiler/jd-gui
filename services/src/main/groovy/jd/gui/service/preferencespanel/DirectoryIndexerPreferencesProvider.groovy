@@ -44,6 +44,8 @@ class DirectoryIndexerPreferencesProvider extends JPanel implements PreferencesP
         this.errorBackgroundColor = errorBackgroundColor
     }
 
+    public boolean isActivated() { true }
+
     void loadPreferences(Map<String, String> preferences) {
         maximumDepthTextField.text = preferences.get(MAXIMUM_DEPTH_KEY) ?: '15'
         maximumDepthTextField.setCaretPosition(maximumDepthTextField.text.size())

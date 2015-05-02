@@ -15,6 +15,7 @@ import jd.gui.api.feature.PageClosable
 import jd.gui.api.feature.FocusedTypeGettable
 import jd.gui.api.feature.ContentSavable
 import jd.gui.api.feature.ContentCopyable
+import jd.gui.api.feature.PreferencesChangeListener
 import jd.gui.api.feature.SourcesSavable
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.feature.UriOpenable
@@ -41,7 +42,7 @@ import jd.gui.view.component.panel.MainTabbedPanel
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 
-class MainView implements UriOpenable {
+class MainView implements UriOpenable, PreferencesChangeListener {
     SwingBuilder swing
     History history
     Closure openFilesClosure
@@ -127,6 +128,7 @@ class MainView implements UriOpenable {
                     }
                 }
             })
+            mainTabbedPanel.preferencesChanged(configuration.preferences)
             findComboBox.editor.editorComponent.addKeyListener(new KeyAdapter() {
                 String lastStr = ''
 
@@ -317,5 +319,10 @@ class MainView implements UriOpenable {
             success = swing.mainTabbedPanel.openUri(uri)
         }
         return success
+    }
+
+    // --- PreferencesChangeListener --- //
+    void preferencesChanged(Map<String, String> preferences) {
+        swing.mainTabbedPanel.preferencesChanged(preferences)
     }
 }

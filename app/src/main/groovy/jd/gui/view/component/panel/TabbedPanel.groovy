@@ -5,6 +5,7 @@
 
 package jd.gui.view.component.panel
 
+import jd.gui.api.feature.PreferencesChangeListener
 import jd.gui.api.feature.UriGettable
 import jd.gui.service.platform.PlatformService
 
@@ -29,11 +30,14 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 
-class TabbedPanel extends JPanel {
+class TabbedPanel extends JPanel implements PreferencesChangeListener {
 	static final ImageIcon closeIcon = new ImageIcon(TabbedPanel.class.classLoader.getResource('images/close.gif'))
 	static final ImageIcon  closeActivateIcon = new ImageIcon(TabbedPanel.class.classLoader.getResource('images/close_active.gif'))
 
+    static final String TAB_LAYOUT = 'UITabsPreferencesProvider.singleLineTabs'
+
 	JTabbedPane tabbedPane
+    Map<String, String> preferences
 
     TabbedPanel() {
 		create()
@@ -84,6 +88,11 @@ class TabbedPanel extends JPanel {
 	}
 
     public <T extends JComponent & UriGettable> void addPage(String title, Icon icon, String tip, T page) {
+        // Update preferences
+        if (page instanceof PreferencesChangeListener) {
+            page.preferencesChanged(preferences)
+        }
+        // Add a new tab
         JLabel tabCloseButton = new JLabel(closeIcon)
         tabCloseButton.toolTipText = 'Close this panel'
         tabCloseButton.addMouseListener(new MouseListener() {
@@ -110,8 +119,10 @@ class TabbedPanel extends JPanel {
 		int index = tabbedPane.getTabCount()
 		tabbedPane.addTab(title, page)
         tabbedPane.setTabComponentAt(index, tab)
-		tabbedPane.selectedIndex = index
-		
+        // Ensure new page is visible (bug with SCROLL_TAB_LAYOUT)
+        tabbedPane.selectedIndex = 0
+        tabbedPane.selectedIndex = index
+
 		getLayout().show(this, 'tabs')
 	}
 
@@ -178,6 +189,24 @@ class TabbedPanel extends JPanel {
         tabbedPane.removeAll()
         if (tabbedPane.tabCount == 0) {
             getLayout().show(this, 'panel')
+        }
+    }
+
+    // --- PreferencesChangeListener --- //
+    void preferencesChanged(Map<String, String> preferences) {
+        // Store preferences
+        this.preferences = preferences
+        // Update layout
+        if ('true'.equals(preferences.get(TAB_LAYOUT))) {
+            tabbedPane.tabLayoutPolicy = JTabbedPane.SCROLL_TAB_LAYOUT
+        } else {
+            tabbedPane.tabLayoutPolicy = JTabbedPane.WRAP_TAB_LAYOUT
+        }
+        // Ensure selected sub-page is visible (bug with SCROLL_TAB_LAYOUT)
+        int index = tabbedPane.selectedIndex
+        if (index != -1) {
+            tabbedPane.selectedIndex = 0
+            tabbedPane.selectedIndex = index
         }
     }
 }

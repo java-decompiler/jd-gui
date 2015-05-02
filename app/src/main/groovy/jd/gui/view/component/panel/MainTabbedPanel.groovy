@@ -7,6 +7,7 @@ package jd.gui.view.component.panel
 
 import jd.gui.api.feature.PageChangeListener
 import jd.gui.api.feature.PageChangeable
+import jd.gui.api.feature.PreferencesChangeListener
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.feature.UriOpenable
 
@@ -41,14 +42,22 @@ class MainTabbedPanel extends TabbedPanel implements UriOpenable, PageChangeList
         tabbedPane.addChangeListener(new ChangeListener() {
             void stateChanged(ChangeEvent e) {
                 if (pageChangedListenersEnabled) {
-                    def page = tabbedPane.selectedComponent?.getClientProperty('currentPage')
+                    def subPage = tabbedPane.selectedComponent
 
-                    if (page == null) {
-                        page = tabbedPane.selectedComponent
-                    }
-                    // Fire page changed event
-                    for (def listener : pageChangedListeners) {
-                        listener.pageChanged(page)
+                    if (subPage) {
+                        def page = subPage.getClientProperty('currentPage')
+
+                        if (page == null) {
+                            page = tabbedPane.selectedComponent
+                        }
+                        // Fire page changed event
+                        for (def listener : pageChangedListeners) {
+                            listener.pageChanged(page)
+                        }
+                        // Update current sub-page preferences
+                        if (subPage instanceof PreferencesChangeListener) {
+                            subPage.preferencesChanged(preferences)
+                        }
                     }
                 }
             }
@@ -153,6 +162,17 @@ class MainTabbedPanel extends TabbedPanel implements UriOpenable, PageChangeList
         // Forward event
         for (def listener : pageChangedListeners) {
             listener.pageChanged(page)
+        }
+    }
+
+    // --- PreferencesChangeListener --- //
+    void preferencesChanged(Map<String, String> preferences) {
+        super.preferencesChanged(preferences)
+
+        // Update current sub-page preferences
+        def subPage = tabbedPane.selectedComponent
+        if (subPage instanceof PreferencesChangeListener) {
+            subPage.preferencesChanged(preferences)
         }
     }
 }

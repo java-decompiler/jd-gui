@@ -9,6 +9,7 @@ import jd.gui.api.API
 import jd.gui.api.feature.PageChangeListener
 import jd.gui.api.feature.PageChangeable
 import jd.gui.api.feature.PageClosable
+import jd.gui.api.feature.PreferencesChangeListener
 import jd.gui.api.feature.TreeNodeExpandable
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.TreeNodeData
@@ -28,7 +29,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.*
 import java.util.List
 
-class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageChangeable, PageClosable {
+class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageChangeable, PageClosable, PreferencesChangeListener {
     API api
     URI uri
     Tree tree
@@ -241,5 +242,10 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
         } else {
             return false
         }
+    }
+
+    // --- PreferencesChangeListener --- //
+    void preferencesChanged(Map<String, String> preferences) {
+        tabbedPanel.preferencesChanged(preferences)
     }
 }
