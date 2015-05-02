@@ -8,13 +8,34 @@ package jd.gui.service.configuration
 import groovy.xml.MarkupBuilder
 import jd.gui.Constants
 import jd.gui.model.configuration.Configuration
+import jd.gui.service.platform.PlatformService
 
 import java.awt.*
 
 class ConfigurationXmlPersisterProvider implements ConfigurationPersister {
     static final String ERROR_BACKGROUND_COLOR = 'JdGuiPreferences.errorBackgroundColor'
 
-    static final File FILE = new File(Constants.CONFIG_FILENAME)
+    static final File FILE = getConfigFile()
+
+    static File getConfigFile() {
+        if (PlatformService.instance.isLinux) {
+            // See: http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+            def xdgConfigHome = System.getenv('XDG_CONFIG_HOME')
+            if (xdgConfigHome) {
+                def xdgConfigHomeFile = new File(xdgConfigHome)
+                if (xdgConfigHomeFile.exists()) {
+                    return new File(xdgConfigHomeFile, Constants.CONFIG_FILENAME)
+                }
+            }
+
+            def userConfigFile = new File(System.getProperty('user.home'), '.config')
+            if (userConfigFile.exists()) {
+                return new File(userConfigFile, Constants.CONFIG_FILENAME)
+            }
+        }
+
+        return new File(Constants.CONFIG_FILENAME)
+    }
 
 	Configuration load() {
         // Default values
