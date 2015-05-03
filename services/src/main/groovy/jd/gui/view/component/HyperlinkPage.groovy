@@ -25,9 +25,10 @@ abstract class HyperlinkPage extends TextPage {
         def listener = new MouseAdapter() {
             int lastX = -1
             int lastY = -1
+            int lastModifiers = -1
 
             void mouseClicked(MouseEvent e) {
-                if (e.clickCount > 0) {
+                if ((e.clickCount == 1) && ((e.modifiers & (Event.ALT_MASK|Event.META_MASK|Event.SHIFT_MASK)) == 0)) {
                     int offset = textArea.viewToModel(new Point(e.x, e.y))
                     if (offset != -1) {
                         def entry = hyperlinks.floorEntry(offset)
@@ -42,18 +43,21 @@ abstract class HyperlinkPage extends TextPage {
             }
 
             void mouseMoved(MouseEvent e) {
-                if ((e.x != lastX) || (e.y != lastY)) {
+                if ((e.x != lastX) || (e.y != lastY) || (lastModifiers != e.modifiers)) {
                     lastX = e.x
                     lastY = e.y
+                    lastModifiers = e.modifiers
 
-                    int offset = textArea.viewToModel(new Point(e.x, e.y))
-                    if (offset != -1) {
-                        def entry = hyperlinks.floorEntry(offset)
-                        if (entry) {
-                            def entryData = entry.value
-                            if (entryData && (offset < entryData.endPosition) && (offset >= entryData.startPosition) && isHyperlinkEnabled(entryData)) {
-                                textArea.cursor = handCursor
-                                return
+                    if ((e.modifiers & (Event.ALT_MASK|Event.META_MASK|Event.SHIFT_MASK)) == 0) {
+                        int offset = textArea.viewToModel(new Point(e.x, e.y))
+                        if (offset != -1) {
+                            def entry = hyperlinks.floorEntry(offset)
+                            if (entry) {
+                                def entryData = entry.value
+                                if (entryData && (offset < entryData.endPosition) && (offset >= entryData.startPosition) && isHyperlinkEnabled(entryData)) {
+                                    textArea.cursor = handCursor
+                                    return
+                                }
                             }
                         }
                     }
