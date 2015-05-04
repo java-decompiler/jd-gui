@@ -13,6 +13,7 @@ class IconButton extends JButton {
 	
 	IconButton() {
 		focusPainted = false
+		borderPainted = false
 		margin = new Insets(0, 0, 0, 0)
 	}
 }

@@ -162,7 +162,7 @@ class MainView implements UriOpenable, PreferencesChangeListener {
             })
             findComboBox.editor.editorComponent.opaque = true
 
-            this.findBackgroundColor = findComboBox.editor.editorComponent.background
+            this.findBackgroundColor = findComboBox.background = findComboBox.editor.editorComponent.background
             this.findErrorBackgroundColor = Color.decode(configuration.preferences.get('JdGuiPreferences.errorBackgroundColor'))
         }
         swing.doLater {

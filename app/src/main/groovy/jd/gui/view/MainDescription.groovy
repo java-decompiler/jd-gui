@@ -5,6 +5,7 @@
 
 package jd.gui.view
 
+import javax.swing.BorderFactory
 import javax.swing.UIManager
 import java.awt.BorderLayout
 import java.awt.Color
@@ -220,9 +221,9 @@ frame(
             comboBox(id:'findComboBox', editable: true)
             hstrut(5)
             toolBar(floatable:false, rollover:true) {
-                iconButton(action:findNextAction, icon:imageIcon(resource: '/images/next_nav.png'))
+                iconButton(id:'findNextButton', action:findNextAction, icon:imageIcon(resource: '/images/next_nav.png'))
                 hstrut(5)
-                iconButton(action:findPreviousAction, icon:imageIcon(resource: '/images/prev_nav.png'))
+                iconButton(id:'findPreviousButton', action:findPreviousAction, icon:imageIcon(resource: '/images/prev_nav.png'))
             }
             checkBox(id:'findCaseSensitive', action:findCaseSensitiveAction, text:'Case sensitive')
             hglue()
@@ -230,7 +231,12 @@ frame(
             def closeIcon = imageIcon(resource:'/images/close.gif')
             def closeActivateIcon = imageIcon(resource:'/images/close_active.gif')
 
-            iconButton(action:findCloseAction, contentAreaFilled:false, icon:closeIcon, rolloverIcon:closeActivateIcon)
+            iconButton(id:'findCloseButton', action:findCloseAction, contentAreaFilled:false, icon:closeIcon, rolloverIcon:closeActivateIcon)
+        }
+
+        if (PlatformService.instance.isMac) {
+            findPanel.border = BorderFactory.createEmptyBorder(0, 10, 10, 10)
+            findNextButton.border = findPreviousButton.border = findCloseButton.border = BorderFactory.createEmptyBorder()
         }
     }
 }
