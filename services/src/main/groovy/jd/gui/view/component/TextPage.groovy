@@ -13,7 +13,6 @@ import jd.gui.api.feature.LineNumberNavigable
 import jd.gui.api.feature.UriOpenable
 import org.fife.ui.rsyntaxtextarea.DocumentRange
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
-import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rsyntaxtextarea.Theme
 import org.fife.ui.rsyntaxtextarea.folding.FoldManager
@@ -56,13 +55,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
             void mouseClicked(MouseEvent e) {
                 if (e.clickCount == 2) {
                     textArea.markAllHighlightColor = doubleClickHighlightColor
-
-                    int selectionStart = textArea.selectionStart
-                    int selectionEnd = textArea.selectionEnd
-
-                    SearchEngine.find(textArea, newSearchContext(textArea.selectedText, true, true, true, false))
-
-                    textArea.select(selectionStart, selectionEnd)
+                    SearchEngine.markAll(textArea, newSearchContext(textArea.selectedText, true, true, true, false))
                 }
             }
         })
