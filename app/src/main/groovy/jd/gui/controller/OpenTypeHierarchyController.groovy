@@ -44,7 +44,7 @@ class OpenTypeHierarchyController implements IndexesChangeListener {
         openTypeHierarchyView.swing.mainFrame.rootPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR))
         for (def indexes : collectionOfIndexes) { indexes.waitIndexers() }
         openTypeHierarchyView.swing.mainFrame.rootPane.setCursor(Cursor.getDefaultCursor())
-
+        // Prepare view
         openTypeHierarchyView.updateTree(entry, typeName)
         // Show
         openTypeHierarchyView.show()

@@ -38,8 +38,6 @@ class OpenTypeHierarchyView {
     Closure onTypeSelectedClosure
     Closure getSubTypeNamesClosure
     Closure getEntriesClosure
-    Container.Entry entry
-    String typeName
 
     OpenTypeHierarchyView(
             SwingBuilder swing, Configuration configuration, API api,
@@ -114,9 +112,6 @@ class OpenTypeHierarchyView {
 
     void updateTree(Container.Entry entry, String typeName) {
         swing.doLater {
-            // Store current entry and type name
-            this.entry = entry
-            this.typeName = typeName
             // Clear tree
             JTree tree = swing.openTypeHierarchyTree
             def model = tree.model
@@ -160,6 +155,9 @@ class OpenTypeHierarchyView {
 
     TreeNode createTreeNode(Container.Entry entry, String typeName) {
         def type = api.getTypeFactory(entry).make(api, entry, typeName)
+
+        typeName = type.name
+
         def entries = getEntriesClosure(typeName)
         def treeNode = new TreeNode(entry, typeName, entries, new TreeNodeBean(type))
         def childTypeNames = getSubTypeNamesClosure(typeName)
