@@ -14,7 +14,9 @@ import jd.gui.spi.Indexer
 import java.util.regex.Pattern
 
 class TextFileIndexerProvider implements Indexer {
-    String[] getTypes() { ['*:file:*.txt', '*:file:*.html', '*:file:*.js', '*:file:*.jsp', '*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.properties'] }
+    String[] getTypes() { [
+        '*:file:*.txt', '*:file:*.html', '*:file:*.js', '*:file:*.jsp', '*:file:*.xml',
+        '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.properties', '*:file:*.sql'] }
 
     Pattern getPathPattern() { null }
 

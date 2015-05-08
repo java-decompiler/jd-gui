@@ -12,6 +12,7 @@ jd.gui.service.treenode.MetainfDirectoryTreeNodeFactoryProvider
 jd.gui.service.treenode.MetainfServiceFileTreeNodeFactoryProvider
 jd.gui.service.treenode.PackageTreeNodeFactoryProvider
 jd.gui.service.treenode.PropertiesFileTreeNodeFactoryProvider
+jd.gui.service.treenode.SqlFileTreeNodeFactoryProvider
 jd.gui.service.treenode.TextFileTreeNodeFactoryProvider
 jd.gui.service.treenode.XmlFileTreeNodeFactoryProvider
 jd.gui.service.treenode.ZipFileTreeNodeFactoryProvider
