@@ -13,7 +13,7 @@ import jd.gui.spi.*;
 import javax.swing.*;
 import java.io.File;
 import java.net.URI;
-import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public interface API {
 
     public FileLoader getFileLoader(File file);
 
-    public ContainerFactory getContainerFactory(FileSystem fileSystem);
+    public ContainerFactory getContainerFactory(Path rootPath);
 
     public PanelFactory getMainPanelFactory(Container container);
 

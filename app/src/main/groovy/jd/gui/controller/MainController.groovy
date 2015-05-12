@@ -62,11 +62,10 @@ import java.awt.WaitDispatchSupport
 import java.awt.datatransfer.DataFlavor
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.nio.file.Path
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-import java.nio.file.FileSystem
 
 class MainController implements API {
     SwingBuilder swing
@@ -510,7 +509,7 @@ class MainController implements API {
     PanelFactory getMainPanelFactory(Container container) { PanelFactoryService.instance.get(container) }
 
     @CompileStatic
-    ContainerFactory getContainerFactory(FileSystem fileSystem) { ContainerFactoryService.instance.get(this, fileSystem) }
+    ContainerFactory getContainerFactory(Path rootPath) { ContainerFactoryService.instance.get(this, rootPath) }
 
     @CompileStatic
     TreeNodeFactory getTreeNodeFactory(Container.Entry entry) { TreeNodeFactoryService.instance.get(entry) }
