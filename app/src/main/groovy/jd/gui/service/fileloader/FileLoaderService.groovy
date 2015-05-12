@@ -22,7 +22,7 @@ class FileLoaderService {
         String extension = name.substring(lastDot+1)
         def provider = mapProviders[extension]
 
-        if (provider.accept(api, file)) {
+        if (provider?.accept(api, file)) {
             return provider
         } else {
             return null
