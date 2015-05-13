@@ -471,6 +471,10 @@ class MainController implements API {
         mainView.addMainPanel(title, icon, tip, component)
 
         if (component instanceof ContentIndexable) {
+            if (executor == null) {
+                executor = Executors.newSingleThreadExecutor()
+            }
+
             def futureIndexes = executor.submit(new Callable<Indexes>() {
                 Indexes call() throws Exception {
                     return component.index(MainController.this)
