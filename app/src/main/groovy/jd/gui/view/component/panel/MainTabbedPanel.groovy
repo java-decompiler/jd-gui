@@ -139,7 +139,7 @@ class MainTabbedPanel extends TabbedPanel implements UriOpenable, PageChangeList
             // Search & display main tab
             def page = showPage(uri)
             if (page) {
-                if (page instanceof UriOpenable) {
+                if (!uri.equals(page.uri) && (page instanceof UriOpenable)) {
                     // Enable page changed event
                     pageChangedListenersEnabled = true
                     // Search & display sub tab
