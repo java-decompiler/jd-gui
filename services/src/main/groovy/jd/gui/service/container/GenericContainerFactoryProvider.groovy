@@ -10,14 +10,13 @@ import jd.gui.api.model.Container
 import jd.gui.model.container.GenericContainer
 import jd.gui.spi.ContainerFactory
 
-import java.nio.file.FileSystem
 import java.nio.file.Path
 
 class GenericContainerFactoryProvider implements ContainerFactory {
 
 	String getType() { 'generic' }
 	
-	boolean accept(API api, FileSystem fileSystem) { true }
+	boolean accept(API api, Path rootPath) { true }
 
     Container make(API api, Container.Entry parentEntry, Path rootPath) {
 		return new GenericContainer(api, parentEntry, rootPath)

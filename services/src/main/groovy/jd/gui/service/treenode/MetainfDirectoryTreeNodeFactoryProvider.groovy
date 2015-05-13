@@ -5,12 +5,18 @@
 
 package jd.gui.service.treenode
 
+import javax.swing.ImageIcon
 import java.util.regex.Pattern
 
 class MetainfDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
-    Pattern pattern = ~/META-IN(F|F\/.*)/
+    static final ImageIcon icon = new ImageIcon(MetainfDirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/inf_obj.png'))
 
-    String[] getTypes() { ['jar:dir:*'] }
+    Pattern pattern = ~/(WEB-INF|(WEB-INF\/classes\/)?META-IN(F|F\/.*))/
+
+    String[] getTypes() { ['jar:dir:*', 'war:dir:*'] }
 
     Pattern getPathPattern() { pattern }
+
+    ImageIcon getIcon() { icon }
+    ImageIcon getOpenIcon() { null }
 }

@@ -13,7 +13,7 @@ import jd.gui.util.JarContainerEntryUtil
 import java.nio.file.Path
 
 class PackageSourceSaverProvider extends DirectorySourceSaverProvider {
-    String[] getTypes() { ['jar:dir:*'] }
+    String[] getTypes() { ['jar:dir:*', 'war:dir:*'] }
 
     void save(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path path, Container.Entry entry) {
         save(api, controller, listener, path, JarContainerEntryUtil.removeInnerTypeEntries(entry.children))

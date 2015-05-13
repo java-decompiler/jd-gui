@@ -34,7 +34,7 @@ abstract class AbstractFileLoaderProvider implements FileLoader {
             InputStream getInputStream() { null }
             Collection<Container.Entry> getChildren() { children }
         }
-        def container = api.getContainerFactory(rootPath.fileSystem)?.make(api, parentEntry, rootPath)
+        def container = api.getContainerFactory(rootPath)?.make(api, parentEntry, rootPath)
 
         if (container) {
             parentEntry.children = container.root.children

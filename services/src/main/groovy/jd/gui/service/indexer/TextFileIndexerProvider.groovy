@@ -15,8 +15,8 @@ import java.util.regex.Pattern
 
 class TextFileIndexerProvider implements Indexer {
     String[] getTypes() { [
-        '*:file:*.txt', '*:file:*.html', '*:file:*.js', '*:file:*.jsp', '*:file:*.xml',
-        '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.properties', '*:file:*.sql'] }
+        '*:file:*.txt', '*:file:*.html', '*:file:*.xhtml', '*:file:*.js', '*:file:*.jsp', '*:file:*.jspf',
+        '*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.properties', '*:file:*.sql'] }
 
     Pattern getPathPattern() { null }
 

@@ -114,7 +114,7 @@ class GenericContainer implements Container {
         }
 
         protected Collection<Container.Entry> loadChildrenFromFileEntry() {
-            def tmpFile = File.createTempFile('jd-gui.', '.tmp.zip')
+            def tmpFile = File.createTempFile('jd-gui.', '.tmp.' + fsPath.fileName.toString())
             def tmpPath = Paths.get(tmpFile.toURI())
 
             tmpFile.withOutputStream { OutputStream os ->
@@ -130,7 +130,7 @@ class GenericContainer implements Container {
                     tmpFile.deleteOnExit()
 
                     def rootPath = rootDirectories.next()
-                    def container = api.getContainerFactory(subFileSystem)?.make(api, this, rootPath)
+                    def container = api.getContainerFactory(rootPath)?.make(api, this, rootPath)
                     if (container) {
                         return container.root.children
                     }

@@ -9,19 +9,21 @@ import jd.gui.api.API
 import jd.gui.api.feature.PageCreator
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
-import jd.gui.view.component.ManifestFilePage
+import jd.gui.view.component.WebXmlFilePage
 import jd.gui.view.data.TreeNodeBean
 
-import javax.swing.*
+import javax.swing.ImageIcon
+import javax.swing.JComponent
 import javax.swing.tree.DefaultMutableTreeNode
 
-class ManifestFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
-    static final ImageIcon icon = new ImageIcon(ManifestFileTreeNodeFactoryProvider.class.classLoader.getResource('images/manifest_obj.png'))
 
-    String[] getTypes() { ['*:file:META-INF/MANIFEST.MF'] }
+class WebXmlFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
+    static final ImageIcon icon = new ImageIcon(ManifestFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
+
+    String[] getTypes() { ['war:file:WEB-INF/web.xml'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
-        return new TreeNode(entry, new TreeNodeBean(label:'MANIFEST.MF', icon:icon, tip:"Location: $entry.uri.path"))
+        return new TreeNode(entry, new TreeNodeBean(label:'web.xml', icon:icon, tip:"Location: $entry.uri.path"))
     }
 
     static class TreeNode extends FileTreeNodeFactoryProvider.TreeNode implements PageCreator {
@@ -30,7 +32,7 @@ class ManifestFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
         }
         // --- PageCreator --- //
         public <T extends JComponent & UriGettable> T createPage(API api) {
-            return new ManifestFilePage(api, entry)
+            return new WebXmlFilePage(api, entry)
         }
     }
 }

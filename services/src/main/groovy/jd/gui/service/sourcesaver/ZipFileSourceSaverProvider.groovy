@@ -17,11 +17,11 @@ import java.nio.file.Paths
 
 class ZipFileSourceSaverProvider extends DirectorySourceSaverProvider {
 
-    String[] getTypes() { ['*:file:*.zip', '*:file:*.jar'] }
+    String[] getTypes() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war'] }
 
     String getSourcePath(Container.Entry entry) {
         def path = entry.path
-        return path.substring(0, path.length()-3) + 'src.zip'
+        return path + '.src.zip'
     }
 
     @CompileStatic

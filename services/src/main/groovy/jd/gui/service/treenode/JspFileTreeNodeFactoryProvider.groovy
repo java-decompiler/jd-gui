@@ -11,13 +11,14 @@ import jd.gui.api.model.Container
 import jd.gui.view.data.TreeNodeBean
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 
-import javax.swing.*
+import javax.swing.ImageIcon
+import javax.swing.JComponent
 import javax.swing.tree.DefaultMutableTreeNode
 
-class HtmlFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
+class JspFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(HtmlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/html_obj.gif'))
 
-    String[] getTypes() { ['*:file:*.html', '*:file:*.xhtml'] }
+    String[] getTypes() { ['*:file:*.jsp', '*:file:*.jspf'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
@@ -33,7 +34,7 @@ class HtmlFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
         public <T extends JComponent & UriGettable> T createPage(API api) {
             return new TextFileTreeNodeFactoryProvider.Page(entry) {
                 String getSyntaxStyle() {
-                    SyntaxConstants.SYNTAX_STYLE_HTML
+                    SyntaxConstants.SYNTAX_STYLE_JSP
                 }
             }
         }
