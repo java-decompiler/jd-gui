@@ -48,7 +48,13 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
         tree.showsRootHandles = true
         tree.setMinimumSize([150, 10] as Dimension)
         tree.expandsSelectedPaths = true
-        tree.cellRenderer = new TreeNodeRenderer()
+        tree.cellRenderer = new TreeNodeRenderer() {
+            Component getTreeCellRendererComponent(
+                    JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                // Always render the left tree with focus
+                return super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, true)
+            }
+        }
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             void valueChanged(TreeSelectionEvent e) { treeNodeChanged(tree.lastSelectedPathComponent) }
         })

@@ -235,18 +235,27 @@ class OpenTypeHierarchyView {
         }
     }
 
-    void populateTreeNode(TreeNode superTreeNode, TreeNode treeNode) {
+    /**
+     * @param superTreeNode  node to populate
+     * @param activeTreeNode active child node
+     */
+    void populateTreeNode(TreeNode superTreeNode, TreeNode activeTreeNode) {
         superTreeNode.removeAllChildren()
 
+        // Search preferred container: if 'superTreeNode' is a root with an unknown super entry, uses the container of active child node
+        def notNullEntry = superTreeNode.entry ?: activeTreeNode.entry
+        def preferredContainer = notNullEntry.container
+
+        def activeTypName = activeTreeNode?.typeName
         def subTypeNames = getSubTypeNamesClosure(superTreeNode.typeName)
 
         subTypeNames.collect { tn ->
-            if (tn.equals(treeNode?.typeName)) {
-                return treeNode
+            if (tn.equals(activeTypName)) {
+                return activeTreeNode
             } else {
+                // Search entry in the sane container of 'superTreeNode.entry'
                 def entries = getEntriesClosure(tn)
-                // Search entry in the sane container of 'entry'
-                def e = entries.find { it.container == treeNode.entry.container }
+                def e = entries.find { it.container == preferredContainer }
                 if (e == null) {
                     // Not found -> Choose 1st one
                     e = entries.get(0)
