@@ -23,6 +23,8 @@ class TreeNodeRenderer  implements TreeCellRenderer {
     Color backgroundSelectionColor
     Color textNonSelectionColor
     Color backgroundNonSelectionColor
+    Color textDisabledColor
+    Color backgroundDisabledColor
 
     JPanel panel
     JLabel icon, label
@@ -37,13 +39,13 @@ class TreeNodeRenderer  implements TreeCellRenderer {
         backgroundSelectionColor = UIManager.getColor("Tree.selectionBackground")
         textNonSelectionColor = UIManager.getColor("Tree.textForeground")
         backgroundNonSelectionColor = UIManager.getColor("Tree.textBackground")
+        textDisabledColor = UIManager.getColor("Tree.disabledText")
+        backgroundDisabledColor = UIManager.getColor("Tree.disabled")
         Insets margins = UIManager.getInsets("Tree.rendererMargins")
 
         icon.foreground = textNonSelectionColor
         icon.opaque = label.opaque = false
         icon.border = BorderFactory.createEmptyBorder(0, 0, 0, 2)
-
-        label.background = backgroundSelectionColor
 
         if (margins) {
             label.border = BorderFactory.createEmptyBorder(margins.top, margins.left, margins.bottom, margins.right)
@@ -67,7 +69,13 @@ class TreeNodeRenderer  implements TreeCellRenderer {
         }
 
         if (selected) {
-            label.foreground = textSelectionColor
+            if (hasFocus) {
+                label.foreground = textSelectionColor
+                label.background = backgroundSelectionColor
+            } else {
+                label.foreground = textDisabledColor
+                label.background = backgroundDisabledColor
+            }
             label.opaque = true
         } else {
             label.foreground = textNonSelectionColor
