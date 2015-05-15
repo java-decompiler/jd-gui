@@ -166,7 +166,17 @@ class SearchInConstantPoolsView {
                 })
                 searchInConstantPoolsTree.addTreeExpansionListener(new TreeExpansionListener() {
                     void treeExpanded(TreeExpansionEvent e) {
-                        populate(e.source.model, e.path.lastPathComponent)
+                        def model = e.source.model
+                        def node = e.path.lastPathComponent
+                        // Expand node and find the first leaf
+                        while (true) {
+                            populate(model, node)
+                            if (node.childCount == 0) {
+                                break
+                            }
+                            node = node.getChildAt(0)
+                        }
+                        swing.searchInConstantPoolsTree.selectionPath = new TreePath(node.path)
                     }
                     void treeCollapsed(TreeExpansionEvent e) {}
                 })

@@ -9,26 +9,38 @@ import jd.gui.api.model.Container
 
 class FilteredContainerWrapper implements Container {
     Container container
-    Map<URI, Container.Entry> map
+    Map<URI, Container.Entry> uriToEntry
+    Map<URI, FilteredContainerWrapper> uriToWrapper
     Container.Entry root
 
     FilteredContainerWrapper(Container container, Container.Entry parentEntry, Collection<Container.Entry> entries) {
         this.container = container
-        this.map = new HashMap<>()
+        this.uriToEntry = new HashMap<>()
+        this.uriToWrapper = new HashMap<>()
         this.root = new EntryWrapper(container.root, parentEntry)
 
         for (def entry : entries) {
-            while (entry && !map.containsKey(entry.uri)) {
-                map.put(entry.uri, entry)
+            while (entry && !uriToEntry.containsKey(entry.uri)) {
+                uriToEntry.put(entry.uri, entry)
                 entry = entry.parent
             }
         }
     }
 
+    protected FilteredContainerWrapper(
+            Container container, FilteredContainerWrapper.EntryWrapper root,
+            Map<URI, Container.Entry> uriToEntry,
+            Map<URI, FilteredContainerWrapper> uriToWrapper) {
+        this.container = container
+        this.uriToEntry = uriToEntry
+        this.uriToWrapper = uriToWrapper
+        this.root = root
+    }
+
     String getType() { container.type }
     Container.Entry getRoot() { root }
-    Container.Entry getEntry(URI uri) { map.get(uri) }
-    Set<URI> getUris() { map.keySet() }
+    Container.Entry getEntry(URI uri) { uriToEntry.get(uri) }
+    Set<URI> getUris() { uriToEntry.keySet() }
 
     class EntryWrapper implements Container.Entry, Comparable<EntryWrapper> {
         Container.Entry entry
@@ -41,7 +53,30 @@ class FilteredContainerWrapper implements Container {
             this.children = null
         }
 
-        Container getContainer() { FilteredContainerWrapper.this }
+        Container getContainer() {
+            if (entry.container == FilteredContainerWrapper.this.container) {
+                return FilteredContainerWrapper.this
+            } else {
+                def container = entry.container
+                def root = container.root
+                def wrapper = uriToWrapper.get(root.uri)
+
+                if (wrapper == null) {
+                    // Search EntryWrapper root
+                    def entryWrapperRoot = this.parent
+                    while (entryWrapperRoot.entry.container == container) {
+                        entryWrapperRoot = entryWrapperRoot.parent
+                    }
+
+                    // Create a sub wrapper container
+                    wrapper = new FilteredContainerWrapper(container, entryWrapperRoot, uriToEntry, uriToWrapper)
+                    uriToWrapper.put(root.uri, wrapper)
+                }
+
+                return wrapper
+            }
+        }
+
         Container.Entry getParent() { parent }
         URI getUri() { entry.uri }
         String getPath() { entry.path }
@@ -51,7 +86,7 @@ class FilteredContainerWrapper implements Container {
 
         Collection<Container.Entry> getChildren() {
             if (children == null) {
-                children = entry.children.grep { map.containsKey(it.uri) }.collect { new EntryWrapper(it, this) }
+                children = entry.children.grep { uriToEntry.containsKey(it.uri) }.collect { new EntryWrapper(it, this) }
             }
             return children
         }
