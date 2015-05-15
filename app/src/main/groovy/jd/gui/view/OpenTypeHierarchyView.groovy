@@ -72,10 +72,20 @@ class OpenTypeHierarchyView {
                 openTypeHierarchyTree.addTreeExpansionListener(new TreeExpansionListener() {
                     void treeExpanded(TreeExpansionEvent e) {
                         def node = e.path.lastPathComponent
-                        if (node.getChildAt(0).userObject == null) {
-                            populateTreeNode(node, null)
-                            e.source.model.reload(node)
+                        def tree = e.source
+                        // Expand node and find the first leaf
+                        while (node.childCount > 0) {
+                            if (node.getChildAt(0).userObject == null) {
+                                // Remove dummy node and create children
+                                populateTreeNode(node, null)
+                            }
+                            if (node.childCount != 1) {
+                                break
+                            }
+                            node = node.getChildAt(0)
                         }
+                        tree.model.reload(e.path.lastPathComponent)
+                        tree.selectionPath = new TreePath(node.path)
                     }
                     void treeCollapsed(TreeExpansionEvent e) {}
                 })
@@ -125,9 +135,7 @@ class OpenTypeHierarchyView {
             model.reload()
 
             if (selectedTreeNode) {
-                // Select tree node
                 def path = new TreePath(selectedTreeNode.path)
-                tree.selectionPath = path
                 // Expand
                 tree.expandPath(path)
                 // Scroll to show tree node
@@ -149,6 +157,8 @@ class OpenTypeHierarchyView {
                         tree.accessibleContext.fireVisibleDataPropertyChange()
                     }
                 }
+                // Select tree node
+                tree.selectionPath = path
             }
         }
     }
@@ -236,7 +246,7 @@ class OpenTypeHierarchyView {
             } else {
                 def entries = getEntriesClosure(tn)
                 // Search entry in the sane container of 'entry'
-                def e = entries.find { it.container == superTreeNode.entry.container }
+                def e = entries.find { it.container == treeNode.entry.container }
                 if (e == null) {
                     // Not found -> Choose 1st one
                     e = entries.get(0)
