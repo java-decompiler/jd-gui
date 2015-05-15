@@ -34,7 +34,27 @@
 				</array>
 				<key>CFBundleTypeName</key>			<string>Jar File</string>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
-				<key>LSIsAppleDefaultForType</key>	<true/>
+				<key>LSIsAppleDefaultForType</key>	<false/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>war</string>
+				</array>
+				<key>CFBundleTypeName</key>			<string>War File</string>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>	<false/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>ear</string>
+				</array>
+				<key>CFBundleTypeName</key>			<string>Ear File</string>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>	<false/>
 				<key>LSTypeIsPackage</key>			<false/>
 			</dict>
 			<dict>
@@ -44,7 +64,7 @@
 				</array>
 				<key>CFBundleTypeName</key>			<string>Zip File</string>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
-				<key>LSIsAppleDefaultForType</key>	<true/>
+				<key>LSIsAppleDefaultForType</key>	<false/>
 				<key>LSTypeIsPackage</key>			<false/>
 			</dict>
 			<dict>
@@ -55,7 +75,7 @@
 				</array>
 				<key>CFBundleTypeName</key>			<string>Log File</string>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
-				<key>LSIsAppleDefaultForType</key>	<true/>
+				<key>LSIsAppleDefaultForType</key>	<false/>
 				<key>LSTypeIsPackage</key>			<false/>
 			</dict>
 		</array>

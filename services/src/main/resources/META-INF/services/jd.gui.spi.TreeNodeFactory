@@ -2,6 +2,8 @@ jd.gui.service.treenode.ClassFileTreeNodeFactoryProvider
 jd.gui.service.treenode.CssFileTreeNodeFactoryProvider
 jd.gui.service.treenode.DirectoryTreeNodeFactoryProvider
 jd.gui.service.treenode.DtdFileTreeNodeFactoryProvider
+jd.gui.service.treenode.EarFileTreeNodeFactoryProvider
+jd.gui.service.treenode.EjbJarXmlFileTreeNodeFactoryProvider
 jd.gui.service.treenode.FileTreeNodeFactoryProvider
 jd.gui.service.treenode.HtmlFileTreeNodeFactoryProvider
 jd.gui.service.treenode.JarFileTreeNodeFactoryProvider

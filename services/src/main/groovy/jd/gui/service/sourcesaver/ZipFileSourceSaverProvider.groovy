@@ -17,7 +17,7 @@ import java.nio.file.Paths
 
 class ZipFileSourceSaverProvider extends DirectorySourceSaverProvider {
 
-    String[] getTypes() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war'] }
+    String[] getTypes() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war', '*:file:*.ear'] }
 
     String getSourcePath(Container.Entry entry) {
         def path = entry.path

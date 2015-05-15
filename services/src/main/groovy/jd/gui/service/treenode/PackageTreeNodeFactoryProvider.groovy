@@ -30,7 +30,7 @@ class PackageTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
         // Aggregate directory names
         while (entries.length == 1) {
             Container.Entry child = entries[0]
-            if (child.isDirectory() == false) break
+            if ((child.isDirectory() == false) || (api.getTreeNodeFactory(child) != this)) break
             entry = child
             entries = entry.children
         }

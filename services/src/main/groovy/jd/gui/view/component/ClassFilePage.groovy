@@ -313,7 +313,7 @@ class ClassFilePage
 
                 if (highlightFlags && highlightPattern) {
                     def highlightScope = parameters.get('highlightScope')
-                    def regexp = createRegExp(parameters.get('highlightPattern'))
+                    def regexp = createRegExp(highlightPattern)
                     def pattern = Pattern.compile(regexp + '.*')
 
                     if (highlightFlags.indexOf('s') != -1) {

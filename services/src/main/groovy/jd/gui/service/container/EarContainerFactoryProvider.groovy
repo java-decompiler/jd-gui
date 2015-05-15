@@ -7,24 +7,24 @@ package jd.gui.service.container
 
 import jd.gui.api.API
 import jd.gui.api.model.Container
-import jd.gui.model.container.WarContainer
+import jd.gui.model.container.EarContainer
 import jd.gui.spi.ContainerFactory
 
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
 
-class WarContainerFactoryProvider implements ContainerFactory {
+class EarContainerFactoryProvider implements ContainerFactory {
 
-    String getType() { 'war' }
+    String getType() { 'ear' }
 
     boolean accept(API api, Path rootPath) {
-        if (rootPath.toUri().toString().toLowerCase().endsWith('.war!/')) {
+        if (rootPath.toUri().toString().toLowerCase().endsWith('.ear!/')) {
             return true
         } else {
-            // Extension: accept uncompressed WAR file containing a folder 'WEB-INF'
+            // Extension: accept uncompressed EAR file containing a folder 'META-INF/application.xml'
             try {
-                return rootPath.fileSystem.provider().scheme.equals('file') && Files.exists(rootPath.resolve('WEB-INF'))
+                return rootPath.fileSystem.provider().scheme.equals('file') && Files.exists(rootPath.resolve('META-INF/application.xml'))
             } catch (InvalidPathException e) {
                 return false
             }
@@ -32,6 +32,6 @@ class WarContainerFactoryProvider implements ContainerFactory {
     }
 
     Container make(API api, Container.Entry parentEntry, Path rootPath) {
-        return new WarContainer(api, parentEntry, rootPath)
+        return new EarContainer(api, parentEntry, rootPath)
     }
 }

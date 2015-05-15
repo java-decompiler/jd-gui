@@ -1,4 +1,5 @@
 # Order is important
+jd.gui.service.container.EarContainerFactoryProvider
 jd.gui.service.container.WarContainerFactoryProvider
 jd.gui.service.container.JarContainerFactoryProvider
 jd.gui.service.container.GenericContainerFactoryProvider

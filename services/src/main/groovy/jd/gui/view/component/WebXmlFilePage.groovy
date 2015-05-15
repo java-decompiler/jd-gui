@@ -17,7 +17,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import java.awt.Point
 
 
-class WebXmlFilePage extends HyperlinkPage implements UriGettable, ContentSavable, IndexesChangeListener {
+class WebXmlFilePage extends TypeHyperlinkPage implements UriGettable, ContentSavable, IndexesChangeListener {
     protected API api
     protected Container.Entry entry
     protected Collection<Indexes> collectionOfIndexes
@@ -129,17 +129,6 @@ class WebXmlFilePage extends HyperlinkPage implements UriGettable, ContentSavabl
         }
     }
 
-    static class TypeHyperlinkData extends HyperlinkPage.HyperlinkData {
-        boolean enabled
-        String internalTypeName
-
-        TypeHyperlinkData(int startPosition, int endPosition, String internalTypeName) {
-            super(startPosition, endPosition)
-            this.enabled = false
-            this.internalTypeName = internalTypeName
-        }
-    }
-
     static class PathHyperlinkData extends HyperlinkPage.HyperlinkData {
         boolean enabled
         String path
@@ -179,7 +168,7 @@ class WebXmlFilePage extends HyperlinkPage implements UriGettable, ContentSavabl
                     addHyperlink(new PathHyperlinkData(startIndex, endIndex, trim))
                 } else {
                     def internalTypeName = trim.replace('.', '/')
-                    addHyperlink(new TypeHyperlinkData(startIndex, endIndex, internalTypeName))
+                    addHyperlink(new TypeHyperlinkPage.TypeHyperlinkData(startIndex, endIndex, internalTypeName))
                 }
             }
         }
