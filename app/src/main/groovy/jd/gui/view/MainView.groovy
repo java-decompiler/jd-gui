@@ -81,7 +81,7 @@ class MainView implements UriOpenable, PreferencesChangeListener {
                                 def path = page.uri.path
                                 int index = path.lastIndexOf('/')
                                 def name = (index == -1) ? path : path.substring(index + 1)
-                                mainFrame.title = name + ' - Java Decompiler'
+                                mainFrame.title = name ? name + ' - Java Decompiler' : 'Java Decompiler'
                                 // Update history
                                 history.add(page.uri)
                                 // Update history actions
