@@ -75,7 +75,7 @@ public class ClassFileSourceSaverProvider implements SourceSaver {
 
             // Init printer
             baos.reset();
-            PrintStream ps = new PrintStream(baos);
+            PrintStream ps = new PrintStream(baos,true,"UTF-8");
             printer.setPrintStream(ps);
             printer.setPreferences(preferences);
 

@@ -156,7 +156,9 @@ class ClassFilePage
     }
 
     void save(API api, OutputStream os) {
-        os << textArea.text
+		OutputStreamWriter w = new OutputStreamWriter(os, "UTF-8");
+        w.write(textArea.text);
+		w.close();
     }
 
     // --- IndexesChangeListener --- //
