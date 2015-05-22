@@ -23,7 +23,7 @@ class XmlFileIndexerProvider implements Indexer {
         factory.setProperty(XMLInputFactory.SUPPORT_DTD, false)
     }
 
-    String[] getTypes() { ['*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd'] }
+    String[] getSelectors() { ['*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd'] }
 
     Pattern getPathPattern() { null }
 

@@ -16,7 +16,7 @@ import java.nio.file.StandardCopyOption
 import java.util.regex.Pattern
 
 class FileSourceSaverProvider implements SourceSaver {
-    String[] getTypes() { ['*:file:*'] }
+    String[] getSelectors() { ['*:file:*'] }
 
     Pattern getPathPattern() { null }
 

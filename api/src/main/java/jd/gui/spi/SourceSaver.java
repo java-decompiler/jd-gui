@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 public interface SourceSaver {
-    public String[] getTypes();
+    public String[] getSelectors();
 
     public Pattern getPathPattern();
 

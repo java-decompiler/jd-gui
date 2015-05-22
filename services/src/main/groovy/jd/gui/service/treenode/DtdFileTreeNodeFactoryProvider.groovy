@@ -17,7 +17,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 class DtdFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(DtdFileTreeNodeFactoryProvider.class.classLoader.getResource('images/dtd_obj.gif'))
 
-    String[] getTypes() { ['*:file:*.dtd'] }
+    String[] getSelectors() { ['*:file:*.dtd'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

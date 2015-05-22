@@ -32,9 +32,9 @@ public class ClassFileTypeFactoryProvider implements TypeFactory {
         JavaType.class.getName();
     }
 
-    protected String[] types = new String[] { "*:file:*.class" };
+    protected String[] selectors = new String[] { "*:file:*.class" };
 
-    public String[] getTypes() { return types; }
+    public String[] getSelectors() { return selectors; }
 
     public Pattern getPathPattern() { return null; }
 

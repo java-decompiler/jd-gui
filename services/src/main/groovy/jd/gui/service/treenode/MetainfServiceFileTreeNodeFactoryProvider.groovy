@@ -10,7 +10,7 @@ import java.util.regex.Pattern
 class MetainfServiceFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
     Pattern pattern = ~/META-INF\/services\/[^\/]+/
 
-    String[] getTypes() { ['*:file:*'] }
+    String[] getSelectors() { ['*:file:*'] }
 
     Pattern getPathPattern() { pattern }
 }

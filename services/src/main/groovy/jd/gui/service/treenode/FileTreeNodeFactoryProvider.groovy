@@ -18,7 +18,7 @@ import java.util.regex.Pattern
 class FileTreeNodeFactoryProvider implements TreeNodeFactory {
 	static final ImageIcon icon = new ImageIcon(FileTreeNodeFactoryProvider.class.classLoader.getResource('images/file_plain_obj.png'))
 
-    String[] getTypes() { ['*:file:*'] }
+    String[] getSelectors() { ['*:file:*'] }
 
     Pattern getPathPattern() { null }
 

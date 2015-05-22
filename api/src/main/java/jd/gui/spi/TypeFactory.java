@@ -12,7 +12,7 @@ import jd.gui.api.model.Type;
 import java.util.regex.Pattern;
 
 public interface TypeFactory {
-	public String[] getTypes();
+	public String[] getSelectors();
 
     public Pattern getPathPattern();
 

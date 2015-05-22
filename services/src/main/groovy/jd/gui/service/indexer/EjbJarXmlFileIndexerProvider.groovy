@@ -11,7 +11,7 @@ import jd.gui.api.model.Indexes
 import jd.gui.util.xml.AbstractXmlPathFinder
 
 class EjbJarXmlFileIndexerProvider extends XmlFileIndexerProvider {
-    String[] getTypes() { ['*:file:META-INF/ejb-jar.xml'] }
+    String[] getSelectors() { ['*:file:META-INF/ejb-jar.xml'] }
 
     void index(API api, Container.Entry entry, Indexes indexes) {
         super.index(api, entry, indexes)

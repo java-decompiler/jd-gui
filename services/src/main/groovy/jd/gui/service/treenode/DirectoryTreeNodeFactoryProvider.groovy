@@ -21,7 +21,7 @@ class DirectoryTreeNodeFactoryProvider implements TreeNodeFactory {
 	static final ImageIcon icon = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/folder.gif'))
 	static final ImageIcon openIcon = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/folder_open.png'))
 
-	String[] getTypes() { ['*:dir:*'] }
+	String[] getSelectors() { ['*:dir:*'] }
     Pattern getPathPattern() { null }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {

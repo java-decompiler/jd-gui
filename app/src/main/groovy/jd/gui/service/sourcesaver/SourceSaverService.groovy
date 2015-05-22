@@ -22,8 +22,8 @@ class SourceSaverService {
         def mapProvidersWithDefault = mapProviders.withDefault { new SourceSavers() }
 
         for (def provider : providers) {
-            for (String type : provider.types) {
-                mapProvidersWithDefault[type].add(provider)
+            for (String selector : provider.selectors) {
+                mapProvidersWithDefault[selector].add(provider)
             }
         }
 

@@ -30,7 +30,7 @@ class ClassFileTreeNodeFactoryProvider implements TreeNodeFactory {
         } catch (Exception ignore) {}
     }
 
-    String[] getTypes() { ['*:file:*.class'] }
+    String[] getSelectors() { ['*:file:*.class'] }
 
     Pattern getPathPattern() { null }
 

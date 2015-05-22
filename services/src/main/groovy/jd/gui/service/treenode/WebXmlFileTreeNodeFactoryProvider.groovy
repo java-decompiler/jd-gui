@@ -20,7 +20,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 class WebXmlFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(ManifestFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
 
-    String[] getTypes() { ['war:file:WEB-INF/web.xml'] }
+    String[] getSelectors() { ['war:file:WEB-INF/web.xml'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         return new TreeNode(entry, new TreeNodeBean(label:'web.xml', icon:icon, tip:"Location: $entry.uri.path"))

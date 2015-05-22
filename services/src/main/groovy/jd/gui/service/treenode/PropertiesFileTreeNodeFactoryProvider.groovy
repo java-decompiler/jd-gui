@@ -17,7 +17,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 class PropertiesFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(PropertiesFileTreeNodeFactoryProvider.class.classLoader.getResource('images/ascii_obj.png'))
 
-    String[] getTypes() { ['*:file:*.properties'] }
+    String[] getSelectors() { ['*:file:*.properties'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

@@ -31,7 +31,7 @@ public class ClassFileSourceSaverProvider implements SourceSaver {
     protected static final String WRITE_LINE_NUMBERS = "ClassFileSaverPreferences.writeLineNumbers";
     protected static final String WRITE_METADATA = "ClassFileSaverPreferences.writeMetadata";
 
-    protected static final String[] TYPES = new String[] { "*:file:*.class" };
+    protected static final String[] SELECTORS = new String[] { "*:file:*.class" };
     protected static final Decompiler DECOMPILER = new DecompilerImpl();
 
     protected GuiPreferences preferences = new GuiPreferences();
@@ -39,7 +39,7 @@ public class ClassFileSourceSaverProvider implements SourceSaver {
     protected PlainTextPrinter printer = new PlainTextPrinter();
     protected ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-    public String[] getTypes() { return TYPES; }
+    public String[] getSelectors() { return SELECTORS; }
 
     public Pattern getPathPattern() { return null; }
 

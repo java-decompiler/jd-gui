@@ -11,7 +11,7 @@ import java.util.regex.Pattern
 class WebinfClassesDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(WebinfClassesDirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/packagefolder_obj.png'))
 
-    String[] getTypes() { ['war:dir:WEB-INF/classes'] }
+    String[] getSelectors() { ['war:dir:WEB-INF/classes'] }
 
     ImageIcon getIcon() { icon }
     ImageIcon getOpenIcon() { null }

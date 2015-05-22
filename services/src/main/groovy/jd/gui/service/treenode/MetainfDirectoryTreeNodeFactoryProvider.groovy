@@ -13,7 +13,7 @@ class MetainfDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryPr
 
     Pattern pattern = ~/(WEB-INF|(WEB-INF\/classes\/)?META-IN(F|F\/.*))/
 
-    String[] getTypes() { ['jar:dir:*', 'war:dir:*', 'ear:dir:*'] }
+    String[] getSelectors() { ['jar:dir:*', 'war:dir:*', 'ear:dir:*'] }
 
     Pattern getPathPattern() { pattern }
 

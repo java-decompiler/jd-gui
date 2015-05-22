@@ -18,7 +18,7 @@ import java.util.regex.Pattern
 class ZipFileTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
 	static final ImageIcon icon = new ImageIcon(ZipFileTreeNodeFactoryProvider.class.classLoader.getResource('images/zip_obj.png'))
 
-    String[] getTypes() { ['*:file:*.zip'] }
+    String[] getSelectors() { ['*:file:*.zip'] }
     Pattern getPathPattern() { null }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {

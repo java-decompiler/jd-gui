@@ -18,7 +18,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 class EjbJarXmlFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(ManifestFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
 
-    String[] getTypes() { ['jar:file:META-INF/ejb-jar.xml'] }
+    String[] getSelectors() { ['jar:file:META-INF/ejb-jar.xml'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         return new TreeNode(entry, new TreeNodeBean(label:'ejb-jar.xml', icon:icon, tip:"Location: $entry.uri.path"))

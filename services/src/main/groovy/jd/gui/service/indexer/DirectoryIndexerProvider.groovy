@@ -14,7 +14,7 @@ import jd.gui.spi.Indexer
 import java.util.regex.Pattern
 
 class DirectoryIndexerProvider implements Indexer {
-    String[] getTypes() { ['*:dir:*'] }
+    String[] getSelectors() { ['*:dir:*'] }
 
     Pattern getPathPattern() { null }
 

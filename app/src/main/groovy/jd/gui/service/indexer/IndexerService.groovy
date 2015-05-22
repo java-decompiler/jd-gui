@@ -22,8 +22,8 @@ class IndexerService {
         def mapProvidersWithDefault = mapProviders.withDefault { new Indexers() }
 
         for (def provider : providers) {
-            for (String type : provider.types) {
-                mapProvidersWithDefault[type].add(provider)
+            for (String selector : provider.selectors) {
+                mapProvidersWithDefault[selector].add(provider)
             }
         }
 

@@ -39,9 +39,9 @@ public class ClassFileIndexerProvider implements Indexer {
         fieldDeclarationSet, typeReferenceSet, superTypeNameSet, descriptorSet);
     protected SignatureIndexer signatureIndexer = new SignatureIndexer(typeReferenceSet);
 
-    protected String[] types = new String[] { "*:file:*.class" };
+    protected String[] selectors = new String[] { "*:file:*.class" };
 
-    public String[] getTypes() { return types; }
+    public String[] getSelectors() { return selectors; }
 
     public Pattern getPathPattern() { return null; }
 

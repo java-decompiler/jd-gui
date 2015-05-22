@@ -14,7 +14,7 @@ import jd.gui.api.model.Container;
 import java.util.regex.Pattern;
 
 public interface TreeNodeFactory {
-	public String[] getTypes();
+	public String[] getSelectors();
 
     public Pattern getPathPattern();
 

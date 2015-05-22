@@ -16,7 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 class WarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(JarFileTreeNodeFactoryProvider.class.classLoader.getResource('images/war_obj.gif'))
 
-    String[] getTypes() { ['*:file:*.war'] }
+    String[] getSelectors() { ['*:file:*.war'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

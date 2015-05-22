@@ -22,8 +22,8 @@ class TypeFactoryService {
         def mapProvidersWithDefault = mapProviders.withDefault { new TypeFactories() }
 
         for (def provider : providers) {
-            for (String type : provider.types) {
-                mapProvidersWithDefault[type].add(provider)
+            for (String selector : provider.selectors) {
+                mapProvidersWithDefault[selector].add(provider)
             }
         }
 

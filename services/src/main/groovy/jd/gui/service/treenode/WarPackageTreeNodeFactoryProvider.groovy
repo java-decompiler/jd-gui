@@ -10,7 +10,7 @@ import java.util.regex.Pattern
 class WarPackageTreeNodeFactoryProvider extends PackageTreeNodeFactoryProvider {
     Pattern pattern = ~/WEB-INF\/classes\/.*/
 
-    String[] getTypes() { ['war:dir:*'] }
+    String[] getSelectors() { ['war:dir:*'] }
 
     Pattern getPathPattern() { pattern }
 }

@@ -14,7 +14,7 @@ import jd.gui.spi.Indexer
 import java.util.regex.Pattern
 
 class ZipFileIndexerProvider implements Indexer {
-    String[] getTypes() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war', '*:file:*.ear'] }
+    String[] getSelectors() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war', '*:file:*.ear'] }
 
     Pattern getPathPattern() { null }
 

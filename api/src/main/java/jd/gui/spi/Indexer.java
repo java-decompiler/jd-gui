@@ -12,7 +12,7 @@ import jd.gui.api.model.Indexes;
 import java.util.regex.Pattern;
 
 public interface Indexer {
-    public String[] getTypes();
+    public String[] getSelectors();
 
     public Pattern getPathPattern();
 

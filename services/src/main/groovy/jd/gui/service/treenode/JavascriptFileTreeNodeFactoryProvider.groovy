@@ -17,7 +17,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 class JavascriptFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(JavascriptFileTreeNodeFactoryProvider.class.classLoader.getResource('images/js_obj.png'))
 
-    String[] getTypes() { ['*:file:*.js'] }
+    String[] getSelectors() { ['*:file:*.js'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

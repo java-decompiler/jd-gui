@@ -19,7 +19,7 @@ import java.util.regex.Pattern
 class PackageTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(PackageTreeNodeFactoryProvider.class.classLoader.getResource('images/package_obj.png'))
 
-    String[] getTypes() { ['jar:dir:*'] }
+    String[] getSelectors() { ['jar:dir:*'] }
 
     Pattern getPathPattern() { null }
 

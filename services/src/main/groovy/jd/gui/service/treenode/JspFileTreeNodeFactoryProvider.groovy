@@ -18,7 +18,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 class JspFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
     static final ImageIcon icon = new ImageIcon(HtmlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/html_obj.gif'))
 
-    String[] getTypes() { ['*:file:*.jsp', '*:file:*.jspf'] }
+    String[] getSelectors() { ['*:file:*.jsp', '*:file:*.jspf'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

@@ -16,7 +16,7 @@ import java.util.regex.Pattern
 class MetainfServiceFileIndexerProvider implements Indexer {
     Pattern pattern = ~/META-INF\/services\/[^\/]+/
 
-    String[] getTypes() { ['*:file:*'] }
+    String[] getSelectors() { ['*:file:*'] }
 
     Pattern getPathPattern() { pattern }
 

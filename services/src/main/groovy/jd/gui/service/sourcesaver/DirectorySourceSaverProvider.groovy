@@ -15,7 +15,7 @@ import java.nio.file.Path
 import java.util.regex.Pattern
 
 class DirectorySourceSaverProvider implements SourceSaver {
-    String[] getTypes() { ['*:dir:*'] }
+    String[] getSelectors() { ['*:dir:*'] }
 
     Pattern getPathPattern() { null }
 

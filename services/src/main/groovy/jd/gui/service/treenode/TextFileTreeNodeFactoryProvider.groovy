@@ -28,7 +28,7 @@ class TextFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
         Theme.load(TextFileTreeNodeFactoryProvider.class.classLoader.getResourceAsStream('rsyntaxtextarea/themes/eclipse.xml'))
     }
 
-    String[] getTypes() { ['*:file:*.txt', '*:file:*.md', '*:file:*.SF', '*:file:*.policy'] }
+    String[] getSelectors() { ['*:file:*.txt', '*:file:*.md', '*:file:*.SF', '*:file:*.policy'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
