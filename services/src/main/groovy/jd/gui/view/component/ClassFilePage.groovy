@@ -152,7 +152,7 @@ class ClassFilePage
     String getFileName() {
         def path = entry.path
         int index = path.lastIndexOf('.')
-        return path.substring(index+1) + '.java'
+        return path.substring(0, index) + '.java'
     }
 
     void save(API api, OutputStream os) {
