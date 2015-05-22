@@ -137,7 +137,6 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
         }
 
         if (openUriEnabled && page instanceof UriOpenable) {
-            api.addURI(uri)
             page.openUri(uri)
         }
 

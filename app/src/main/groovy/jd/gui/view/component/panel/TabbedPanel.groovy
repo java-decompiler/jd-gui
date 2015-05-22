@@ -13,6 +13,7 @@ import javax.swing.JComponent
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.ToolTipManager
+import javax.swing.event.ChangeEvent
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.Color
@@ -52,7 +53,7 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
 	JPanel createPanel(Color background) {
 		return new JPanel()
 	}
-	
+
 	JTabbedPane createTabPanel() {
         JTabbedPane tabPanel = new JTabbedPane() {
             String getToolTipText(MouseEvent e) {
@@ -78,7 +79,7 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
         })
         return tabPanel
 	}
-	
+
 	static Color darker(Color c) {
 		return new Color(
 			Math.max((int)(c.red  *0.85), 0),
@@ -119,12 +120,25 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
 		int index = tabbedPane.getTabCount()
 		tabbedPane.addTab(title, page)
         tabbedPane.setTabComponentAt(index, tab)
-        // Ensure new page is visible (bug with SCROLL_TAB_LAYOUT)
-        tabbedPane.selectedIndex = 0
-        tabbedPane.selectedIndex = index
+        setSelectedIndex(index)
 
 		getLayout().show(this, 'tabs')
 	}
+
+    void setSelectedIndex(int index) {
+        if (index != -1) {
+            if (tabbedPane.tabLayoutPolicy == JTabbedPane.SCROLL_TAB_LAYOUT) {
+                // Ensure that the new page is visible (bug with SCROLL_TAB_LAYOUT)
+                def event = new ChangeEvent(tabbedPane)
+                for (def listener : tabbedPane.getChangeListeners()) {
+                    if (listener.class.package.name.startsWith('javax.'))
+                        listener.stateChanged(event)
+                }
+            }
+
+            tabbedPane.selectedIndex = index
+        }
+    }
 
     Object showPage(URI uri) {
         def u1 = uri.toString()
@@ -202,11 +216,6 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
         } else {
             tabbedPane.tabLayoutPolicy = JTabbedPane.WRAP_TAB_LAYOUT
         }
-        // Ensure selected sub-page is visible (bug with SCROLL_TAB_LAYOUT)
-        int index = tabbedPane.selectedIndex
-        if (index != -1) {
-            tabbedPane.selectedIndex = 0
-            tabbedPane.selectedIndex = index
-        }
+        setSelectedIndex(tabbedPane.selectedIndex)
     }
 }
