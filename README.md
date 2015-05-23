@@ -19,13 +19,13 @@ for instant access to methods and fields.
 ```
 generate _"build/libs/jd-gui-x.y.z.jar"_
 ```
-> gradle build installOsxDist
+> gradle installOsxDist
 ```
 generate _"build/install/jd-gui-osx/JD-GUI.app"_
 ```
 > iexplore http://sourceforge.net/projects/launch4j/files/launch4j-3/3.7/launch4j-3.7-win32.zip/download
 > unzip launch4j-3.7-win32.zip
-> gradle -DLAUNCH4J_HOME=.../path/to/launch4j-3.7-win32 launch4j installWindowsDist
+> gradle -DLAUNCH4J_HOME=.../path/to/launch4j-3.7-win32 installWindowsDist
 ```
 generate _"build/install/jd-gui-windows/jd-gui.exe"_
 

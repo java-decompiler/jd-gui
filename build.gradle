@@ -3,7 +3,7 @@ apply plugin: 'distribution'
 
 // Common configuration //
 allprojects {
-	version='1.0.0'
+	version='1.1.0'
 
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
@@ -107,12 +107,23 @@ task launch4j(type: Exec, dependsOn: [':jar', ':launch4jConfig']) {
 }
 
 // Distributions for OSX and Windows //
+task installOsxDistConfig(type: Copy) {
+    from 'src/osx/resources/Info.plist'
+    into 'build/distributions/osx'
+    expand(
+            VERSION: project.version
+    )
+}
+
 distributions {
 	osx {
 		contents {
-			into('JD-GUI.app/Contents/Resources/Java') {
-				from jar.archivePath
-			}
+            into('JD-GUI.app/Contents') {
+                from 'build/distributions/osx'
+            }
+            into('JD-GUI.app/Contents/Resources/Java') {
+                from jar.archivePath
+            }
 			from 'LICENSE', 'NOTICE', 'README.md'
 		}
 	}
@@ -123,3 +134,6 @@ distributions {
 		}
 	}
 }
+installOsxDist.dependsOn build
+installOsxDist.dependsOn installOsxDistConfig
+installWindowsDist.dependsOn launch4j

@@ -5,13 +5,13 @@
 		<key>CFBundleDevelopmentRegion</key>		<string>English</string>
 		<key>CFBundleExecutable</key>				<string>universalJavaApplicationStub.sh</string>
 		<key>CFBundleName</key>						<string>JD-GUI</string>
-		<key>CFBundleGetInfoString</key>			<string>JD-GUI version 1.0.0, Copyright 2008-2015 Emmanuel Dupuy</string>
+		<key>CFBundleGetInfoString</key>			<string>JD-GUI version ${VERSION}, Copyright 2008-2015 Emmanuel Dupuy</string>
 		<key>CFBundleIconFile</key>					<string>jd-gui.icns</string>
 		<key>CFBundleIdentifier</key>				<string>jd.jd-gui</string>
 		<key>CFBundleInfoDictionaryVersion</key>	<string>6.0</string>
 		<key>CFBundlePackageType</key>				<string>APPL</string>
-		<key>CFBundleLongVersionString</key>		<string>1.0.0, Copyright 2008-2015 Emmanuel Dupuy</string>
-		<key>CFBundleShortVersionString</key>		<string>1.0.0</string>
+		<key>CFBundleLongVersionString</key>		<string>${VERSION}, Copyright 2008-2015 Emmanuel Dupuy</string>
+		<key>CFBundleShortVersionString</key>		<string>${VERSION}</string>
 		<key>CSResourcesFileMapped</key>			<true/>
 		<key>LSRequiresCarbon</key>					<true/>
 		<key>NSHumanReadableCopyright</key>			<string>Copyright 2008-2015 Emmanuel Dupuy</string>
@@ -83,8 +83,8 @@
 		<dict>
 			<key>MainClass</key>					<string>jd.gui.OsxApp</string>
 			<key>JVMVersion</key>					<string>1.7+</string>
-			<key>ClassPath</key>					<string>$JAVAROOT/jd-gui-1.0.0.jar</string>
-			<key>WorkingDirectory</key>				<string>$JAVAROOT</string>
+			<key>ClassPath</key>					<string>\$JAVAROOT/jd-gui-${VERSION}.jar</string>
+			<key>WorkingDirectory</key> <string>\$JAVAROOT</string>
 			<key>Properties</key>
 			<dict>
 				<key>apple.laf.useScreenMenuBar</key>

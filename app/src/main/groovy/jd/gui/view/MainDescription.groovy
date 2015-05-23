@@ -263,7 +263,7 @@ dialog(
                     hbox {
                         panel(layout:new GridLayout(2,2), opaque:false, border:emptyBorder([5,10,5,50])) {
                             label(text: 'JD-GUI')
-                            label(text: 'version 1.0.0')
+                            label(text: 'version 1.1.0')
                             label(text: 'JD-Core')
                             label(text: 'version 0.7.1')
                         }
