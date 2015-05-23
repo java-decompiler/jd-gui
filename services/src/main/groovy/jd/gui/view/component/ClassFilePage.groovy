@@ -17,6 +17,7 @@ import jd.gui.api.model.Indexes
 import jd.gui.util.decompiler.ClassFileSourcePrinter
 import jd.gui.util.decompiler.ContainerLoader
 import jd.gui.util.decompiler.GuiPreferences
+import jd.gui.util.io.NewlineOutputStream
 import org.fife.ui.rsyntaxtextarea.DocumentRange
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 
@@ -156,7 +157,7 @@ class ClassFilePage
     }
 
     void save(API api, OutputStream os) {
-        os.withWriter('UTF-8') {
+        new NewlineOutputStream(os).withWriter('UTF-8') {
             it.write(textArea.text)
         }
     }

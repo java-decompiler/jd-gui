@@ -15,6 +15,7 @@ import jd.gui.util.decompiler.ContainerLoader;
 import jd.gui.util.decompiler.GuiPreferences;
 import jd.gui.spi.SourceSaver;
 import jd.gui.util.decompiler.PlainTextPrinter;
+import jd.gui.util.io.NewlineOutputStream;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -111,7 +112,7 @@ public class ClassFileSourceSaverProvider implements SourceSaver {
                 ps.print("\n */");
             }
 
-            try (OutputStream os = Files.newOutputStream(path)) {
+            try (OutputStream os = new NewlineOutputStream(Files.newOutputStream(path))) {
                 baos.writeTo(os);
             } catch (IOException ignore) {
             }
