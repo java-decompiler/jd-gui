@@ -15,6 +15,10 @@
 		<key>CSResourcesFileMapped</key>			<true/>
 		<key>LSRequiresCarbon</key>					<true/>
 		<key>NSHumanReadableCopyright</key>			<string>Copyright 2008-2015 Emmanuel Dupuy</string>
+		<key>NSPrincipalClass</key>
+		<string>NSApplication</string>
+		<key>NSHighResolutionCapable</key>
+		<true/>
 		<key>CFBundleDocumentTypes</key>
 		<array>
 			<dict>
