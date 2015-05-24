@@ -15,10 +15,8 @@
 		<key>CSResourcesFileMapped</key>			<true/>
 		<key>LSRequiresCarbon</key>					<true/>
 		<key>NSHumanReadableCopyright</key>			<string>Copyright 2008-2015 Emmanuel Dupuy</string>
-		<key>NSPrincipalClass</key>
-		<string>NSApplication</string>
-		<key>NSHighResolutionCapable</key>
-		<true/>
+		<key>NSPrincipalClass</key>					<string>NSApplication</string>
+		<key>NSHighResolutionCapable</key>			<true/>
 		<key>CFBundleDocumentTypes</key>
 		<array>
 			<dict>
@@ -88,13 +86,13 @@
 			<key>MainClass</key>					<string>jd.gui.OsxApp</string>
 			<key>JVMVersion</key>					<string>1.7+</string>
 			<key>ClassPath</key>					<string>\$JAVAROOT/jd-gui-${VERSION}.jar</string>
-			<key>WorkingDirectory</key> <string>\$JAVAROOT</string>
+			<key>WorkingDirectory</key>				<string>\$JAVAROOT</string>
 			<key>Properties</key>
 			<dict>
 				<key>apple.laf.useScreenMenuBar</key>
 				<string>true</string>
 			</dict>
-			<key>VMOptions</key>				<string>-Xms512m</string>
+			<key>VMOptions</key>					<string>-Xms512m</string>
 		</dict>
 	</dict>
 </plist>

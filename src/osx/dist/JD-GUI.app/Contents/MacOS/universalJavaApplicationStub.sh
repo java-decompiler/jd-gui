@@ -13,8 +13,8 @@
 #                                                                                #
 # @author    Tobias Fischer                                                      #
 # @url       https://github.com/tofi86/universalJavaApplicationStub              #
-# @date      2014-10-12                                                          #
-# @version   0.7.0                                                               #
+# @date      2015-05-15                                                          #
+# @version   0.9.0                                                               #
 #                                                                                #
 #                                                                                #
 ##################################################################################
@@ -22,7 +22,7 @@
 #                                                                                #
 # The MIT License (MIT)                                                          #
 #                                                                                #
-# Copyright (c) 2014 Tobias Fischer                                              #
+# Copyright (c) 2015 Tobias Fischer                                              #
 #                                                                                #
 # Permission is hereby granted, free of charge, to any person obtaining a copy   #
 # of this software and associated documentation files (the "Software"), to deal  #
@@ -96,6 +96,8 @@ OracleResourcesFolder="${AppPackageFolder}"/Contents/Resources
 # set path to Info.plist in bundle
 InfoPlistFile="${AppPackageFolder}"/Contents/Info.plist
 
+# set the default JVM Version to a null string
+JVMVersion=""
 
 
 
@@ -111,59 +113,63 @@ CFBundleName=`/usr/libexec/PlistBuddy -c "print :CFBundleName" "${InfoPlistFile}
 CFBundleIconFile=`/usr/libexec/PlistBuddy -c "print :CFBundleIconFile" "${InfoPlistFile}"`
 
 
-# check Info.plist for Apple style Java keys -> if key :JavaX is present, parse in apple mode
-/usr/libexec/PlistBuddy -c "print :JavaX" "${InfoPlistFile}" > /dev/null 2>&1
+# check Info.plist for Apple style Java keys -> if key :Java is present, parse in apple mode
+/usr/libexec/PlistBuddy -c "print :Java" "${InfoPlistFile}" > /dev/null 2>&1
 exitcode=$?
+JavaKey=":Java"
 
-# read Info.plist in Apple style if exit code returns 0 (true, :JavaX key is present)
+# if no :Java key is present, check Info.plist for universalJavaApplication style JavaX keys -> if key :JavaX is present, parse in apple mode
+if [ $exitcode -ne 0 ]; then
+	/usr/libexec/PlistBuddy -c "print :JavaX" "${InfoPlistFile}" > /dev/null 2>&1
+	exitcode=$?
+	JavaKey=":JavaX"
+fi
+
+
+# read Info.plist in Apple style if exit code returns 0 (true, :Java key is present)
 if [ $exitcode -eq 0 ]; then
 
-	# read the Java WorkingDirectory
-	JVMWorkDir=`/usr/libexec/PlistBuddy -c "print :JavaX:WorkingDirectory" "${InfoPlistFile}" 2> /dev/null | xargs`
-	
-	# set Working Directory based upon Plist info
-	if [ "${JVMWorkDir}" == "\$JAVAROOT" ]; then
-		WorkingDirectory="${AppleJavaFolder}"
-		
-	elif [ "${JVMWorkDir}" == "\$APP_PACKAGE" ]; then
-		WorkingDirectory="${AppPackageFolder}"
-		
-	elif [ "${JVMWorkDir}" == "\$USER_HOME" ]; then
-		WorkingDirectory="~"
-		
-	elif [[ ! -z ${JVMWorkDir} ]]; then
-		WorkingDirectory="${JVMWorkDir}"
-		
-	else
-		# AppPackageRoot is the standard WorkingDirectory when the script is started
-		WorkingDirectory="${AppPackageRoot}"
-	fi
-	
 	# set Java and Resources folder
 	JavaFolder="${AppleJavaFolder}"
 	ResourcesFolder="${AppleResourcesFolder}"
 
 	APP_PACKAGE="${AppPackageFolder}"
 	JAVAROOT="${AppleJavaFolder}"
-	USER_HOME="`eval echo ~`"
+	USER_HOME="$HOME"
+
+
+	# read the Java WorkingDirectory
+	JVMWorkDir=`/usr/libexec/PlistBuddy -c "print ${JavaKey}:WorkingDirectory" "${InfoPlistFile}" 2> /dev/null | xargs`
+	
+	# set Working Directory based upon Plist info
+	if [[ ! -z ${JVMWorkDir} ]]; then
+		WorkingDirectory="${JVMWorkDir}"
+	else
+		# AppPackageRoot is the standard WorkingDirectory when the script is started
+		WorkingDirectory="${AppPackageRoot}"
+	fi
+
+	# expand variables $APP_PACKAGE, $JAVAROOT, $USER_HOME
+	WorkingDirectory=`eval "echo ${WorkingDirectory}"`
+
 
 	# read the MainClass name
-	JVMMainClass=`/usr/libexec/PlistBuddy -c "print :JavaX:MainClass" "${InfoPlistFile}" 2> /dev/null`
+	JVMMainClass=`/usr/libexec/PlistBuddy -c "print ${JavaKey}:MainClass" "${InfoPlistFile}" 2> /dev/null`
 
 	# read the JVM Options
-	JVMOptions=`/usr/libexec/PlistBuddy -c "print :JavaX:Properties" "${InfoPlistFile}" 2> /dev/null | grep " =" | sed 's/^ */-D/g' | tr '\n' ' ' | sed 's/  */ /g' | sed 's/ = /=/g' | xargs`
+	JVMOptions=`/usr/libexec/PlistBuddy -c "print ${JavaKey}:Properties" "${InfoPlistFile}" 2> /dev/null | grep " =" | sed 's/^ */-D/g' | tr '\n' ' ' | sed 's/  */ /g' | sed 's/ = /=/g' | xargs`
 
 	# read StartOnMainThread
-	JVMStartOnMainThread=`/usr/libexec/PlistBuddy -c "print :JavaX:StartOnMainThread" "${InfoPlistFile}" 2> /dev/null`
+	JVMStartOnMainThread=`/usr/libexec/PlistBuddy -c "print ${JavaKey}:StartOnMainThread" "${InfoPlistFile}" 2> /dev/null`
 	if [ "${JVMStartOnMainThread}" == "true" ]; then
 		echo ${JVMStartOnMainThread} > ~/Desktop/test.txt
 		JVMOptions+=" -XstartOnFirstThread"
 	fi
 
 	# read the ClassPath in either Array or String style
-	JVMClassPath_RAW=`/usr/libexec/PlistBuddy -c "print :JavaX:ClassPath" "${InfoPlistFile}" 2> /dev/null`
+	JVMClassPath_RAW=`/usr/libexec/PlistBuddy -c "print ${JavaKey}:ClassPath" "${InfoPlistFile}" 2> /dev/null`
 	if [[ $JVMClassPath_RAW == *Array* ]] ; then
-		JVMClassPath=.`/usr/libexec/PlistBuddy -c "print :JavaX:ClassPath" "${InfoPlistFile}" 2> /dev/null | grep "    " | sed 's/^ */:/g' | tr -d '\n' | xargs`
+		JVMClassPath=.`/usr/libexec/PlistBuddy -c "print ${JavaKey}:ClassPath" "${InfoPlistFile}" 2> /dev/null | grep "    " | sed 's/^ */:/g' | tr -d '\n' | xargs`
 	else
 		JVMClassPath=${JVMClassPath_RAW}
 	fi
@@ -171,11 +177,13 @@ if [ $exitcode -eq 0 ]; then
 	JVMClassPath=`eval "echo ${JVMClassPath}"`
 
 	# read the JVM Default Options
-	JVMDefaultOptions=`/usr/libexec/PlistBuddy -c "print :JavaX:VMOptions" "${InfoPlistFile}" 2> /dev/null | xargs`
+	JVMDefaultOptions=`/usr/libexec/PlistBuddy -c "print ${JavaKey}:VMOptions" "${InfoPlistFile}" 2> /dev/null | xargs`
 
 	# read the JVM Arguments
-	JVMArguments=`/usr/libexec/PlistBuddy -c "print :JavaX:Arguments" "${InfoPlistFile}" 2> /dev/null | xargs`
+	JVMArguments=`/usr/libexec/PlistBuddy -c "print ${JavaKey}:Arguments" "${InfoPlistFile}" 2> /dev/null | xargs`
 
+    # read the Java version we want to find
+    JVMVersion=`/usr/libexec/PlistBuddy -c "print ${JavaKey}:JVMVersion" "${InfoPlistFile}" 2> /dev/null | xargs`
 
 # read Info.plist in Oracle style
 else
@@ -216,9 +224,21 @@ fi
 # first check system variable "$JAVA_HOME"
 if [ -n "$JAVA_HOME" ] ; then
 	JAVACMD="$JAVA_HOME/bin/java"
+	
+# check for specified JVMversion in "/usr/libexec/java_home" symlinks
+elif [ ! -z ${JVMVersion} ] && [ -x /usr/libexec/java_home ] && /usr/libexec/java_home -F; then
+
+	if /usr/libexec/java_home -F -v ${JVMVersion}; then
+		JAVACMD="`/usr/libexec/java_home -F -v ${JVMVersion} 2> /dev/null`/bin/java"
+	else
+		# display error message with applescript
+		osascript -e "tell application \"System Events\" to display dialog \"ERROR launching '${CFBundleName}'\n\nNo suitable Java version found on your system!\nThis program requires Java ${JVMVersion}\nMake sure you install the required Java version.\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
+		# exit with error
+		exit 3
+	fi
 
 # otherwise check "/usr/libexec/java_home" symlinks
-elif [ -x /usr/libexec/java_home ] && [ -d "`/usr/libexec/java_home 2> /dev/null`" ] ; then
+elif [ -x /usr/libexec/java_home ] && /usr/libexec/java_home -F; then
 	JAVACMD="`/usr/libexec/java_home 2> /dev/null`/bin/java"
 
 # otherwise check Java standard symlink (old Apple Java)
@@ -245,7 +265,7 @@ if [ -z ${JVMMainClass} ]; then
 	# display error message with applescript
 	osascript -e "tell application \"System Events\" to display dialog \"ERROR launching '${CFBundleName}'!\n\n'MainClass' isn't specified!\nJava application cannot be started!\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
 	# exit with error
-	exit 1
+	exit 2
 
 
 # check whether $JAVACMD is a file and executable
