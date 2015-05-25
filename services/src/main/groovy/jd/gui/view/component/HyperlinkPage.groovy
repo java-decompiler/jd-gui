@@ -16,8 +16,8 @@ import java.awt.event.MouseWheelEvent
 
 @CompileStatic
 abstract class HyperlinkPage extends TextPage {
-    protected static final Cursor defaultCursor = Cursor.defaultCursor
-    protected static final Cursor handCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+    protected static final Cursor DEFAULT_CURSOR = Cursor.defaultCursor
+    protected static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
 
     protected TreeMap<Integer, HyperlinkData> hyperlinks = new TreeMap<>()
 
@@ -55,14 +55,14 @@ abstract class HyperlinkPage extends TextPage {
                             if (entry) {
                                 def entryData = entry.value
                                 if (entryData && (offset < entryData.endPosition) && (offset >= entryData.startPosition) && isHyperlinkEnabled(entryData)) {
-                                    textArea.cursor = handCursor
+                                    textArea.cursor = HAND_CURSOR
                                     return
                                 }
                             }
                         }
                     }
 
-                    textArea.cursor = defaultCursor
+                    textArea.cursor = DEFAULT_CURSOR
                 }
             }
 

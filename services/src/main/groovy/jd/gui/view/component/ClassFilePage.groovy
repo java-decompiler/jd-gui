@@ -377,7 +377,7 @@ class ClassFilePage
         }
 
         if (ranges) {
-            textArea.markAllHighlightColor = selectHighlightColor
+            textArea.markAllHighlightColor = SELECT_HIGHLIGHT_COLOR
             textArea.markAll(ranges)
             setCaretPositionAndCenter(ranges.sort().get(0))
         }

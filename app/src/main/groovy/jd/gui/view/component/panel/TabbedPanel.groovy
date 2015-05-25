@@ -32,8 +32,8 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 
 class TabbedPanel extends JPanel implements PreferencesChangeListener {
-	static final ImageIcon closeIcon = new ImageIcon(TabbedPanel.class.classLoader.getResource('images/close.gif'))
-	static final ImageIcon  closeActivateIcon = new ImageIcon(TabbedPanel.class.classLoader.getResource('images/close_active.gif'))
+	static final ImageIcon CLOSE_ICON = new ImageIcon(TabbedPanel.class.classLoader.getResource('images/close.gif'))
+	static final ImageIcon  CLOSE_ACTIVE_ICON = new ImageIcon(TabbedPanel.class.classLoader.getResource('images/close_active.gif'))
 
     static final String TAB_LAYOUT = 'UITabsPreferencesProvider.singleLineTabs'
 
@@ -94,13 +94,13 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
             page.preferencesChanged(preferences)
         }
         // Add a new tab
-        JLabel tabCloseButton = new JLabel(closeIcon)
+        JLabel tabCloseButton = new JLabel(CLOSE_ICON)
         tabCloseButton.toolTipText = 'Close this panel'
         tabCloseButton.addMouseListener(new MouseListener() {
             void mousePressed(MouseEvent e) {}
             void mouseReleased(MouseEvent e) {}
-            void mouseEntered(MouseEvent e) { e.source.icon = closeActivateIcon }
-            void mouseExited(MouseEvent e) { e.source.icon = closeIcon }
+            void mouseEntered(MouseEvent e) { e.source.icon = TabbedPanel.@CLOSE_ACTIVE_ICON }
+            void mouseExited(MouseEvent e) { e.source.icon = TabbedPanel.@CLOSE_ICON }
             void mouseClicked(MouseEvent e) { removeComponent(page) }
         })
 

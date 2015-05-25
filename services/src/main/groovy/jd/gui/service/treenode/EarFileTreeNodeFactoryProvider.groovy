@@ -14,14 +14,14 @@ import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 
 class EarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvider {
-    static final ImageIcon icon = new ImageIcon(JarFileTreeNodeFactoryProvider.class.classLoader.getResource('images/ear_obj.gif'))
+    static final ImageIcon ICON = new ImageIcon(JarFileTreeNodeFactoryProvider.class.classLoader.getResource('images/ear_obj.gif'))
 
     String[] getSelectors() { ['*:file:*.ear'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
         def name = entry.path.substring(lastSlashIndex+1)
-        def node = new TreeNode(entry, 'ear', new TreeNodeBean(label:name, icon:icon))
+        def node = new TreeNode(entry, 'ear', new TreeNodeBean(label:name, icon:ICON))
         // Add dummy node
         node.add(new DefaultMutableTreeNode())
         return node

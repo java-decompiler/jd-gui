@@ -15,14 +15,14 @@ import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 
 class XmlFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
-    static final ImageIcon icon = new ImageIcon(XmlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
+    static final ImageIcon ICON = new ImageIcon(XmlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
 
     String[] getSelectors() { ['*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.tld', '*:file:*.wsdl'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
         def name = entry.path.substring(lastSlashIndex+1)
-        return new TreeNode(entry, new TreeNodeBean(label:name, icon:icon, tip:"Location: $entry.uri.path"))
+        return new TreeNode(entry, new TreeNodeBean(label:name, icon:ICON, tip:"Location: $entry.uri.path"))
     }
 
     static class TreeNode extends TextFileTreeNodeFactoryProvider.TreeNode {

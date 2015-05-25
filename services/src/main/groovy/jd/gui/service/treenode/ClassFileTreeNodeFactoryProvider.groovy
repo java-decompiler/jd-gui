@@ -21,7 +21,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import java.util.regex.Pattern
 
 class ClassFileTreeNodeFactoryProvider implements TreeNodeFactory {
-    static final ImageIcon classFileIcon = new ImageIcon(ClassFileTreeNodeFactoryProvider.class.classLoader.getResource('images/classf_obj.png'))
+    static final ImageIcon CLASS_FILE_ICON = new ImageIcon(ClassFileTreeNodeFactoryProvider.class.classLoader.getResource('images/classf_obj.png'))
 
     static {
         // Early class loading
@@ -37,7 +37,7 @@ class ClassFileTreeNodeFactoryProvider implements TreeNodeFactory {
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
         def name = entry.path.substring(lastSlashIndex+1)
-        return new ClassFileTreeNode(entry, new TreeNodeBean(label:name, icon: classFileIcon))
+        return new ClassFileTreeNode(entry, new TreeNodeBean(label:name, icon:CLASS_FILE_ICON))
     }
 
     static abstract class AbstractTreeNode extends DefaultMutableTreeNode implements UriGettable, PageCreator {

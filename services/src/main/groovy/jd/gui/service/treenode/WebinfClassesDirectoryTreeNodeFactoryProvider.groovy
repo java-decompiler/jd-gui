@@ -6,13 +6,12 @@
 package jd.gui.service.treenode
 
 import javax.swing.*
-import java.util.regex.Pattern
 
 class WebinfClassesDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
-    static final ImageIcon icon = new ImageIcon(WebinfClassesDirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/packagefolder_obj.png'))
+    static final ImageIcon ICON = new ImageIcon(WebinfClassesDirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/packagefolder_obj.png'))
 
     String[] getSelectors() { ['war:dir:WEB-INF/classes'] }
 
-    ImageIcon getIcon() { icon }
+    ImageIcon getIcon() { ICON }
     ImageIcon getOpenIcon() { null }
 }

@@ -257,7 +257,7 @@ public class ClassFileTypeFactoryProvider implements TypeFactory {
                             public int getFlags() { return fieldNode.access; }
                             public String getName() { return fieldNode.name; }
                             public String getDescriptor() { return fieldNode.desc; }
-                            public Icon getIcon() { return fieldIcons[accessToIndex(fieldNode.access)]; }
+                            public Icon getIcon() { return FIELD_ICONS[accessToIndex(fieldNode.access)]; }
                         });
                     }
                 }
@@ -276,7 +276,7 @@ public class ClassFileTypeFactoryProvider implements TypeFactory {
                             public int getFlags() { return methodNode.access; }
                             public String getName() { return methodNode.name; }
                             public String getDescriptor() { return methodNode.desc; }
-                            public Icon getIcon() { return methodIcons[accessToIndex(methodNode.access)]; }
+                            public Icon getIcon() { return METHOD_ICONS[accessToIndex(methodNode.access)]; }
                         });
                     }
                 }
@@ -286,13 +286,13 @@ public class ClassFileTypeFactoryProvider implements TypeFactory {
 
         protected static ImageIcon getIcon(int access) {
             if ((access & Opcodes.ACC_ANNOTATION) != 0)
-                return annotationIcon;
+                return ANNOTATION_ICON;
             else if ((access & Opcodes.ACC_INTERFACE) != 0)
-                return interfaceIcons[accessToIndex(access)];
+                return INTERFACE_ICONS[accessToIndex(access)];
             else if ((access & Opcodes.ACC_ENUM) != 0)
-                return enumIcon;
+                return ENUM_ICON;
             else
-                return classIcons[accessToIndex(access)];
+                return CLASS_ICONS[accessToIndex(access)];
         }
 
         protected static int accessToIndex(int access) {
@@ -351,78 +351,78 @@ public class ClassFileTypeFactoryProvider implements TypeFactory {
             return result;
         }
 
-        protected static final ImageIcon abstractOverlayIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/abstract_ovr.png"));
-        protected static final ImageIcon finalOverlayIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/final_ovr.png"));
-        protected static final ImageIcon staticOverlayIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/static_ovr.png"));
+        protected static final ImageIcon ABSTRACT_OVERLAY_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/abstract_ovr.png"));
+        protected static final ImageIcon FINAL_OVERLAY_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/final_ovr.png"));
+        protected static final ImageIcon STATIC_OVERLAY_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/static_ovr.png"));
 
-        protected static final ImageIcon classIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/class_default_obj.png"));
-        protected static final ImageIcon publicClassIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/class_obj.png"));
-        protected static final ImageIcon protectedClassIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/class_protected_obj.png"));
-        protected static final ImageIcon privateClassIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/class_private_obj.png"));
+        protected static final ImageIcon CLASS_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/class_default_obj.png"));
+        protected static final ImageIcon PUBLIC_CLASS_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/class_obj.png"));
+        protected static final ImageIcon PROTECTED_CLASS_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/class_protected_obj.png"));
+        protected static final ImageIcon PRIVATE_CLASS_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/class_private_obj.png"));
 
-        protected static final ImageIcon interfaceIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/int_default_obj.png"));
-        protected static final ImageIcon publicInterfaceIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/int_obj.png"));
-        protected static final ImageIcon protectedInterfaceIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/int_protected_obj.png"));
-        protected static final ImageIcon privateInterfaceIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/int_private_obj.png"));
+        protected static final ImageIcon INTERFACE_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/int_default_obj.png"));
+        protected static final ImageIcon PUBLIC_INTERFACE_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/int_obj.png"));
+        protected static final ImageIcon PROTECTED_INTERFACE_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/int_protected_obj.png"));
+        protected static final ImageIcon PRIVATE_INTERFACE_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/int_private_obj.png"));
 
-        protected static final ImageIcon annotationIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/annotation_obj.png"));
-        protected static final ImageIcon enumIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/enum_obj.png"));
+        protected static final ImageIcon ANNOTATION_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/annotation_obj.png"));
+        protected static final ImageIcon ENUM_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/enum_obj.png"));
 
-        protected static final ImageIcon fieldIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/field_default_obj.png"));
-        protected static final ImageIcon publicFieldIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/field_public_obj.png"));
-        protected static final ImageIcon protectedFieldIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/field_protected_obj.png"));
-        protected static final ImageIcon privateFieldIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/field_private_obj.png"));
+        protected static final ImageIcon FIELD_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/field_default_obj.png"));
+        protected static final ImageIcon PUBLIC_FIELD_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/field_public_obj.png"));
+        protected static final ImageIcon PROTECTED_FIELD_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/field_protected_obj.png"));
+        protected static final ImageIcon PRIVATE_FIELD_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/field_private_obj.png"));
 
-        protected static final ImageIcon methodIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/methdef_obj.png"));
-        protected static final ImageIcon publicMethodIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/methpub_obj.png"));
-        protected static final ImageIcon protedtedMethodIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/methpro_obj.png"));
-        protected static final ImageIcon privateMethodIcon = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/methpri_obj.png"));
+        protected static final ImageIcon METHOD_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/methdef_obj.png"));
+        protected static final ImageIcon PUBLIC_METHOD_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/methpub_obj.png"));
+        protected static final ImageIcon PROTECTED_METHOD_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/methpro_obj.png"));
+        protected static final ImageIcon PRIVATE_METHOD_ICON = new ImageIcon(ClassFileTypeFactoryProvider.class.getClassLoader().getResource("images/methpri_obj.png"));
 
         // Default icon set
-        protected static final ImageIcon[] defaultClassIcons = {
-            classIcon,
-            publicClassIcon,
-            protectedClassIcon,
-            privateClassIcon
+        protected static final ImageIcon[] DEFAULT_CLASS_ICONS = {
+            CLASS_ICON,
+            PUBLIC_CLASS_ICON,
+            PROTECTED_CLASS_ICON,
+            PRIVATE_CLASS_ICON
         };
 
-        protected static final ImageIcon[] defaultInterfaceIcons = {
-            interfaceIcon,
-            publicInterfaceIcon,
-            protectedInterfaceIcon,
-            privateInterfaceIcon
+        protected static final ImageIcon[] DEFAULT_INTERFACE_ICONS = {
+            INTERFACE_ICON,
+            PUBLIC_INTERFACE_ICON,
+            PROTECTED_INTERFACE_ICON,
+            PRIVATE_INTERFACE_ICON
         };
 
-        protected static final ImageIcon[] defaultFieldIcons = {
-            fieldIcon,
-            publicFieldIcon,
-            protectedFieldIcon,
-            privateFieldIcon
+        protected static final ImageIcon[] DEFAULT_FIELD_ICONS = {
+            FIELD_ICON,
+            PUBLIC_FIELD_ICON,
+            PROTECTED_FIELD_ICON,
+            PRIVATE_FIELD_ICON
         };
 
-        protected static final ImageIcon[] defaultMethodIcons = {
-            methodIcon,
-            publicMethodIcon,
-            protedtedMethodIcon,
-            privateMethodIcon
+        protected static final ImageIcon[] DEFAULT_METHOD_ICONS = {
+            METHOD_ICON,
+            PUBLIC_METHOD_ICON,
+            PROTECTED_METHOD_ICON,
+            PRIVATE_METHOD_ICON
         };
 
         // Add static icon set
-        protected static final ImageIcon[] staticClassIcons = mergeIcons(defaultClassIcons, staticOverlayIcon, 100, 0);
-        protected static final ImageIcon[] staticInterfaceIcons = mergeIcons(defaultInterfaceIcons, staticOverlayIcon, 100, 0);
-        protected static final ImageIcon[] staticFieldIcons = mergeIcons(defaultFieldIcons, staticOverlayIcon, 100, 0);
-        protected static final ImageIcon[] staticMethodIcons = mergeIcons(defaultMethodIcons, staticOverlayIcon, 100, 0);
+        protected static final ImageIcon[] STATIC_CLASS_ICONS = mergeIcons(DEFAULT_CLASS_ICONS, STATIC_OVERLAY_ICON, 100, 0);
+        protected static final ImageIcon[] STATIC_INTERFACE_ICONS = mergeIcons(DEFAULT_INTERFACE_ICONS, STATIC_OVERLAY_ICON, 100, 0);
+        protected static final ImageIcon[] STATIC_FIELD_ICONS = mergeIcons(DEFAULT_FIELD_ICONS, STATIC_OVERLAY_ICON, 100, 0);
+        protected static final ImageIcon[] STATIC_METHOD_ICONS = mergeIcons(DEFAULT_METHOD_ICONS, STATIC_OVERLAY_ICON, 100, 0);
 
         // Add final icon set
-        protected static final ImageIcon[] finalStaticClassIcons = mergeIcons(staticClassIcons, finalOverlayIcon, 0, 0);
-        protected static final ImageIcon[] finalStaticInterfaceIcons = mergeIcons(staticInterfaceIcons, finalOverlayIcon, 0, 0);
-        protected static final ImageIcon[] finalStaticFieldIcons = mergeIcons(staticFieldIcons, finalOverlayIcon, 0, 0);
-        protected static final ImageIcon[] finalStaticMethodIcons = mergeIcons(staticMethodIcons, finalOverlayIcon, 0, 0);
+        protected static final ImageIcon[] FINAL_STATIC_CLASS_ICONS = mergeIcons(STATIC_CLASS_ICONS, FINAL_OVERLAY_ICON, 0, 0);
+        protected static final ImageIcon[] FINAL_STATIC_INTERFACE_ICONS = mergeIcons(STATIC_INTERFACE_ICONS, FINAL_OVERLAY_ICON, 0, 0);
+        protected static final ImageIcon[] FINAL_STATIC_FIELD_ICONS = mergeIcons(STATIC_FIELD_ICONS, FINAL_OVERLAY_ICON, 0, 0);
+        protected static final ImageIcon[] FINAL_STATIC_METHOD_ICONS = mergeIcons(STATIC_METHOD_ICONS, FINAL_OVERLAY_ICON, 0, 0);
 
         // Add abstract icon set
-        protected static final ImageIcon[] classIcons = mergeIcons(finalStaticClassIcons, abstractOverlayIcon, 0, 100);
-        protected static final ImageIcon[] interfaceIcons = mergeIcons(finalStaticInterfaceIcons, abstractOverlayIcon, 0, 100);
-        protected static final ImageIcon[] fieldIcons = mergeIcons(finalStaticFieldIcons, abstractOverlayIcon, 0, 100);
-        protected static final ImageIcon[] methodIcons = mergeIcons(finalStaticMethodIcons, abstractOverlayIcon, 0, 100);
+        protected static final ImageIcon[] CLASS_ICONS = mergeIcons(FINAL_STATIC_CLASS_ICONS, ABSTRACT_OVERLAY_ICON, 0, 100);
+        protected static final ImageIcon[] INTERFACE_ICONS = mergeIcons(FINAL_STATIC_INTERFACE_ICONS, ABSTRACT_OVERLAY_ICON, 0, 100);
+        protected static final ImageIcon[] FIELD_ICONS = mergeIcons(FINAL_STATIC_FIELD_ICONS, ABSTRACT_OVERLAY_ICON, 0, 100);
+        protected static final ImageIcon[] METHOD_ICONS = mergeIcons(FINAL_STATIC_METHOD_ICONS, ABSTRACT_OVERLAY_ICON, 0, 100);
     }
 }

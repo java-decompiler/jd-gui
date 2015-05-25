@@ -15,14 +15,14 @@ import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 
 class JavascriptFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
-    static final ImageIcon icon = new ImageIcon(JavascriptFileTreeNodeFactoryProvider.class.classLoader.getResource('images/js_obj.png'))
+    static final ImageIcon ICON = new ImageIcon(JavascriptFileTreeNodeFactoryProvider.class.classLoader.getResource('images/js_obj.png'))
 
     String[] getSelectors() { ['*:file:*.js'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
         def name = entry.path.substring(lastSlashIndex+1)
-        return new TreeNode(entry, new TreeNodeBean(label:name, icon:icon, tip:"Location: $entry.uri.path"))
+        return new TreeNode(entry, new TreeNodeBean(label:name, icon:ICON, tip:"Location: $entry.uri.path"))
     }
 
     static class TreeNode extends TextFileTreeNodeFactoryProvider.TreeNode {

@@ -18,8 +18,8 @@ import javax.swing.tree.DefaultMutableTreeNode
 import java.util.regex.Pattern
 
 class DirectoryTreeNodeFactoryProvider implements TreeNodeFactory {
-	static final ImageIcon icon = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/folder.gif'))
-	static final ImageIcon openIcon = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/folder_open.png'))
+	static final ImageIcon ICON = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/folder.gif'))
+	static final ImageIcon OPEN_ICON = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/folder_open.png'))
 
 	String[] getSelectors() { ['*:dir:*'] }
     Pattern getPathPattern() { null }
@@ -47,8 +47,8 @@ class DirectoryTreeNodeFactoryProvider implements TreeNodeFactory {
 		return node
 	}
 
-    ImageIcon getIcon() { icon }
-    ImageIcon getOpenIcon() { openIcon }
+    ImageIcon getIcon() { ICON }
+    ImageIcon getOpenIcon() { OPEN_ICON }
 
     static class TreeNode extends DefaultMutableTreeNode implements UriGettable, TreeNodeExpandable {
         Container.Entry entry

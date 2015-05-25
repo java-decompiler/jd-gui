@@ -30,8 +30,8 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
 class OpenTypeHierarchyView {
-    static final ImageIcon rootClassIcon = new ImageIcon(OpenTypeHierarchyView.class.classLoader.getResource('images/generate_class.png'))
-    static final ImageIcon rootInterfaceIcon = new ImageIcon(OpenTypeHierarchyView.class.classLoader.getResource('images/generate_int.png'))
+    static final ImageIcon ROOT_CLASS_ICON = new ImageIcon(OpenTypeHierarchyView.class.classLoader.getResource('images/generate_class.png'))
+    static final ImageIcon ROOT_INTERFACE_ICON = new ImageIcon(OpenTypeHierarchyView.class.classLoader.getResource('images/generate_int.png'))
 
     SwingBuilder swing
     API api
@@ -213,7 +213,7 @@ class OpenTypeHierarchyView {
                 def package_ = superTypeName.substring(0, lastPackageSeparatorIndex).replace('/', '.')
                 def name = superTypeName.substring(lastPackageSeparatorIndex + 1).replace('$', '.')
                 def label = package_ ? name + ' - ' + package_ : name
-                def icon = ((type.flags & Type.FLAG_INTERFACE) == 0) ? rootClassIcon : rootInterfaceIcon
+                def icon = ((type.flags & Type.FLAG_INTERFACE) == 0) ? ROOT_CLASS_ICON : ROOT_INTERFACE_ICON
                 def rootTreeNode = new TreeNode(null, superTypeName, null, new TreeNodeBean(label, icon))
 
                 if (package_.startsWith('java.')) {

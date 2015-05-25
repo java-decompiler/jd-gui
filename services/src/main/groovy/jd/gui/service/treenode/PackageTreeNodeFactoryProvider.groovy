@@ -8,7 +8,6 @@ package jd.gui.service.treenode
 import jd.gui.api.API
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
-import jd.gui.spi.TreeNodeFactory
 import jd.gui.util.JarContainerEntryUtil
 import jd.gui.view.data.TreeNodeBean
 
@@ -17,7 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import java.util.regex.Pattern
 
 class PackageTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
-    static final ImageIcon icon = new ImageIcon(PackageTreeNodeFactoryProvider.class.classLoader.getResource('images/package_obj.png'))
+    static final ImageIcon ICON = new ImageIcon(PackageTreeNodeFactoryProvider.class.classLoader.getResource('images/package_obj.png'))
 
     String[] getSelectors() { ['jar:dir:*'] }
 
@@ -46,7 +45,7 @@ class PackageTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
         return node
     }
 
-    ImageIcon getIcon() { icon }
+    ImageIcon getIcon() { ICON }
     ImageIcon getOpenIcon() { null }
 
     static class TreeNode extends DirectoryTreeNodeFactoryProvider.TreeNode {

@@ -16,12 +16,12 @@ import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 
 class EjbJarXmlFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
-    static final ImageIcon icon = new ImageIcon(ManifestFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
+    static final ImageIcon ICON = new ImageIcon(ManifestFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
 
     String[] getSelectors() { ['jar:file:META-INF/ejb-jar.xml'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
-        return new TreeNode(entry, new TreeNodeBean(label:'ejb-jar.xml', icon:icon, tip:"Location: $entry.uri.path"))
+        return new TreeNode(entry, new TreeNodeBean(label:'ejb-jar.xml', icon:ICON, tip:"Location: $entry.uri.path"))
     }
 
     static class TreeNode extends FileTreeNodeFactoryProvider.TreeNode implements PageCreator {

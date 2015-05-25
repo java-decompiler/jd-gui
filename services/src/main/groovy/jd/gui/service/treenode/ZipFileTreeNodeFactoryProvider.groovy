@@ -16,7 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode
 import java.util.regex.Pattern
 
 class ZipFileTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
-	static final ImageIcon icon = new ImageIcon(ZipFileTreeNodeFactoryProvider.class.classLoader.getResource('images/zip_obj.png'))
+	static final ImageIcon ICON = new ImageIcon(ZipFileTreeNodeFactoryProvider.class.classLoader.getResource('images/zip_obj.png'))
 
     String[] getSelectors() { ['*:file:*.zip'] }
     Pattern getPathPattern() { null }
@@ -24,7 +24,7 @@ class ZipFileTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
         def name = entry.path.substring(lastSlashIndex+1)
-        def node = new TreeNode(entry, 'generic', new TreeNodeBean(label:name, icon:icon))
+        def node = new TreeNode(entry, 'generic', new TreeNodeBean(label:name, icon:ICON))
         // Add dummy node
         node.add(new DefaultMutableTreeNode())
         return node

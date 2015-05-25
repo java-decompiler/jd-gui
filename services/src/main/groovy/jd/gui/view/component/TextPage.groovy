@@ -30,12 +30,12 @@ import java.awt.event.MouseEvent
 
 @CompileStatic
 class TextPage extends JPanel implements ContentCopyable, ContentSelectable, LineNumberNavigable, ContentSearchable, UriOpenable {
-    protected static final ImageIcon collapsedIcon = new ImageIcon(TextPage.class.classLoader.getResource('images/plus.png'))
-    protected static final ImageIcon expandedIcon = new ImageIcon(TextPage.class.classLoader.getResource('images/minus.png'))
+    protected static final ImageIcon COLLAPSED_ICON = new ImageIcon(TextPage.class.classLoader.getResource('images/plus.png'))
+    protected static final ImageIcon EXPANDED_ICON = new ImageIcon(TextPage.class.classLoader.getResource('images/minus.png'))
 
-    protected static final Color doubleClickHighlightColor = new Color(0x66ff66)
-    protected static final Color searchHighlightColor = new Color(0xffff66)
-    protected static final Color selectHighlightColor = new Color(0xF49810)
+    protected static final Color DOUBLE_CLICK_HIGHLIGHT_COLOR = new Color(0x66ff66)
+    protected static final Color SEARCH_HIGHLIGHT_COLOR = new Color(0xffff66)
+    protected static final Color SELECT_HIGHLIGHT_COLOR = new Color(0xF49810)
 
     protected RSyntaxTextArea textArea
     protected RTextScrollPane scrollPane
@@ -54,7 +54,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
         textArea.addMouseListener(new MouseAdapter() {
             void mouseClicked(MouseEvent e) {
                 if (e.clickCount == 2) {
-                    textArea.markAllHighlightColor = doubleClickHighlightColor
+                    textArea.markAllHighlightColor = DOUBLE_CLICK_HIGHLIGHT_COLOR
                     SearchEngine.markAll(textArea, newSearchContext(textArea.selectedText, true, true, true, false))
                 }
             }
@@ -76,7 +76,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
         scrollPane.font = textArea.font
 
         def gutter = scrollPane.gutter
-        gutter.setFoldIcons(collapsedIcon, expandedIcon)
+        gutter.setFoldIcons(COLLAPSED_ICON, EXPANDED_ICON)
         gutter.foldIndicatorForeground = gutter.borderColor
 
         add(scrollPane, BorderLayout.CENTER)
@@ -194,7 +194,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
     // --- ContentSearchable --- //
     boolean highlightText(String text, boolean caseSensitive) {
         if (text.length() > 1) {
-            textArea.markAllHighlightColor = searchHighlightColor
+            textArea.markAllHighlightColor = SEARCH_HIGHLIGHT_COLOR
             textArea.caretPosition = textArea.selectionStart
 
             def context = newSearchContext(text, caseSensitive, false, true, false)
@@ -213,7 +213,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
 
     void findNext(String text, boolean caseSensitive) {
         if (text.length() > 1) {
-            textArea.markAllHighlightColor = searchHighlightColor
+            textArea.markAllHighlightColor = SEARCH_HIGHLIGHT_COLOR
 
             def context = newSearchContext(text, caseSensitive, false, true, false)
             def result = SearchEngine.find(textArea, context)
@@ -227,7 +227,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
 
     void findPrevious(String text, boolean caseSensitive) {
         if (text.length() > 1) {
-            textArea.markAllHighlightColor = searchHighlightColor
+            textArea.markAllHighlightColor = SEARCH_HIGHLIGHT_COLOR
 
             def context = newSearchContext(text, caseSensitive, false, false, false)
             def result = SearchEngine.find(textArea, context)
@@ -275,7 +275,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
                 def highlightFlags = parameters.get('highlightFlags')
 
                 if ((highlightFlags.indexOf('s') != -1) && parameters.containsKey('highlightPattern')) {
-                    textArea.markAllHighlightColor = selectHighlightColor
+                    textArea.markAllHighlightColor = SELECT_HIGHLIGHT_COLOR
                     textArea.caretPosition = 0
 
                     // Highlight all

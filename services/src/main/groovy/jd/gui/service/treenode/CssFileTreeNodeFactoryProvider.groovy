@@ -16,14 +16,14 @@ import javax.swing.JComponent
 import javax.swing.tree.DefaultMutableTreeNode
 
 class CssFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
-    static final ImageIcon icon = new ImageIcon(HtmlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/css_obj.png'))
+    static final ImageIcon ICON = new ImageIcon(HtmlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/css_obj.png'))
 
     String[] getSelectors() { ['*:file:*.css'] }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
         def name = entry.path.substring(lastSlashIndex+1)
-        return new TreeNode(entry, new TreeNodeBean(label:name, icon:icon, tip:"Location: $entry.uri.path"))
+        return new TreeNode(entry, new TreeNodeBean(label:name, icon:ICON, tip:"Location: $entry.uri.path"))
     }
 
     static class TreeNode extends TextFileTreeNodeFactoryProvider.TreeNode {

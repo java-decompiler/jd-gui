@@ -8,10 +8,10 @@ package jd.gui.service.treenode
 import javax.swing.*
 
 class WebinfLibDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
-    static final ImageIcon icon = new ImageIcon(WebinfLibDirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/archivefolder_obj.png'))
+    static final ImageIcon ICON = new ImageIcon(WebinfLibDirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/archivefolder_obj.png'))
 
     String[] getSelectors() { ['war:dir:WEB-INF/lib'] }
 
-    ImageIcon getIcon() { icon }
+    ImageIcon getIcon() { ICON }
     ImageIcon getOpenIcon() { null }
 }
