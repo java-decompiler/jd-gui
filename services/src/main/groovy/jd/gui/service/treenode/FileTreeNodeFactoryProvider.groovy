@@ -8,19 +8,18 @@ package jd.gui.service.treenode
 import jd.gui.api.API
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
-import jd.gui.spi.TreeNodeFactory
 import jd.gui.view.data.TreeNodeBean
 
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
-import java.util.regex.Pattern
 
-class FileTreeNodeFactoryProvider implements TreeNodeFactory {
+class FileTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
 	static final ImageIcon ICON = new ImageIcon(FileTreeNodeFactoryProvider.class.classLoader.getResource('images/file_plain_obj.png'))
 
-    String[] getSelectors() { ['*:file:*'] }
-
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

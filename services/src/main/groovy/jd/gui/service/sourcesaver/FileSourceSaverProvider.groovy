@@ -13,12 +13,13 @@ import jd.gui.spi.SourceSaver
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
-import java.util.regex.Pattern
 
-class FileSourceSaverProvider implements SourceSaver {
-    String[] getSelectors() { ['*:file:*'] }
+class FileSourceSaverProvider extends AbstractSourceSaverProvider {
 
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*'] + externalSelectors }
 
     String getSourcePath(Container.Entry entry) { entry.path }
 

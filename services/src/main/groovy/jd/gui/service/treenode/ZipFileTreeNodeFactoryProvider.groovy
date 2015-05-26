@@ -13,13 +13,14 @@ import jd.gui.view.data.TreeNodeBean
 
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
-import java.util.regex.Pattern
 
 class ZipFileTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
 	static final ImageIcon ICON = new ImageIcon(ZipFileTreeNodeFactoryProvider.class.classLoader.getResource('images/zip_obj.png'))
 
-    String[] getSelectors() { ['*:file:*.zip'] }
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*.zip'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

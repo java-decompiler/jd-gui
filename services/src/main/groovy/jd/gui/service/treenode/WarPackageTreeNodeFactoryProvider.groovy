@@ -8,9 +8,14 @@ package jd.gui.service.treenode
 import java.util.regex.Pattern
 
 class WarPackageTreeNodeFactoryProvider extends PackageTreeNodeFactoryProvider {
-    Pattern pattern = ~/WEB-INF\/classes\/.*/
 
-    String[] getSelectors() { ['war:dir:*'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['war:dir:*'] + externalSelectors }
 
-    Pattern getPathPattern() { pattern }
+    /**
+     * @return external or local path pattern
+     */
+    Pattern getPathPattern() { externalPathPattern ?: ~/WEB-INF\/classes\/.*/ }
 }

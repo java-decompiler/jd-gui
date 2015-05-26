@@ -13,14 +13,14 @@ import jd.gui.view.data.TreeNodeBean
 
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
-import java.util.regex.Pattern
 
 class PackageTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
     static final ImageIcon ICON = new ImageIcon(PackageTreeNodeFactoryProvider.class.classLoader.getResource('images/package_obj.png'))
 
-    String[] getSelectors() { ['jar:dir:*'] }
-
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['jar:dir:*'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

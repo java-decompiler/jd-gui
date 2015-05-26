@@ -14,7 +14,6 @@ import groovyjarjarasm.asm.tree.MethodNode;
 import jd.gui.api.API;
 import jd.gui.api.model.Container;
 import jd.gui.api.model.Type;
-import jd.gui.spi.TypeFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,20 +22,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
-public class ClassFileTypeFactoryProvider implements TypeFactory {
+public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
     static {
         // Early class loading
         JavaType.class.getName();
     }
 
-    protected String[] selectors = new String[] { "*:file:*.class" };
+    /**
+     * @return local + optional external selectors
+     */
+    public String[] getSelectors() {
+        List<String> externalSelectors = getExternalSelectors();
 
-    public String[] getSelectors() { return selectors; }
-
-    public Pattern getPathPattern() { return null; }
+        if (externalSelectors == null) {
+            return new String[] { "*:file:*.class" };
+        } else {
+            int size = externalSelectors.size();
+            String[] selectors = new String[size+1];
+            externalSelectors.toArray(selectors);
+            selectors[size] = "*:file:*.class";
+            return selectors;
+        }
+    }
 
     public Type make(API api, Container.Entry entry, String fragment) {
         try (InputStream is = entry.getInputStream()) {

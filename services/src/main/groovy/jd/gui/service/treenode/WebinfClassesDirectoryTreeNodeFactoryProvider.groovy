@@ -10,7 +10,10 @@ import javax.swing.*
 class WebinfClassesDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
     static final ImageIcon ICON = new ImageIcon(WebinfClassesDirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/packagefolder_obj.png'))
 
-    String[] getSelectors() { ['war:dir:WEB-INF/classes'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['war:dir:WEB-INF/classes'] + externalSelectors }
 
     ImageIcon getIcon() { ICON }
     ImageIcon getOpenIcon() { null }

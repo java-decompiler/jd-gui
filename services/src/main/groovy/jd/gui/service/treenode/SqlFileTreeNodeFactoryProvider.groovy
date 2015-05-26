@@ -17,7 +17,10 @@ import javax.swing.tree.DefaultMutableTreeNode
 class SqlFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
     static final ImageIcon ICON = new ImageIcon(SqlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/sql_obj.png'))
 
-    String[] getSelectors() { ['*:file:*.sql'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*.sql'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

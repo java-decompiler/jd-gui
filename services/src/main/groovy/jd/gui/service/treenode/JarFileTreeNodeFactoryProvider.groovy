@@ -18,7 +18,10 @@ class JarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvider {
     static final ImageIcon JAR_FILE_ICON = new ImageIcon(JarFileTreeNodeFactoryProvider.class.classLoader.getResource('images/jar_obj.png'))
     static final ImageIcon EJB_FILE_ICON = new ImageIcon(JarFileTreeNodeFactoryProvider.class.classLoader.getResource('images/ejbmodule_obj.gif'))
 
-    String[] getSelectors() { ['*:file:*.jar'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*.jar'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

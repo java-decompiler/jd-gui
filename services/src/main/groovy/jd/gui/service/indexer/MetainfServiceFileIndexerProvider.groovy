@@ -9,16 +9,20 @@ import groovy.transform.CompileStatic
 import jd.gui.api.API
 import jd.gui.api.model.Container
 import jd.gui.api.model.Indexes
-import jd.gui.spi.Indexer
 
 import java.util.regex.Pattern
 
-class MetainfServiceFileIndexerProvider implements Indexer {
-    Pattern pattern = ~/META-INF\/services\/[^\/]+/
+class MetainfServiceFileIndexerProvider extends AbstractIndexerProvider {
 
-    String[] getSelectors() { ['*:file:*'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*'] + externalSelectors }
 
-    Pattern getPathPattern() { pattern }
+    /**
+     * @return external or local path pattern
+     */
+    Pattern getPathPattern() { externalPathPattern ?: ~/META-INF\/services\/[^\/]+/ }
 
     @CompileStatic
     void index(API api, Container.Entry entry, Indexes indexes) {

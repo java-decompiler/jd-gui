@@ -12,15 +12,13 @@ import jd.gui.api.feature.TreeNodeExpandable
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
 import jd.gui.api.model.Type
-import jd.gui.spi.TreeNodeFactory
 import jd.gui.view.component.ClassFilePage
 import jd.gui.view.data.TreeNodeBean
 
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
-import java.util.regex.Pattern
 
-class ClassFileTreeNodeFactoryProvider implements TreeNodeFactory {
+class ClassFileTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
     static final ImageIcon CLASS_FILE_ICON = new ImageIcon(ClassFileTreeNodeFactoryProvider.class.classLoader.getResource('images/classf_obj.png'))
 
     static {
@@ -30,9 +28,10 @@ class ClassFileTreeNodeFactoryProvider implements TreeNodeFactory {
         } catch (Exception ignore) {}
     }
 
-    String[] getSelectors() { ['*:file:*.class'] }
-
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*.class'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

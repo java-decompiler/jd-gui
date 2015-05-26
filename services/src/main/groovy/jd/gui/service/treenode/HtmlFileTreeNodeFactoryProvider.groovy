@@ -17,7 +17,10 @@ import javax.swing.tree.DefaultMutableTreeNode
 class HtmlFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
     static final ImageIcon ICON = new ImageIcon(HtmlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/html_obj.gif'))
 
-    String[] getSelectors() { ['*:file:*.html', '*:file:*.xhtml'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*.html', '*:file:*.xhtml'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

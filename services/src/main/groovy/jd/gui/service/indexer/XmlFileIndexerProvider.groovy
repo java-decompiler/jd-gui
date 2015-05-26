@@ -9,13 +9,11 @@ import groovy.transform.CompileStatic
 import jd.gui.api.API
 import jd.gui.api.model.Container
 import jd.gui.api.model.Indexes
-import jd.gui.spi.Indexer
 
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLStreamConstants
-import java.util.regex.Pattern
 
-class XmlFileIndexerProvider implements Indexer {
+class XmlFileIndexerProvider extends AbstractIndexerProvider {
     XMLInputFactory factory
 
     XmlFileIndexerProvider() {
@@ -23,9 +21,10 @@ class XmlFileIndexerProvider implements Indexer {
         factory.setProperty(XMLInputFactory.SUPPORT_DTD, false)
     }
 
-    String[] getSelectors() { ['*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd'] }
-
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd'] + externalSelectors }
 
     @CompileStatic
     void index(API api, Container.Entry entry, Indexes indexes) {

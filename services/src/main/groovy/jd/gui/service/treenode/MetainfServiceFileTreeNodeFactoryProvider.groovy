@@ -8,9 +8,14 @@ package jd.gui.service.treenode
 import java.util.regex.Pattern
 
 class MetainfServiceFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
-    Pattern pattern = ~/META-INF\/services\/[^\/]+/
 
-    String[] getSelectors() { ['*:file:*'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*'] + externalSelectors }
 
-    Pattern getPathPattern() { pattern }
+    /**
+     * @return external or local path pattern
+     */
+    Pattern getPathPattern() { externalPathPattern ?: ~/META-INF\/services\/[^\/]+/ }
 }

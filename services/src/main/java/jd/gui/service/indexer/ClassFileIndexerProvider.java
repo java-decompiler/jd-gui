@@ -11,17 +11,15 @@ import groovyjarjarasm.asm.signature.SignatureVisitor;
 import jd.gui.api.API;
 import jd.gui.api.model.Container;
 import jd.gui.api.model.Indexes;
-import jd.gui.spi.Indexer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Unsafe thread implementation of class file indexer.
  */
-public class ClassFileIndexerProvider implements Indexer {
+public class ClassFileIndexerProvider extends AbstractIndexerProvider {
     protected Set<String> typeDeclarationSet = new HashSet<>();
     protected Set<String> constructorDeclarationSet = new HashSet<>();
     protected Set<String> methodDeclarationSet = new HashSet<>();
@@ -39,11 +37,22 @@ public class ClassFileIndexerProvider implements Indexer {
         fieldDeclarationSet, typeReferenceSet, superTypeNameSet, descriptorSet);
     protected SignatureIndexer signatureIndexer = new SignatureIndexer(typeReferenceSet);
 
-    protected String[] selectors = new String[] { "*:file:*.class" };
+    /**
+     * @return local + optional external selectors
+     */
+    public String[] getSelectors() {
+        List<String> externalSelectors = getExternalSelectors();
 
-    public String[] getSelectors() { return selectors; }
-
-    public Pattern getPathPattern() { return null; }
+        if (externalSelectors == null) {
+            return new String[] { "*:file:*.class" };
+        } else {
+            int size = externalSelectors.size();
+            String[] selectors = new String[size+1];
+            externalSelectors.toArray(selectors);
+            selectors[size] = "*:file:*.class";
+            return selectors;
+        }
+    }
 
     /**
      * Index format : @see jd.gui.spi.Indexer

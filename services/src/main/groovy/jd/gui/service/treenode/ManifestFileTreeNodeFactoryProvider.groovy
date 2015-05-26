@@ -18,7 +18,10 @@ import javax.swing.tree.DefaultMutableTreeNode
 class ManifestFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
     static final ImageIcon ICON = new ImageIcon(ManifestFileTreeNodeFactoryProvider.class.classLoader.getResource('images/manifest_obj.png'))
 
-    String[] getSelectors() { ['*:file:META-INF/MANIFEST.MF'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:META-INF/MANIFEST.MF'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         return new TreeNode(entry, new TreeNodeBean(label:'MANIFEST.MF', icon:ICON, tip:"Location: $entry.uri.path"))

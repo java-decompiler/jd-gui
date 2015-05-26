@@ -15,14 +15,15 @@ import jd.gui.view.data.TreeNodeBean
 
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
-import java.util.regex.Pattern
 
-class DirectoryTreeNodeFactoryProvider implements TreeNodeFactory {
+class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
 	static final ImageIcon ICON = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/folder.gif'))
 	static final ImageIcon OPEN_ICON = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/folder_open.png'))
 
-	String[] getSelectors() { ['*:dir:*'] }
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:dir:*'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

@@ -16,7 +16,10 @@ import javax.swing.tree.DefaultMutableTreeNode
 class EarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvider {
     static final ImageIcon ICON = new ImageIcon(JarFileTreeNodeFactoryProvider.class.classLoader.getResource('images/ear_obj.gif'))
 
-    String[] getSelectors() { ['*:file:*.ear'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*.ear'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

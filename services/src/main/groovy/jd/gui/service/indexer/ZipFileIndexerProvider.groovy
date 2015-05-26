@@ -9,14 +9,13 @@ import groovy.transform.CompileStatic
 import jd.gui.api.API
 import jd.gui.api.model.Container
 import jd.gui.api.model.Indexes
-import jd.gui.spi.Indexer
 
-import java.util.regex.Pattern
+class ZipFileIndexerProvider extends AbstractIndexerProvider {
 
-class ZipFileIndexerProvider implements Indexer {
-    String[] getSelectors() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war', '*:file:*.ear'] }
-
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war', '*:file:*.ear'] + externalSelectors }
 
     @CompileStatic
     void index(API api, Container.Entry entry, Indexes indexes) {

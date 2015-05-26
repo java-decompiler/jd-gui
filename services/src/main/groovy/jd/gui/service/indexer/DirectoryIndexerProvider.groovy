@@ -9,14 +9,13 @@ import groovy.transform.CompileStatic
 import jd.gui.api.API
 import jd.gui.api.model.Container
 import jd.gui.api.model.Indexes
-import jd.gui.spi.Indexer
 
-import java.util.regex.Pattern
+class DirectoryIndexerProvider extends AbstractIndexerProvider {
 
-class DirectoryIndexerProvider implements Indexer {
-    String[] getSelectors() { ['*:dir:*'] }
-
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:dir:*'] + externalSelectors }
 
     @CompileStatic
     void index(API api, Container.Entry entry, Indexes indexes) {

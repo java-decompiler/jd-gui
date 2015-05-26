@@ -9,16 +9,15 @@ import groovy.transform.CompileStatic
 import jd.gui.api.API
 import jd.gui.api.model.Container
 import jd.gui.api.model.Indexes
-import jd.gui.spi.Indexer
 
-import java.util.regex.Pattern
+class TextFileIndexerProvider extends AbstractIndexerProvider {
 
-class TextFileIndexerProvider implements Indexer {
-    String[] getSelectors() { [
-        '*:file:*.txt', '*:file:*.html', '*:file:*.xhtml', '*:file:*.js', '*:file:*.jsp', '*:file:*.jspf',
-        '*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.properties', '*:file:*.sql'] }
-
-    Pattern getPathPattern() { null }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() {
+        ['*:file:*.txt', '*:file:*.html', '*:file:*.xhtml', '*:file:*.js', '*:file:*.jsp', '*:file:*.jspf',
+         '*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.properties', '*:file:*.sql'] + externalSelectors }
 
     @CompileStatic
     void index(API api, Container.Entry entry, Indexes indexes) {

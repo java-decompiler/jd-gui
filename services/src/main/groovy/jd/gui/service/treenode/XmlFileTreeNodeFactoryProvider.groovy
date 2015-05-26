@@ -17,7 +17,10 @@ import javax.swing.tree.DefaultMutableTreeNode
 class XmlFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
     static final ImageIcon ICON = new ImageIcon(XmlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
 
-    String[] getSelectors() { ['*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.tld', '*:file:*.wsdl'] }
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:*.xml', '*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.tld', '*:file:*.wsdl'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')

@@ -11,7 +11,11 @@ import jd.gui.api.model.Indexes
 import jd.gui.util.xml.AbstractXmlPathFinder
 
 class WebXmlFileIndexerProvider extends XmlFileIndexerProvider {
-    String[] getSelectors() { ['*:file:WEB-INF/web.xml'] }
+
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['*:file:WEB-INF/web.xml'] + externalSelectors }
 
     void index(API api, Container.Entry entry, Indexes indexes) {
         super.index(api, entry, indexes)

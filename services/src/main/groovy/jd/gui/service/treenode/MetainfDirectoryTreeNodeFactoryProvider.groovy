@@ -11,11 +11,15 @@ import java.util.regex.Pattern
 class MetainfDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
     static final ImageIcon ICON = new ImageIcon(MetainfDirectoryTreeNodeFactoryProvider.class.classLoader.getResource('images/inf_obj.png'))
 
-    Pattern pattern = ~/(WEB-INF|(WEB-INF\/classes\/)?META-IN(F|F\/.*))/
+    /**
+     * @return local + optional external selectors
+     */
+    String[] getSelectors() { ['jar:dir:*', 'war:dir:*', 'ear:dir:*'] + externalSelectors }
 
-    String[] getSelectors() { ['jar:dir:*', 'war:dir:*', 'ear:dir:*'] }
-
-    Pattern getPathPattern() { pattern }
+    /**
+     * @return external or local path pattern
+     */
+    Pattern getPathPattern() { externalPathPattern ?: ~/(WEB-INF|(WEB-INF\/classes\/)?META-IN(F|F\/.*))/ }
 
     ImageIcon getIcon() { ICON }
     ImageIcon getOpenIcon() { null }

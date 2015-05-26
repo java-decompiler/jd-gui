@@ -13,7 +13,6 @@ import jd.gui.api.API;
 import jd.gui.api.model.Container;
 import jd.gui.util.decompiler.ContainerLoader;
 import jd.gui.util.decompiler.GuiPreferences;
-import jd.gui.spi.SourceSaver;
 import jd.gui.util.decompiler.PlainTextPrinter;
 import jd.gui.util.io.NewlineOutputStream;
 
@@ -21,10 +20,10 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-public class ClassFileSourceSaverProvider implements SourceSaver {
+public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
     protected static final String ESCAPE_UNICODE_CHARACTERS = "ClassFileSaverPreferences.escapeUnicodeCharacters";
     protected static final String OMIT_THIS_PREFIX = "ClassFileSaverPreferences.omitThisPrefix";
     protected static final String WRITE_DEFAULT_CONSTRUCTOR = "ClassFileSaverPreferences.writeDefaultConstructor";
@@ -32,7 +31,6 @@ public class ClassFileSourceSaverProvider implements SourceSaver {
     protected static final String WRITE_LINE_NUMBERS = "ClassFileSaverPreferences.writeLineNumbers";
     protected static final String WRITE_METADATA = "ClassFileSaverPreferences.writeMetadata";
 
-    protected static final String[] SELECTORS = new String[] { "*:file:*.class" };
     protected static final Decompiler DECOMPILER = new DecompilerImpl();
 
     protected GuiPreferences preferences = new GuiPreferences();
@@ -40,13 +38,28 @@ public class ClassFileSourceSaverProvider implements SourceSaver {
     protected PlainTextPrinter printer = new PlainTextPrinter();
     protected ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-    public String[] getSelectors() { return SELECTORS; }
+    /**
+     * @return local + optional external selectors
+     */
+    public String[] getSelectors() {
+        List<String> externalSelectors = getExternalSelectors();
 
-    public Pattern getPathPattern() { return null; }
+        if (externalSelectors == null) {
+            return new String[] { "*:file:*.class" };
+        } else {
+            int size = externalSelectors.size();
+            String[] selectors = new String[size+1];
+            externalSelectors.toArray(selectors);
+            selectors[size] = "*:file:*.class";
+            return selectors;
+        }
+    }
 
     public String getSourcePath(Container.Entry entry) {
         String path = entry.getPath();
-        return path.substring(0, path.length()-6) + ".java";
+        int index = path.lastIndexOf('.');
+        String prefix = (index == -1) ? path : path.substring(0, index);
+        return prefix + ".java";
     }
 
     public int getFileCount(API api, Container.Entry entry) {
