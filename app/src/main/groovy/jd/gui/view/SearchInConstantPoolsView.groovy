@@ -290,13 +290,13 @@ class SearchInConstantPoolsView {
             // Update matching item counter
             switch (matchingTypeCount) {
                 case 0:
-                    searchInConstantPoolsLabel.text = 'Matching types:'
+                    searchInConstantPoolsLabel.text = 'Matching entries:'
                     break
                 case 1:
-                    searchInConstantPoolsLabel.text = '1 matching type:'
+                    searchInConstantPoolsLabel.text = '1 matching entry:'
                     break
                 default:
-                    searchInConstantPoolsLabel.text = matchingTypeCount + ' matching types:'
+                    searchInConstantPoolsLabel.text = matchingTypeCount + ' matching entries:'
             }
         }
     }
