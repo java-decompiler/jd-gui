@@ -103,7 +103,7 @@ class SearchInConstantPoolsController implements IndexesChangeListener {
                         Container.Entry getParent() { null }
                         URI getUri() { parentEntry.uri }
                         String getPath() { parentEntry.path }
-                        boolean isDirectory() { false }
+                        boolean isDirectory() { parentEntry.isDirectory() }
                         long length() { 0 }
                         InputStream getInputStream() { null }
                         Collection<Container.Entry> getChildren() { children }

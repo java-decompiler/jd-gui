@@ -20,11 +20,9 @@ class GenericContainer implements Container {
     GenericContainer(API api, Container.Entry parentEntry, Path rootPath) {
         this.api = api
         this.rootNameCount = rootPath.nameCount
-        this.root = newEntry(parentEntry, rootPath, parentEntry.uri)
-    }
-
-    protected Container.Entry newEntry(Container.Entry parent, Path fsPath, URI uri) {
-        return new Entry(parent, fsPath, uri)
+        this.root = new Entry(parentEntry, rootPath, parentEntry.uri) {
+            Entry newChildEntry(Path fsPath) { new Entry(parent, fsPath, null) }
+        }
     }
 
     String getType() { 'generic' }
@@ -46,6 +44,8 @@ class GenericContainer implements Container {
             this.isDirectory = null
             this.children = null
         }
+
+        Entry newChildEntry(Path fsPath) { new Entry(this, fsPath, null) }
 
         Container getContainer() { GenericContainer.this }
         Container.Entry getParent() { parent }
@@ -103,7 +103,7 @@ class GenericContainer implements Container {
 
                 for (def subPath : stream) {
                     if (subPath.nameCount > parentNameCount) {
-                        children.add(new Entry(this, subPath, null))
+                        children.add(newChildEntry(subPath))
                     }
                 }
 
