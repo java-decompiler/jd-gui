@@ -22,13 +22,18 @@ abstract class AbstractFileLoaderProvider implements FileLoader {
         }
         // Dummy parent entry
         def uri = file.toURI()
+        def path = uri.path
+
+        if (path.endsWith('/'))
+            path = path.substring(0, path.length()-1)
+
         def parentEntry = new Container.Entry() {
             Collection<Container.Entry> children = Collections.emptyList()
 
             Container getContainer() { parentContainer }
             Container.Entry getParent() { null }
             URI getUri() { uri }
-            String getPath() { uri.path }
+            String getPath() { path }
             boolean isDirectory() { file.isDirectory() }
             long length() { 0 }
             InputStream getInputStream() { null }
