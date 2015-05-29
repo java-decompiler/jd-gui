@@ -50,9 +50,9 @@ class LogPage extends HyperlinkPage implements UriGettable, ContentSavable, Inde
         }
     }
 
-    protected boolean isHyperlinkEnabled(HyperlinkData hyperlinkData) { hyperlinkData.enabled }
+    protected boolean isHyperlinkEnabled(HyperlinkPage.HyperlinkData hyperlinkData) { hyperlinkData.enabled }
 
-    protected void openHyperlink(int x, int y, HyperlinkData hyperlinkData) {
+    protected void openHyperlink(int x, int y, HyperlinkPage.HyperlinkData hyperlinkData) {
         if (hyperlinkData.enabled) {
             // Save current position in history
             def location = textArea.getLocationOnScreen()
