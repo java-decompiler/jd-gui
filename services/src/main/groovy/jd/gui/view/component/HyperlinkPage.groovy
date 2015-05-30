@@ -55,20 +55,26 @@ abstract class HyperlinkPage extends TextPage {
                             if (entry) {
                                 def entryData = entry.value
                                 if (entryData && (offset < entryData.endPosition) && (offset >= entryData.startPosition) && isHyperlinkEnabled(entryData)) {
-                                    textArea.cursor = HAND_CURSOR
+                                    if (textArea.cursor != HAND_CURSOR) {
+                                        textArea.cursor = HAND_CURSOR
+                                    }
                                     return
                                 }
                             }
                         }
                     }
 
-                    textArea.cursor = DEFAULT_CURSOR
+                    if (textArea.cursor!= DEFAULT_CURSOR) {
+                        textArea.cursor = DEFAULT_CURSOR
+                    }
                 }
             }
 
             void mouseWheelMoved(MouseWheelEvent e) {
-                mouseMoved(e)
-                textArea.parent.dispatchEvent(e)
+                if (e.modifiers == 0) {
+                    mouseMoved(e)
+                    textArea.parent.dispatchEvent(e)
+                }
             }
         }
 

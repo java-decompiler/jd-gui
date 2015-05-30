@@ -13,6 +13,7 @@ import jd.gui.api.feature.LineNumberNavigable
 import jd.gui.api.feature.UriOpenable
 import org.fife.ui.rsyntaxtextarea.DocumentRange
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rsyntaxtextarea.Theme
 import org.fife.ui.rsyntaxtextarea.folding.FoldManager
@@ -27,6 +28,8 @@ import java.awt.datatransfer.StringSelection
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseWheelListener
 
 @CompileStatic
 class TextPage extends JPanel implements ContentCopyable, ContentSelectable, LineNumberNavigable, ContentSearchable, UriOpenable {
@@ -36,6 +39,9 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
     protected static final Color DOUBLE_CLICK_HIGHLIGHT_COLOR = new Color(0x66ff66)
     protected static final Color SEARCH_HIGHLIGHT_COLOR = new Color(0xffff66)
     protected static final Color SELECT_HIGHLIGHT_COLOR = new Color(0xF49810)
+
+    protected static final RSyntaxTextAreaEditorKit.DecreaseFontSizeAction DECREASE_FONT_SIZE_ACTION = new RSyntaxTextAreaEditorKit.DecreaseFontSizeAction()
+    protected static final RSyntaxTextAreaEditorKit.IncreaseFontSizeAction INCREASE_FONT_SIZE_ACTION = new RSyntaxTextAreaEditorKit.IncreaseFontSizeAction()
 
     protected RSyntaxTextArea textArea
     protected RTextScrollPane scrollPane
@@ -56,6 +62,28 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
                 if (e.clickCount == 2) {
                     textArea.markAllHighlightColor = DOUBLE_CLICK_HIGHLIGHT_COLOR
                     SearchEngine.markAll(textArea, newSearchContext(textArea.selectedText, true, true, true, false))
+                }
+            }
+        })
+        textArea.addMouseWheelListener(new MouseWheelListener() {
+            void mouseWheelMoved(MouseWheelEvent e) {
+                if ((e.modifiers & (Event.META_MASK|Event.CTRL_MASK)) != 0) {
+                    int offset = textArea.viewToModel(new Point(e.x, e.y))
+
+                    // Update font size
+                    if (e.wheelRotation > 0) {
+                        INCREASE_FONT_SIZE_ACTION.actionPerformedImpl(null, textArea)
+                    } else {
+                        DECREASE_FONT_SIZE_ACTION.actionPerformedImpl(null, textArea)
+                    }
+
+                    Rectangle newRectangle = textArea.modelToView(offset)
+                    int newY = newRectangle.@y + (newRectangle.@height >> 1)
+
+                    // Scroll
+                    Point viewPosition = scrollPane.viewport.viewPosition
+                    viewPosition.translate(0, newY-e.y)
+                    scrollPane.viewport.viewPosition = viewPosition
                 }
             }
         })
