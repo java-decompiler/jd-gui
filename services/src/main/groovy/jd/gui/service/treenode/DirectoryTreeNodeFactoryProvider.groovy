@@ -27,10 +27,10 @@ class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
-        Entry[] entries = entry.children
+        Collection<Container.Entry> entries = entry.children
 
         // Aggregate directory names
-        while (entries.length == 1) {
+        while (entries.size() == 1) {
             Entry child = entries[0]
             if ((child.isDirectory() == false) || (api.getTreeNodeFactory(child) != this)) break
             entry = child
@@ -40,7 +40,7 @@ class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
         def label = entry.path.substring(lastSlashIndex+1)
         def node = new TreeNode(entry, new TreeNodeBean(label:label, icon:getIcon(), openIcon:getOpenIcon()))
 
-        if (entries.length > 0) {
+        if (entries.size() > 0) {
             // Add dummy node
             node.add(new DefaultMutableTreeNode())
         }
@@ -69,9 +69,9 @@ class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
             if (!initialized) {
                 removeAllChildren()
 
-                Entry[] entries = getChildren()
+                Collection<Container.Entry> entries = getChildren()
 
-                while (entries.length == 1) {
+                while (entries.size() == 1) {
                     Entry child = entries[0]
                     if ((child.isDirectory() == false) || (api.getTreeNodeFactory(child) != this)) break
                     entries = child.children

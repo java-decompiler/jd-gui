@@ -107,7 +107,7 @@ class GenericContainer implements Container {
                     }
                 }
 
-                return children.sort()
+                return Collections.unmodifiableCollection(children.sort())
             } finally {
                 stream?.close()
             }
