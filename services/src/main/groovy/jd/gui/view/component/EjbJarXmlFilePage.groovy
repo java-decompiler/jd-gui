@@ -6,7 +6,6 @@
 package jd.gui.view.component
 
 import jd.gui.api.API
-import jd.gui.api.feature.ContentSavable
 import jd.gui.api.feature.IndexesChangeListener
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
@@ -16,7 +15,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 
 import java.awt.*
 
-class EjbJarXmlFilePage extends TypeHyperlinkPage implements UriGettable, ContentSavable, IndexesChangeListener {
+class EjbJarXmlFilePage extends TypeHyperlinkPage implements UriGettable, IndexesChangeListener {
     protected API api
     protected Container.Entry entry
     protected Collection<Indexes> collectionOfIndexes
@@ -63,15 +62,11 @@ class EjbJarXmlFilePage extends TypeHyperlinkPage implements UriGettable, Conten
     // --- UriGettable --- //
     URI getUri() { entry.uri }
 
-    // --- SourceSavable --- //
+    // --- ContentSavable --- //
     String getFileName() {
         def path = entry.path
         int index = path.lastIndexOf('/')
         return path.substring(index+1)
-    }
-
-    void save(API api, OutputStream os) {
-        os << textArea.text
     }
 
     // --- IndexesChangeListener --- //

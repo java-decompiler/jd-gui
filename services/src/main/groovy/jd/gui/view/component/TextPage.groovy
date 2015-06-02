@@ -6,11 +6,14 @@
 package jd.gui.view.component
 
 import groovy.transform.CompileStatic
+import jd.gui.api.API
 import jd.gui.api.feature.ContentCopyable
+import jd.gui.api.feature.ContentSavable
 import jd.gui.api.feature.ContentSearchable
 import jd.gui.api.feature.ContentSelectable
 import jd.gui.api.feature.LineNumberNavigable
 import jd.gui.api.feature.UriOpenable
+import jd.gui.util.io.NewlineOutputStream
 import org.fife.ui.rsyntaxtextarea.DocumentRange
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit
@@ -32,7 +35,7 @@ import java.awt.event.MouseWheelEvent
 import java.awt.event.MouseWheelListener
 
 @CompileStatic
-class TextPage extends JPanel implements ContentCopyable, ContentSelectable, LineNumberNavigable, ContentSearchable, UriOpenable {
+class TextPage extends JPanel implements ContentCopyable, ContentSelectable, LineNumberNavigable, ContentSearchable, UriOpenable, ContentSavable {
     protected static final ImageIcon COLLAPSED_ICON = new ImageIcon(TextPage.class.classLoader.getResource('images/plus.png'))
     protected static final ImageIcon EXPANDED_ICON = new ImageIcon(TextPage.class.classLoader.getResource('images/minus.png'))
 
@@ -368,5 +371,14 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
         }
 
         return sbPattern.toString()
+    }
+
+    // --- ContentSavable --- //
+    String getFileName() { 'file.txt' }
+
+    void save(API api, OutputStream os) {
+        new NewlineOutputStream(os).withWriter('UTF-8') { Writer w ->
+            w.write(textArea.text)
+        }
     }
 }

@@ -6,7 +6,6 @@
 package jd.gui.service.treenode
 
 import jd.gui.api.API
-import jd.gui.api.feature.ContentSavable
 import jd.gui.api.feature.PageCreator
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
@@ -49,7 +48,7 @@ class TextFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
         }
     }
 
-    static class Page extends TextPage implements UriGettable, ContentSavable {
+    static class Page extends TextPage implements UriGettable {
         Container.Entry entry
 
         Page(Container.Entry entry) {
@@ -60,15 +59,11 @@ class TextFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
         // --- UriGettable --- //
         URI getUri() { entry.uri }
 
-        // --- SourceSavable --- //
+        // --- ContentSavable --- //
         String getFileName() {
             def path = entry.path
             int index = path.lastIndexOf('/')
             return path.substring(index+1)
-        }
-
-        void save(API api, OutputStream os) {
-            os << textArea.text
         }
     }
 }

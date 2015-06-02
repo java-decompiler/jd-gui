@@ -7,7 +7,6 @@ package jd.gui.view.component
 
 import groovy.transform.CompileStatic
 import jd.gui.api.API
-import jd.gui.api.feature.ContentSavable
 import jd.gui.api.feature.IndexesChangeListener
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
@@ -15,7 +14,7 @@ import jd.gui.api.model.Indexes
 
 import java.awt.Point
 
-class ManifestFilePage extends HyperlinkPage implements UriGettable, ContentSavable, IndexesChangeListener {
+class ManifestFilePage extends HyperlinkPage implements UriGettable, IndexesChangeListener {
     protected API api
     protected Container.Entry entry
     protected Collection<Indexes> collectionOfIndexes
@@ -139,15 +138,11 @@ class ManifestFilePage extends HyperlinkPage implements UriGettable, ContentSava
     // --- UriGettable --- //
     URI getUri() { entry.uri }
 
-    // --- SourceSavable --- //
+    // --- ContentSavable --- //
     String getFileName() {
         def path = entry.path
         int index = path.lastIndexOf('/')
         return path.substring(index+1)
-    }
-
-    void save(API api, OutputStream os) {
-        os << textArea.text
     }
 
     // --- IndexesChangeListener --- //

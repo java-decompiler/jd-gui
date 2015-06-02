@@ -6,7 +6,6 @@
 package jd.gui.view.component
 
 import jd.gui.api.API
-import jd.gui.api.feature.ContentSavable
 import jd.gui.api.feature.IndexesChangeListener
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
@@ -17,7 +16,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import java.awt.Point
 
 
-class WebXmlFilePage extends TypeHyperlinkPage implements UriGettable, ContentSavable, IndexesChangeListener {
+class WebXmlFilePage extends TypeHyperlinkPage implements UriGettable, IndexesChangeListener {
     protected API api
     protected Container.Entry entry
     protected Collection<Indexes> collectionOfIndexes
@@ -48,7 +47,7 @@ class WebXmlFilePage extends TypeHyperlinkPage implements UriGettable, ContentSa
             api.addURI(new URI(uri.scheme, uri.authority, uri.path, 'position=' + offset, null))
 
             // Open link
-            if (hyperlinkData instanceof TypeHyperlinkData) {
+            if (hyperlinkData instanceof TypeHyperlinkPage.TypeHyperlinkData) {
                 def internalTypeName = hyperlinkData.internalTypeName
                 def entries = collectionOfIndexes?.collect { it.getIndex('typeDeclarations')?.get(internalTypeName) }.flatten().grep { it!=null }
                 def rootUri = entry.container.root.uri.toString()
@@ -89,15 +88,11 @@ class WebXmlFilePage extends TypeHyperlinkPage implements UriGettable, ContentSa
     // --- UriGettable --- //
     URI getUri() { entry.uri }
 
-    // --- SourceSavable --- //
+    // --- ContentSavable --- //
     String getFileName() {
         def path = entry.path
         int index = path.lastIndexOf('/')
         return path.substring(index+1)
-    }
-
-    void save(API api, OutputStream os) {
-        os << textArea.text
     }
 
     // --- IndexesChangeListener --- //

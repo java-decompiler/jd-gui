@@ -6,14 +6,13 @@
 package jd.gui.view.component
 
 import jd.gui.api.API
-import jd.gui.api.feature.ContentSavable
 import jd.gui.api.feature.IndexesChangeListener
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Indexes
 
 import java.awt.Point
 
-class LogPage extends HyperlinkPage implements UriGettable, ContentSavable, IndexesChangeListener {
+class LogPage extends HyperlinkPage implements UriGettable, IndexesChangeListener {
     protected API api
     protected URI uri
     protected Collection<Indexes> collectionOfIndexes
@@ -88,15 +87,11 @@ class LogPage extends HyperlinkPage implements UriGettable, ContentSavable, Inde
     // --- UriGettable --- //
     URI getUri() { uri }
 
-    // --- SourceSavable --- //
+    // --- ContentSavable --- //
     String getFileName() {
         def path = uri.path
         int index = path.lastIndexOf('/')
         return path.substring(index + 1)
-    }
-
-    void save(API api, OutputStream os) {
-        os << textArea.text
     }
 
     // --- IndexesChangeListener --- //

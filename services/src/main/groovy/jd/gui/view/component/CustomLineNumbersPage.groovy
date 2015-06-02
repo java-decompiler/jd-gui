@@ -28,7 +28,7 @@ import java.awt.Insets
 import java.awt.Rectangle
 
 @CompileStatic
-abstract class SourcePage extends HyperlinkPage {
+abstract class CustomLineNumbersPage extends HyperlinkPage {
 
     Color errorForeground = Color.RED
     boolean showMisalignment = true
@@ -42,7 +42,7 @@ abstract class SourcePage extends HyperlinkPage {
     }
 
     /**
-     * Map[textarea line number] = source line number
+     * Map[textarea line number] = original line number
      */
     protected int[] lineNumberMap = null
 
@@ -58,10 +58,10 @@ abstract class SourcePage extends HyperlinkPage {
         }
     }
 
-    void setLineNumber(int textAreaLineNumber, int sourceLineNumber) {
-        if (sourceLineNumber > 0) {
+    void setLineNumber(int textAreaLineNumber, int originalLineNumber) {
+        if (originalLineNumber > 0) {
             setMaxLineNumber(textAreaLineNumber)
-            lineNumberMap[textAreaLineNumber] = sourceLineNumber
+            lineNumberMap[textAreaLineNumber] = originalLineNumber
         }
     }
 
@@ -82,14 +82,14 @@ abstract class SourcePage extends HyperlinkPage {
     }
 
     @CompileStatic
-    int getTextAreaLineNumber(int sourceLineNumber) {
+    int getTextAreaLineNumber(int originalLineNumber) {
         int textAreaLineNumber = 1
         int greatestLowerSourceLineNumber = 0
         int i = lineNumberMap.length
 
         while (i-- > 0) {
             int sln = lineNumberMap[i]
-            if (sln <= sourceLineNumber) {
+            if (sln <= originalLineNumber) {
                 if (greatestLowerSourceLineNumber < sln) {
                     greatestLowerSourceLineNumber = sln
                     textAreaLineNumber = i
@@ -280,18 +280,18 @@ abstract class SourcePage extends HyperlinkPage {
         }
 
         protected void paintLineNumber(Graphics g, FontMetrics metrics, int x, int y, int lineNumber) {
-            int sourceLineNumber
+            int originalLineNumber
 
             if (lineNumberMap) {
-                sourceLineNumber = (lineNumber < lineNumberMap.length) ? lineNumberMap[lineNumber] : 0
+                originalLineNumber = (lineNumber < lineNumberMap.length) ? lineNumberMap[lineNumber] : 0
             } else {
-                sourceLineNumber = lineNumber
+                originalLineNumber = lineNumber
             }
 
-            if (sourceLineNumber != 0) {
-                String number = Integer.toString(sourceLineNumber)
+            if (originalLineNumber != 0) {
+                String number = Integer.toString(originalLineNumber)
                 int strWidth = metrics.stringWidth(number)
-                g.setColor(showMisalignment && (lineNumber != sourceLineNumber) ? errorForeground : foreground)
+                g.setColor(showMisalignment && (lineNumber != originalLineNumber) ? errorForeground : foreground)
                 g.drawString(number, x-strWidth, y)
             }
         }
