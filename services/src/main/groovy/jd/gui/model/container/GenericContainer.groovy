@@ -52,7 +52,7 @@ class GenericContainer implements Container {
 
         URI getUri() {
             if (uri == null) {
-                uri = URI.create(root.uri.toString() + '!/' + path)
+                uri = new URI(root.uri.scheme, root.uri.host, root.uri.path +  '!/' + path, null)
             }
             return uri
         }

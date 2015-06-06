@@ -56,7 +56,8 @@ class ClassFileLoaderProvider extends AbstractFileLoaderProvider {
                 if (mainPanel instanceof UriOpenable) {
                     // Open page
                     pathSuffix = file.absolutePath.substring(rootFile.absolutePath.length()).replace(File.separator, '/')
-                    def uri = URI.create(rootFile.toURI().toString() + '!' + pathSuffix)
+                    def rootUri = rootFile.toURI()
+                    def uri = new URI(rootUri.scheme, rootUri.host, rootUri.path + '!' + pathSuffix, null)
                     mainPanel.openUri(uri)
                     return true
                 } else {

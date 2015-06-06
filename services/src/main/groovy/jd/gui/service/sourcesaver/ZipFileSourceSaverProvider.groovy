@@ -32,7 +32,8 @@ class ZipFileSourceSaverProvider extends DirectorySourceSaverProvider {
         def env = new HashMap<String, String>()
         env.put('create', 'true')
 
-        def tmpURI = URI.create('jar:' + tmpFile.toURI() + '!/')
+        def tmpFileUri = tmpFile.toURI()
+        def tmpURI = new URI('jar:' + tmpFileUri.scheme, tmpFileUri.host, tmpFileUri.path + '!/', null)
         def tmpFs = FileSystems.newFileSystem(tmpURI, env);
 
         super.save(api, controller, listener, tmpFs.getPath('/'), entry)

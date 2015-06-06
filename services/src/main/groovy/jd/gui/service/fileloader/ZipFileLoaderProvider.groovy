@@ -20,7 +20,8 @@ class ZipFileLoaderProvider extends AbstractFileLoaderProvider {
     }
 
     boolean load(API api, File file) {
-        def uri = URI.create('jar:' + file.toURI().toString() + '!/')
+        def fileUri = file.toURI()
+        def uri = new URI('jar:' + fileUri.scheme, fileUri.host, fileUri.path + '!/', null)
         def fileSystem
 
         try {
