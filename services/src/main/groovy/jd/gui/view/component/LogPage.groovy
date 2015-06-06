@@ -74,7 +74,7 @@ class LogPage extends HyperlinkPage implements UriGettable, IndexesChangeListene
                 // Example: at java.security.AccessController.doPrivileged(Native Method)
                 lastDotIndex = internalTypeName.lastIndexOf('/')
                 def shortTypeName = internalTypeName.substring(lastDotIndex+1)
-                api.openURI(x, y, entries, null, shortTypeName + '-' + methodName + '-(?)?')
+                api.openURI(x, y, entries, null, shortTypeName + '-' + methodName + '-(*)?')
             } else {
                 // Example: at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:294)
                 int colonIndex = lineNumberOrNativeMethodFlag.indexOf(':')

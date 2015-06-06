@@ -17,6 +17,7 @@ import jd.gui.api.model.Indexes
 import jd.gui.util.decompiler.ClassFileSourcePrinter
 import jd.gui.util.decompiler.ContainerLoader
 import jd.gui.util.decompiler.GuiPreferences
+import jd.gui.util.matcher.DescriptorMatcher
 import org.fife.ui.rsyntaxtextarea.DocumentRange
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 
@@ -29,9 +30,9 @@ class ClassFilePage
         extends CustomLineNumbersPage
         implements UriGettable, IndexesChangeListener, LineNumberNavigable, FocusedTypeGettable, PreferencesChangeListener {
 
-    protected static final String ESCAPE_UNICODE_CHARACTERS = 'ClassFileViewerPreferences.escapeUnicodeCharacters'
-    protected static final String OMIT_THIS_PREFIX = 'ClassFileViewerPreferences.omitThisPrefix'
-    protected static final String REALIGN_LINE_NUMBERS = 'ClassFileViewerPreferences.realignLineNumbers'
+    protected static final String ESCAPE_UNICODE_CHARACTERS   = 'ClassFileViewerPreferences.escapeUnicodeCharacters'
+    protected static final String OMIT_THIS_PREFIX            = 'ClassFileViewerPreferences.omitThisPrefix'
+    protected static final String REALIGN_LINE_NUMBERS        = 'ClassFileViewerPreferences.realignLineNumbers'
     protected static final String DISPLAY_DEFAULT_CONSTRUCTOR = 'ClassFileViewerPreferences.displayDefaultConstructor'
 
     protected static final Decompiler DECOMPILER = new DecompilerImpl()
@@ -253,6 +254,9 @@ class ClassFilePage
     boolean checkLineNumber(int lineNumber) { lineNumber <= maximumLineNumber }
 
     // --- UriOpenable --- //
+    /**
+     * @param uri for URI format, @see jd.gui.api.feature.UriOpenable
+     */
     boolean openUri(URI uri) {
         List<DocumentRange> ranges = []
         def fragment = uri.fragment
@@ -261,29 +265,7 @@ class ClassFilePage
         textArea.highlighter.clearMarkAllHighlights()
 
         if (fragment) {
-            int index = fragment.indexOf('?')
-
-            if (index == -1) {
-                // Known descriptor ==> Search and high light item
-                def data = declarations.get(fragment)
-                if (data) {
-                    ranges.add(new DocumentRange(data.startPosition, data.endPosition))
-                }
-            } else {
-                // Unknown descriptor ==> Select all and scroll to the first one
-                def prefix = fragment.substring(0, fragment.lastIndexOf('-') + 1)
-                boolean method = (fragment.charAt(index - 1) == '(')
-                int prefixLength = prefix.size()
-
-                for (def entry : declarations.entrySet()) {
-                    if (entry.key.startsWith(prefix)) {
-                        def flag = (entry.key.charAt(prefixLength) == '(')
-                        if (method == flag) {
-                            ranges.add(new DocumentRange(entry.value.startPosition, entry.value.endPosition))
-                        }
-                    }
-                }
-            }
+            matchFragmentAndAddDocumentRange(fragment, declarations, ranges)
         }
 
         if (query) {
@@ -304,68 +286,7 @@ class ClassFilePage
                     }
                 }
             } else {
-                def highlightFlags = parameters.get('highlightFlags')
-                def highlightPattern = parameters.get('highlightPattern')
-
-                if (highlightFlags && highlightPattern) {
-                    def highlightScope = parameters.get('highlightScope')
-                    def regexp = createRegExp(highlightPattern)
-                    def pattern = Pattern.compile(regexp + '.*')
-
-                    if (highlightFlags.indexOf('s') != -1) {
-                        // Highlight strings
-                        def patternForString = Pattern.compile(regexp)
-
-                        for (def data : strings) {
-                            if (!highlightScope || data.owner.equals(highlightScope)) {
-                                def matcher = patternForString.matcher(data.text)
-                                int offset = data.startPosition
-
-                                while(matcher.find()) {
-                                    ranges.add(new DocumentRange(offset + matcher.start(), offset + matcher.end()))
-                                }
-                            }
-                        }
-                    }
-
-                    boolean t = (highlightFlags.indexOf('t') != -1) // Highlight types
-                    boolean f = (highlightFlags.indexOf('f') != -1) // Highlight fields
-                    boolean m = (highlightFlags.indexOf('m') != -1) // Highlight methods
-                    boolean c = (highlightFlags.indexOf('c') != -1) // Highlight constructors
-
-                    if (highlightFlags.indexOf('d') != -1) {
-                        // Highlight declarations
-                        for (def entry : declarations.entrySet()) {
-                            def declaration = entry.value
-
-                            if (!highlightScope || declaration.type.equals(highlightScope)) {
-                                if ((t && declaration.isAType()) || (c && declaration.isAConstructor())) {
-                                    matchAndAddDocumentRange(pattern, getMostInnerTypeName(declaration.type), declaration.startPosition, declaration.endPosition, ranges)
-                                }
-                                if ((f && declaration.isAField()) || (m && declaration.isAMethod())) {
-                                    matchAndAddDocumentRange(pattern, declaration.name, declaration.startPosition, declaration.endPosition, ranges)
-                                }
-                            }
-                        }
-                    }
-
-                    if (highlightFlags.indexOf('r') != -1) {
-                        // Highlight references
-                        for (def entry : hyperlinks.entrySet()) {
-                            def hyperlink = entry.value
-                            def reference = hyperlink.reference as ReferenceData
-
-                            if (!highlightScope || reference.owner.equals(highlightScope)) {
-                                if ((t && reference.isAType()) || (c && reference.isAConstructor())) {
-                                    matchAndAddDocumentRange(pattern, getMostInnerTypeName(reference.type), hyperlink.startPosition, hyperlink.endPosition, ranges)
-                                }
-                                if ((f && reference.isAField()) || (m && reference.isAMethod())) {
-                                    matchAndAddDocumentRange(pattern, reference.name, hyperlink.startPosition, hyperlink.endPosition, ranges)
-                                }
-                            }
-                        }
-                    }
-                }
+                matchQueryAndAddDocumentRange(parameters, declarations, hyperlinks, strings, ranges)
             }
         }
 
@@ -374,17 +295,165 @@ class ClassFilePage
             textArea.markAll(ranges)
             setCaretPositionAndCenter(ranges.sort().get(0))
         }
+
+        return true
     }
 
     @CompileStatic
-    void matchAndAddDocumentRange(Pattern pattern, String text, int start, int end, List<DocumentRange> ranges) {
+    static void matchFragmentAndAddDocumentRange(
+            String fragment, HashMap<String, DeclarationData> declarations, List<DocumentRange> ranges) {
+
+        if ((fragment.indexOf('?') != -1) || (fragment.indexOf('*') != -1)) {
+            // Unknown type and/or descriptor ==> Select all and scroll to the first one
+            int lastDash = fragment.lastIndexOf('-')
+
+            if (lastDash == -1) {
+                // Search types
+                String slashAndTypeName = fragment.substring(1)
+                String typeName = fragment.substring(2)
+
+                for (def entry : declarations.entrySet()) {
+                    if (entry.key.endsWith(slashAndTypeName) || entry.key.equals(typeName)) {
+                        ranges.add(new DocumentRange(entry.value.startPosition, entry.value.endPosition))
+                    }
+                }
+            } else {
+                def prefix = fragment.substring(0, lastDash+1)
+                def suffix = fragment.substring(lastDash+1)
+                def addRangeClosure
+
+                if (suffix.charAt(0) == '(') {
+                    addRangeClosure = { String key, DeclarationData value ->
+                        int index = key.lastIndexOf('-') + 1
+                        if (DescriptorMatcher.matchMethodDescriptors(suffix, key.substring(index))) {
+                            ranges.add(new DocumentRange(value.startPosition, value.endPosition))
+                        }
+                    }
+                } else {
+                    addRangeClosure = { String key, DeclarationData value ->
+                        int index = key.lastIndexOf('-') + 1
+                        if (DescriptorMatcher.matchFieldDescriptors(suffix, key.substring(index))) {
+                            ranges.add(new DocumentRange(value.startPosition, value.endPosition))
+                        }
+                    }
+                }
+
+                if (fragment.charAt(0) == '*') {
+                    // Unknown type
+                    String slashAndTypeNameAndName = prefix.substring(1)
+                    String typeNameAndName = prefix.substring(2)
+
+                    for (def entry : declarations.entrySet()) {
+                        if ((entry.key.indexOf(slashAndTypeNameAndName) != -1) || (entry.key.startsWith(typeNameAndName))) {
+                            addRangeClosure(entry.key, entry.value)
+                        }
+                    }
+                } else {
+                    // Known type
+                    for (def entry : declarations.entrySet()) {
+                        if (entry.key.startsWith(prefix)) {
+                            addRangeClosure(entry.key, entry.value)
+                        }
+                    }
+                }
+            }
+        } else {
+            // Known type and descriptor ==> Search and high light item
+            def data = declarations.get(fragment)
+            if (data) {
+                ranges.add(new DocumentRange(data.startPosition, data.endPosition))
+            }
+        }
+    }
+
+    @CompileStatic
+    static void matchQueryAndAddDocumentRange(
+            Map<String, String> parameters,
+            HashMap<String, DeclarationData> declarations, TreeMap<Integer, HyperlinkPage.HyperlinkData> hyperlinks, ArrayList<StringData> strings,
+            List<DocumentRange> ranges) {
+
+        def highlightFlags = parameters.get('highlightFlags')
+        def highlightPattern = parameters.get('highlightPattern')
+
+        if (highlightFlags && highlightPattern) {
+            def highlightScope = parameters.get('highlightScope')
+            def regexp = createRegExp(highlightPattern)
+            def pattern = Pattern.compile(regexp + '.*')
+
+            if (highlightFlags.indexOf('s') != -1) {
+                // Highlight strings
+                def patternForString = Pattern.compile(regexp)
+
+                for (def data : strings) {
+                    if (matchScope(highlightScope, data.owner)) {
+                        def matcher = patternForString.matcher(data.text)
+                        int offset = data.startPosition
+
+                        while(matcher.find()) {
+                            ranges.add(new DocumentRange(offset + matcher.start(), offset + matcher.end()))
+                        }
+                    }
+                }
+            }
+
+            boolean t = (highlightFlags.indexOf('t') != -1) // Highlight types
+            boolean f = (highlightFlags.indexOf('f') != -1) // Highlight fields
+            boolean m = (highlightFlags.indexOf('m') != -1) // Highlight methods
+            boolean c = (highlightFlags.indexOf('c') != -1) // Highlight constructors
+
+            if (highlightFlags.indexOf('d') != -1) {
+                // Highlight declarations
+                for (def entry : declarations.entrySet()) {
+                    def declaration = entry.value
+
+                    if (matchScope(highlightScope, declaration.type)) {
+                        if ((t && declaration.isAType()) || (c && declaration.isAConstructor())) {
+                            matchAndAddDocumentRange(pattern, getMostInnerTypeName(declaration.type), declaration.startPosition, declaration.endPosition, ranges)
+                        }
+                        if ((f && declaration.isAField()) || (m && declaration.isAMethod())) {
+                            matchAndAddDocumentRange(pattern, declaration.name, declaration.startPosition, declaration.endPosition, ranges)
+                        }
+                    }
+                }
+            }
+
+            if (highlightFlags.indexOf('r') != -1) {
+                // Highlight references
+                for (def entry : hyperlinks.entrySet()) {
+                    def hyperlink = entry.value
+                    def reference = ((HyperlinkReferenceData)hyperlink).reference
+
+                    if (matchScope(highlightScope, reference.owner)) {
+                        if ((t && reference.isAType()) || (c && reference.isAConstructor())) {
+                            matchAndAddDocumentRange(pattern, getMostInnerTypeName(reference.type), hyperlink.startPosition, hyperlink.endPosition, ranges)
+                        }
+                        if ((f && reference.isAField()) || (m && reference.isAMethod())) {
+                            matchAndAddDocumentRange(pattern, reference.name, hyperlink.startPosition, hyperlink.endPosition, ranges)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @CompileStatic
+    static boolean matchScope(String scope, String type) {
+        if (!scope)
+            return true
+        if (scope.charAt(0) == '*')
+            return type.endsWith(scope.substring(1)) || type.equals(scope.substring(2))
+        return type.equals(scope)
+    }
+
+    @CompileStatic
+    static void matchAndAddDocumentRange(Pattern pattern, String text, int start, int end, List<DocumentRange> ranges) {
         if (pattern.matcher(text).matches()) {
             ranges.add(new DocumentRange(start, end))
         }
     }
 
     @CompileStatic
-    String getMostInnerTypeName(String typeName) {
+    static String getMostInnerTypeName(String typeName) {
         int lastPackageSeparatorIndex = typeName.lastIndexOf('/') + 1
         int lastTypeNameSeparatorIndex = typeName.lastIndexOf('$') + 1
         int lastIndex = Math.max(lastPackageSeparatorIndex, lastTypeNameSeparatorIndex)

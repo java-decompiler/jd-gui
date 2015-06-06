@@ -8,4 +8,5 @@ dependencies {
     compile 'com.fifesoft:rsyntaxtextarea:2.5.6'
     compile 'jd:jd-core:0.7.1'
     compile project(':api')
+    testCompile 'org.codehaus.groovy:groovy-test:2.4.0'
 }

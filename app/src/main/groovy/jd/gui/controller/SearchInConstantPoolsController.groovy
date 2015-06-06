@@ -14,7 +14,6 @@ import jd.gui.api.model.Indexes
 import jd.gui.model.configuration.Configuration
 import jd.gui.model.container.FilteredContainerWrapper
 import jd.gui.service.type.TypeFactoryService
-import jd.gui.util.UriUtil
 import jd.gui.view.SearchInConstantPoolsView
 
 import java.awt.Cursor

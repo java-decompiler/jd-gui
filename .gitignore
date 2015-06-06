@@ -2,6 +2,7 @@
 *.class
 
 # JD-GUI
+src-generated/
 jd-gui.cfg
 
 # Idea
@@ -20,6 +21,9 @@ classes/
 # Mac
 .DS_Store
 
+#Windows
+Thumbs.db
+
 # Maven
 log/
 target/
@@ -30,4 +34,3 @@ build/
 
 # WinMerge
 *.bak
-

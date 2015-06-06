@@ -31,11 +31,10 @@ allprojects {
 }
 
 // 'cleanIdea' task extension //
-task fullCleanIdea {
+cleanIdea {
 	file(project.name + '.iws').delete()
 	ant.delete(dir: 'out')
 }
-fullCleanIdea.mustRunAfter cleanIdea
 
 // All in one JAR //
 subprojects.each { subproject -> 
@@ -116,22 +115,18 @@ task installOsxDistConfig(type: Copy) {
 }
 
 distributions {
-	osx {
-		contents {
-            into('JD-GUI.app/Contents') {
-                from 'build/distributions/osx'
-            }
-            into('JD-GUI.app/Contents/Resources/Java') {
-                from jar.archivePath
-            }
-			from 'LICENSE', 'NOTICE', 'README.md'
+	osx.contents {
+		into('JD-GUI.app/Contents') {
+			from 'build/distributions/osx'
 		}
+		into('JD-GUI.app/Contents/Resources/Java') {
+			from jar.archivePath
+		}
+		from 'LICENSE', 'NOTICE', 'README.md'
 	}
-	windows {
-		contents {
-			from 'build/launch4j/jd-gui.exe'
-			from 'LICENSE', 'NOTICE', 'README.md'
-		}
+	windows.contents {
+		from 'build/launch4j/jd-gui.exe'
+		from 'LICENSE', 'NOTICE', 'README.md'
 	}
 }
 installOsxDist.dependsOn build

@@ -46,7 +46,7 @@ class ManifestFilePage extends HyperlinkPage implements UriGettable, IndexesChan
             def internalTypeName = typeName.replace('.', '/')
             // Undefined parameters : 2 candidate methods
             // http://docs.oracle.com/javase/6/docs/api/java/lang/instrument/package-summary.html
-            addHyperlink(new ManifestHyperlinkData(startIndex, endIndex, internalTypeName + '-premain-(?)?'))
+            addHyperlink(new ManifestHyperlinkData(startIndex, endIndex, internalTypeName + '-premain-(*)?'))
         }
         // Display
         setText(text)

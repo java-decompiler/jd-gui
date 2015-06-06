@@ -97,7 +97,7 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
             if (!initialized) {
                 removeAllChildren()
                 // Create type node
-                def type = api.getTypeFactory(entry).make(api, entry, null)                
+                def type = api.getTypeFactory(entry)?.make(api, entry, null)
                 if (type) {
                     add(new TypeTreeNode(entry, type, new TreeNodeBean(label: type.displayTypeName, icon: type.icon), pageFactory))
                 }
