@@ -24,8 +24,6 @@ public interface Type {
 
     public String getName();
 
-    public String getShortName();
-
     public String getSuperName();
 
     public String getOuterName();

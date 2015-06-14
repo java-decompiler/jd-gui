@@ -18,7 +18,7 @@ class UriUtil {
      *  file://codebase/a/b/c/D$E.class => file://codebase/a/b/c/D.class#typeDeclaration=D$E
      */
     static URI createURI(API api, Collection<Indexes> collectionOfIndexes, Container.Entry entry, String query, String fragment) {
-        def type = TypeFactoryService.instance.get(entry)?.make(api, entry, null)
+        def type = TypeFactoryService.instance.get(entry)?.make(api, entry, fragment)
         def uri = entry.uri
         def path = type?.outerName ? getOuterPath(collectionOfIndexes, entry, type) : uri.path
         return new URI(uri.scheme, uri.host, path, query, fragment)
