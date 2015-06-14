@@ -9,6 +9,7 @@ jd.gui.service.treenode.HtmlFileTreeNodeFactoryProvider
 jd.gui.service.treenode.JarFileTreeNodeFactoryProvider
 jd.gui.service.treenode.JavaFileTreeNodeFactoryProvider
 jd.gui.service.treenode.JavascriptFileTreeNodeFactoryProvider
+jd.gui.service.treenode.JsonFileTreeNodeFactoryProvider
 jd.gui.service.treenode.JspFileTreeNodeFactoryProvider
 jd.gui.service.treenode.ManifestFileTreeNodeFactoryProvider
 jd.gui.service.treenode.MetainfDirectoryTreeNodeFactoryProvider
