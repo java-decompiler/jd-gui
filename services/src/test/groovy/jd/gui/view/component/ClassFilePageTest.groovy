@@ -7,9 +7,9 @@ package jd.gui.view.component
 
 class ClassFilePageTest extends GroovyTestCase {
 
-    HashMap<String, ClassFilePage.DeclarationData> initDeclarations() {
-        def data = new ClassFilePage.DeclarationData(0, 1, "Test", "test", "I")
-        HashMap<String, ClassFilePage.DeclarationData> declarations = [:]
+    HashMap<String, TypePage.DeclarationData> initDeclarations() {
+        def data = new TypePage.DeclarationData(0, 1, "Test", "test", "I")
+        HashMap<String, TypePage.DeclarationData> declarations = [:]
 
         // Init type declarations
         declarations.put("Test", data)
@@ -43,16 +43,16 @@ class ClassFilePageTest extends GroovyTestCase {
     TreeMap<Integer, HyperlinkPage.HyperlinkData> initHyperlinks() {
         def hyperlinks = new TreeMap<Integer, HyperlinkPage.HyperlinkData>()
 
-        hyperlinks.put(0, new ClassFilePage.HyperlinkReferenceData(0, 1, new ClassFilePage.ReferenceData("java/lang/Integer", "MAX_VALUE", "I", "Test")))
-        hyperlinks.put(0, new ClassFilePage.HyperlinkReferenceData(0, 1, new ClassFilePage.ReferenceData("java/lang/Integer", "toString", "()Ljava/lang/String;", "Test")))
+        hyperlinks.put(0, new TypePage.HyperlinkReferenceData(0, 1, new TypePage.ReferenceData("java/lang/Integer", "MAX_VALUE", "I", "Test")))
+        hyperlinks.put(0, new TypePage.HyperlinkReferenceData(0, 1, new TypePage.ReferenceData("java/lang/Integer", "toString", "()Ljava/lang/String;", "Test")))
 
         return hyperlinks
     }
 
-    ArrayList<ClassFilePage.StringData> initStrings() {
-        def strings = new ArrayList<ClassFilePage.StringData>()
+    ArrayList<TypePage.StringData> initStrings() {
+        def strings = new ArrayList<TypePage.StringData>()
 
-        strings.add(new ClassFilePage.StringData(0, 3, "abc", "Test"))
+        strings.add(new TypePage.StringData(0, 3, "abc", "Test"))
 
         return strings
     }

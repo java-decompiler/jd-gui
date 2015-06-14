@@ -10,3 +10,59 @@ dependencies {
     compile project(':api')
     testCompile 'org.codehaus.groovy:groovy-test:2.4.0'
 }
+
+// ANTLR //
+ext.antlr4 = [
+        antlrSource: 'src/main/antlr',
+        destinationDir: 'src-generated/antlr/java',
+        grammarPackage: 'jd.gui.util.parser.antlr'
+]
+
+configurations {
+    antlr4 {
+        description = "ANTLR4"
+    }
+}
+
+dependencies {
+    compile 'org.antlr:antlr4-runtime:4.5'
+    antlr4 'org.antlr:antlr4:4.5'
+}
+
+task antlr4OutputDir() {
+    mkdir antlr4.destinationDir
+}
+
+task antlr4GenerateGrammarSource(dependsOn: antlr4OutputDir, type: JavaExec) {
+    description = 'Generates Java sources from ANTLR4 grammars.'
+
+    inputs.dir file(antlr4.antlrSource)
+    outputs.dir file(antlr4.destinationDir)
+
+    def grammars = fileTree(antlr4.antlrSource).include('**/*.g4')
+    def pkg = antlr4.grammarPackage.replaceAll("\\.", "/")
+
+    main = 'org.antlr.v4.Tool'
+    classpath = configurations.antlr4
+    args = ['-o', "${antlr4.destinationDir}/${pkg}", '-atn', '-package', antlr4.grammarPackage, grammars.files].flatten()
+}
+
+compileJava {
+    dependsOn antlr4GenerateGrammarSource
+    source antlr4.destinationDir
+}
+
+clean {
+    delete 'src-generated'
+}
+
+idea.module {
+    sourceDirs += file(antlr4.destinationDir)
+}
+ideaModule.dependsOn antlr4GenerateGrammarSource
+
+eclipse.classpath.file.withXml { xml ->
+    def node = xml.asNode()
+    node.appendNode( 'classpathentry', [ kind: 'src', path: antlr4.destinationDir])
+}
+eclipseClasspath.dependsOn antlr4GenerateGrammarSource

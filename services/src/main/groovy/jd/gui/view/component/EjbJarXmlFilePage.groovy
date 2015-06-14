@@ -15,7 +15,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 
 import java.awt.*
 
-class EjbJarXmlFilePage extends TypeHyperlinkPage implements UriGettable, IndexesChangeListener {
+class EjbJarXmlFilePage extends TypeReferencePage implements UriGettable, IndexesChangeListener {
     protected API api
     protected Container.Entry entry
     protected Collection<Indexes> collectionOfIndexes
@@ -133,7 +133,7 @@ class EjbJarXmlFilePage extends TypeHyperlinkPage implements UriGettable, Indexe
                 int startIndex = position + text.indexOf(trim)
                 int endIndex = startIndex + trim.length()
                 def internalTypeName = trim.replace('.', '/')
-                addHyperlink(new TypeHyperlinkPage.TypeHyperlinkData(startIndex, endIndex, internalTypeName))
+                addHyperlink(new TypeReferencePage.TypeHyperlinkData(startIndex, endIndex, internalTypeName))
             }
         }
     }

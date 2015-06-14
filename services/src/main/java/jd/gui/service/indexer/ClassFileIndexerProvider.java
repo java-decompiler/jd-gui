@@ -12,7 +12,6 @@ import jd.gui.api.API;
 import jd.gui.api.model.Container;
 import jd.gui.api.model.Indexes;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -20,17 +19,17 @@ import java.util.*;
  * Unsafe thread implementation of class file indexer.
  */
 public class ClassFileIndexerProvider extends AbstractIndexerProvider {
-    protected Set<String> typeDeclarationSet = new HashSet<>();
-    protected Set<String> constructorDeclarationSet = new HashSet<>();
-    protected Set<String> methodDeclarationSet = new HashSet<>();
-    protected Set<String> fieldDeclarationSet = new HashSet<>();
-    protected Set<String> typeReferenceSet = new HashSet<>();
-    protected Set<String> constructorReferenceSet = new HashSet<>();
-    protected Set<String> methodReferenceSet = new HashSet<>();
-    protected Set<String> fieldReferenceSet = new HashSet<>();
-    protected Set<String> stringSet = new HashSet<>();
-    protected Set<String> superTypeNameSet = new HashSet<>();
-    protected Set<String> descriptorSet = new HashSet<>();
+    protected HashSet<String> typeDeclarationSet = new HashSet<>();
+    protected HashSet<String> constructorDeclarationSet = new HashSet<>();
+    protected HashSet<String> methodDeclarationSet = new HashSet<>();
+    protected HashSet<String> fieldDeclarationSet = new HashSet<>();
+    protected HashSet<String> typeReferenceSet = new HashSet<>();
+    protected HashSet<String> constructorReferenceSet = new HashSet<>();
+    protected HashSet<String> methodReferenceSet = new HashSet<>();
+    protected HashSet<String> fieldReferenceSet = new HashSet<>();
+    protected HashSet<String> stringSet = new HashSet<>();
+    protected HashSet<String> superTypeNameSet = new HashSet<>();
+    protected HashSet<String> descriptorSet = new HashSet<>();
 
     protected ClassIndexer classIndexer = new ClassIndexer(
         typeDeclarationSet, constructorDeclarationSet, methodDeclarationSet,
@@ -72,11 +71,9 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         superTypeNameSet.clear();
         descriptorSet.clear();
 
-        InputStream inputStream = null;
-
-        try {
+        try (InputStream inputStream = entry.getInputStream()) {
             // Index field, method, interfaces & super type
-            ClassReader classReader = new ClassReader(inputStream = entry.getInputStream());
+            ClassReader classReader = new ClassReader(inputStream);
             classReader.accept(classIndexer, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
             // Index descriptors
@@ -159,32 +156,17 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
             }
 
         } catch (Exception ignore) {
-        } finally {
-            if (inputStream != null) {
-                try { inputStream.close(); } catch (IOException ignore) {}
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected static void addToIndex(Indexes indexes, String indexName, Set<String> set, Container.Entry entry) {
-        if (set.size() > 0) {
-            Map<String, Collection> index = indexes.getIndex(indexName);
-
-            for (String key : set) {
-                index.get(key).add(entry);
-            }
         }
     }
 
     protected static class ClassIndexer extends ClassVisitor {
-        protected Set<String> typeDeclarationSet;
-        protected Set<String> constructorDeclarationSet;
-        protected Set<String> methodDeclarationSet;
-        protected Set<String> fieldDeclarationSet;
-        protected Set<String> typeReferenceSet;
-        protected Set<String> superTypeNameSet;
-        protected Set<String> descriptorSet;
+        protected HashSet<String> typeDeclarationSet;
+        protected HashSet<String> constructorDeclarationSet;
+        protected HashSet<String> methodDeclarationSet;
+        protected HashSet<String> fieldDeclarationSet;
+        protected HashSet<String> typeReferenceSet;
+        protected HashSet<String> superTypeNameSet;
+        protected HashSet<String> descriptorSet;
 
         protected AnnotationIndexer annotationIndexer;
         protected FieldIndexer fieldIndexer;
@@ -193,9 +175,9 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         protected String name;
 
         public ClassIndexer(
-                Set<String> typeDeclarationSet, Set<String> constructorDeclarationSet,
-                Set<String> methodDeclarationSet, Set<String> fieldDeclarationSet,
-                Set<String> typeReferenceSet, Set<String> superTypeNameSet, Set<String> descriptorSet) {
+                HashSet<String> typeDeclarationSet, HashSet<String> constructorDeclarationSet,
+                HashSet<String> methodDeclarationSet, HashSet<String> fieldDeclarationSet,
+                HashSet<String> typeReferenceSet, HashSet<String> superTypeNameSet, HashSet<String> descriptorSet) {
             super(Opcodes.ASM5);
 
             this.typeDeclarationSet = typeDeclarationSet;
@@ -258,9 +240,9 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
     }
 
     protected static class SignatureIndexer extends SignatureVisitor {
-        protected Set<String> typeReferenceSet;
+        protected HashSet<String> typeReferenceSet;
 
-        SignatureIndexer(Set<String> typeReferenceSet) {
+        SignatureIndexer(HashSet<String> typeReferenceSet) {
             super(Opcodes.ASM5);
             this.typeReferenceSet = typeReferenceSet;
         }
@@ -271,9 +253,9 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
     }
 
     protected static class AnnotationIndexer extends AnnotationVisitor {
-        protected Set<String> descriptorSet;
+        protected HashSet<String> descriptorSet;
 
-        public AnnotationIndexer(Set<String> descriptorSet) {
+        public AnnotationIndexer(HashSet<String> descriptorSet) {
             super(Opcodes.ASM5);
             this.descriptorSet = descriptorSet;
         }
@@ -289,10 +271,10 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
     }
 
     protected static class FieldIndexer extends FieldVisitor {
-        protected Set<String> descriptorSet;
+        protected HashSet<String> descriptorSet;
         protected AnnotationIndexer annotationIndexer;
 
-        public FieldIndexer(Set<String> descriptorSet, AnnotationIndexer annotationInexer) {
+        public FieldIndexer(HashSet<String> descriptorSet, AnnotationIndexer annotationInexer) {
             super(Opcodes.ASM5);
             this.descriptorSet = descriptorSet;
             this.annotationIndexer = annotationInexer;
@@ -310,10 +292,10 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
     }
 
     protected static class MethodIndexer extends MethodVisitor {
-        protected Set<String> descriptorSet;
+        protected HashSet<String> descriptorSet;
         protected AnnotationIndexer annotationIndexer;
 
-        public MethodIndexer(Set<String> descriptorSet, AnnotationIndexer annotationIndexer) {
+        public MethodIndexer(HashSet<String> descriptorSet, AnnotationIndexer annotationIndexer) {
             super(Opcodes.ASM5);
             this.descriptorSet = descriptorSet;
             this.annotationIndexer = annotationIndexer;

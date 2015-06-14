@@ -5,7 +5,6 @@
 
 package jd.gui.service.treenode
 
-import groovy.transform.CompileStatic
 import jd.gui.api.API
 import jd.gui.api.feature.PageCreator
 import jd.gui.api.feature.TreeNodeExpandable
@@ -21,13 +20,13 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
 
     static class BaseTreeNode extends DefaultMutableTreeNode implements UriGettable, PageCreator {
         Container.Entry entry
-        PageFactory pageFactory;
+        PageAndTipFactory factory;
         URI uri
 
-        BaseTreeNode(Container.Entry entry, String fragment, Object userObject, PageFactory pageFactory) {
+        BaseTreeNode(Container.Entry entry, String fragment, Object userObject, PageAndTipFactory factory) {
             super(userObject)
             this.entry = entry
-            this.pageFactory = pageFactory
+            this.factory = factory
 
             if (fragment) {
                 def uri = entry.uri
@@ -43,50 +42,20 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
         // --- PageCreator --- //
         public <T extends JComponent & UriGettable> T createPage(API api) {
             // Lazy 'tip' initialization
-            def file = new File(entry.container.root.uri)
-            def tip = "<html>Location: $file.path"
-
-            entry.inputStream.withStream { is ->
-                is.skip(4) // Skip magic number
-                int minorVersion = readUnsignedShort(is)
-                int majorVersion = readUnsignedShort(is)
-
-                if (majorVersion >= 49) {
-                    tip += "<br>Java compiler version: ${majorVersion - (49-5)} ($majorVersion.$minorVersion)"
-                } else if (majorVersion >= 45) {
-                    tip += "<br>Java compiler version: 1.${majorVersion - (45-1)} ($majorVersion.$minorVersion)"
-                }
-            }
-
-            tip += "</html>"
-
-            userObject.tip = tip
-
-            return pageFactory.make(api, entry)
-        }
-
-        /**
-         * @see java.io.DataInputStream#readUnsignedShort()
-         */
-        @CompileStatic
-        int readUnsignedShort(InputStream is) throws IOException {
-            int ch1 = is.read()
-            int ch2 = is.read()
-            if ((ch1 | ch2) < 0)
-                throw new EOFException()
-            return (ch1 << 8) + (ch2 << 0)
+            userObject.tip = factory.makeTip(api, entry)
+            return factory.makePage(api, entry)
         }
     }
 
     static class FileTreeNode extends BaseTreeNode implements TreeNodeExpandable {
         boolean initialized
 
-        FileTreeNode(Container.Entry entry, Object userObject, PageFactory pageFactory) {
-            this(entry, null, userObject, pageFactory)
+        FileTreeNode(Container.Entry entry, Object userObject, PageAndTipFactory pageAndTipFactory) {
+            this(entry, null, userObject, pageAndTipFactory)
         }
 
-        FileTreeNode(Container.Entry entry, String fragment, Object userObject, PageFactory pageFactory) {
-            super(entry, fragment, userObject, pageFactory)
+        FileTreeNode(Container.Entry entry, String fragment, Object userObject, PageAndTipFactory factory) {
+            super(entry, fragment, userObject, factory)
             initialized = false
             // Add dummy node
             add(new DefaultMutableTreeNode())
@@ -97,9 +66,10 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
             if (!initialized) {
                 removeAllChildren()
                 // Create type node
-                def type = api.getTypeFactory(entry)?.make(api, entry, null)
-                if (type) {
-                    add(new TypeTreeNode(entry, type, new TreeNodeBean(label: type.displayTypeName, icon: type.icon), pageFactory))
+                def types = api.getTypeFactory(entry)?.make(api, entry)
+
+                for (def type : types) {
+                    add(new TypeTreeNode(entry, type, new TreeNodeBean(label: type.displayTypeName, icon: type.icon), factory))
                 }
                 
                 initialized = true
@@ -111,8 +81,8 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
         boolean initialized
         Type type
 
-        TypeTreeNode(Container.Entry entry, Type type, Object userObject, PageFactory pageFactory) {
-            super(entry, type.name, userObject, pageFactory)
+        TypeTreeNode(Container.Entry entry, Type type, Object userObject, PageAndTipFactory factory) {
+            super(entry, type.name, userObject, factory)
             this.initialized = false
             this.type = type
             // Add dummy node
@@ -134,7 +104,7 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
                 type.innerTypes.sort { t1, t2 ->
                     t1.name.compareTo(t2.name)
                 }.each {
-                    add(new TypeTreeNode(entry, it, new TreeNodeBean(label: it.displayInnerTypeName, icon: it.icon), pageFactory))
+                    add(new TypeTreeNode(entry, it, new TreeNodeBean(label: it.displayInnerTypeName, icon: it.icon), factory))
                 }
 
                 // Create fields
@@ -148,7 +118,7 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
                 }.sort { f1, f2 ->
                     f1.label.compareTo(f2.label)
                 }.each {
-                    add(new FieldOrMethodTreeNode(entry, it.fragment, new TreeNodeBean(label: it.label, icon: it.icon), pageFactory))
+                    add(new FieldOrMethodTreeNode(entry, it.fragment, new TreeNodeBean(label: it.label, icon: it.icon), factory))
                 }
 
                 // Create methods
@@ -161,7 +131,7 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
                 }.sort { m1, m2 ->
                     m1.label.compareTo(m2.label)
                 }.each {
-                    add(new FieldOrMethodTreeNode(entry, it.fragment, new TreeNodeBean(label: it.label, icon: it.icon), pageFactory))
+                    add(new FieldOrMethodTreeNode(entry, it.fragment, new TreeNodeBean(label: it.label, icon: it.icon), factory))
                 }
 
                 initialized = true
@@ -400,8 +370,8 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
     }
 
     static class FieldOrMethodTreeNode extends BaseTreeNode {
-        FieldOrMethodTreeNode(Container.Entry entry, String fragment, Object userObject, PageFactory pageFactory) {
-            super(entry, fragment, userObject, pageFactory)
+        FieldOrMethodTreeNode(Container.Entry entry, String fragment, Object userObject, PageAndTipFactory factory) {
+            super(entry, fragment, userObject, factory)
         }
     }
 
@@ -409,8 +379,9 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
         String fragment, label
         Icon icon
     }
-    
-    interface PageFactory {
-        public <T extends JComponent & UriGettable> T make(API api, Container.Entry entry);
+
+    interface PageAndTipFactory {
+        public <T extends JComponent & UriGettable> T makePage(API api, Container.Entry entry);
+        public String makeTip(API api, Container.Entry entry);
     }
 }

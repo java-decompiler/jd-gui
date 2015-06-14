@@ -13,22 +13,16 @@ import jd.core.process.DecompilerImpl
 import jd.gui.api.API
 import jd.gui.api.feature.*
 import jd.gui.api.model.Container
-import jd.gui.api.model.Indexes
 import jd.gui.util.decompiler.ClassFileSourcePrinter
 import jd.gui.util.decompiler.ContainerLoader
 import jd.gui.util.decompiler.GuiPreferences
-import jd.gui.util.matcher.DescriptorMatcher
 import org.fife.ui.rsyntaxtextarea.DocumentRange
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 
 import javax.swing.text.DefaultCaret
 import java.awt.Color
-import java.awt.Point
-import java.util.regex.Pattern
 
-class ClassFilePage
-        extends CustomLineNumbersPage
-        implements UriGettable, IndexesChangeListener, LineNumberNavigable, FocusedTypeGettable, PreferencesChangeListener {
+class ClassFilePage extends TypePage implements PreferencesChangeListener {
 
     protected static final String ESCAPE_UNICODE_CHARACTERS   = 'ClassFileViewerPreferences.escapeUnicodeCharacters'
     protected static final String OMIT_THIS_PREFIX            = 'ClassFileViewerPreferences.omitThisPrefix'
@@ -36,15 +30,6 @@ class ClassFilePage
     protected static final String DISPLAY_DEFAULT_CONSTRUCTOR = 'ClassFileViewerPreferences.displayDefaultConstructor'
 
     protected static final Decompiler DECOMPILER = new DecompilerImpl()
-
-    protected API api
-    protected Container.Entry entry
-    protected Collection<Indexes> collectionOfIndexes
-
-    protected ArrayList<ReferenceData> references = new ArrayList<>()
-    protected HashMap<String, DeclarationData> declarations = new HashMap<>()
-    protected TreeMap<Integer, DeclarationData> typeDeclarations = new TreeMap<>()
-    protected ArrayList<StringData> strings = new ArrayList<>()
 
     protected int maximumLineNumber = -1
 
@@ -69,9 +54,7 @@ class ClassFilePage
     }
 
     ClassFilePage(API api, Container.Entry entry) {
-        // Init attributes
-        this.api = api
-        this.entry = entry
+        super(api, entry)
         // Init view
         errorForeground = Color.decode(api.preferences.get('JdGuiPreferences.errorBackgroundColor'))
         // Display source
@@ -111,132 +94,24 @@ class ClassFilePage
         maximumLineNumber = getMaximumSourceLineNumber()
     }
 
-    String getSyntaxStyle() { SyntaxConstants.SYNTAX_STYLE_JAVA }
+    @CompileStatic
+    protected static boolean getPreferenceValue(Map<String, String> preferences, String key, boolean defaultValue) {
+        String v = preferences.get(key);
 
-    protected boolean isHyperlinkEnabled(HyperlinkPage.HyperlinkData hyperlinkData) { hyperlinkData.reference.enabled }
-
-    protected void openHyperlink(int x, int y, HyperlinkPage.HyperlinkData hyperlinkData) {
-        if (hyperlinkData.reference.enabled) {
-            // Save current position in history
-            def location = textArea.getLocationOnScreen()
-            int offset = textArea.viewToModel(new Point(x-location.x as int, y-location.y as int))
-            def uri = entry.uri
-            api.addURI(new URI(uri.scheme, uri.authority, uri.path, 'position=' + offset, null))
-
-            // Open link
-            def reference = hyperlinkData.reference
-            def typeName = reference.type
-            def entries = collectionOfIndexes?.collect { it.getIndex('typeDeclarations')?.get(typeName) }.flatten().grep { it!=null }
-            def rootUri = entry.container.root.uri.toString()
-            def sameContainerEntries = entries?.grep { it.uri.toString().startsWith(rootUri) }
-            def fragment = typeName
-
-            if (reference.name) {
-                fragment += '-' + reference.name
-            }
-            if (reference.descriptor) {
-                fragment += '-' + reference.descriptor
-            }
-
-            if (sameContainerEntries) {
-                api.openURI(x, y, sameContainerEntries, null, fragment)
-            } else if (entries) {
-                api.openURI(x, y, entries, null, fragment)
-            }
+        if (v == null) {
+            return defaultValue;
+        } else {
+            return Boolean.valueOf(v);
         }
     }
 
-    // --- UriGettable --- //
-    URI getUri() { entry.uri }
+    String getSyntaxStyle() { SyntaxConstants.SYNTAX_STYLE_JAVA }
 
     // --- ContentSavable --- //
     String getFileName() {
         def path = entry.path
         int index = path.lastIndexOf('.')
         return path.substring(0, index) + '.java'
-    }
-
-    // --- IndexesChangeListener --- //
-    @CompileStatic
-    void indexesChanged(Collection<Indexes> collectionOfIndexes) {
-        // Update the list of containers
-        this.collectionOfIndexes = collectionOfIndexes
-        // Refresh links
-        boolean refresh = false
-
-        for (def reference : references) {
-            def typeName = reference.type
-            boolean enabled
-
-            if (reference.name) {
-                typeName = searchTypeHavingMember(typeName, reference.name, reference.descriptor, entry)
-                if (typeName) {
-                    // Replace type with the real type containing the referenced member
-                    reference.type = typeName
-                    enabled = true
-                } else {
-                    enabled = false
-                }
-            } else {
-                enabled = collectionOfIndexes.find { it.getIndex('typeDeclarations')?.get(typeName) } != null
-            }
-
-            if (reference.enabled != enabled) {
-                reference.enabled = enabled
-                refresh = true
-            }
-        }
-
-        if (refresh) {
-            textArea.repaint()
-        }
-    }
-
-    protected String searchTypeHavingMember(String typeName, String name, String descriptor, Container.Entry entry) {
-        def entries = collectionOfIndexes?.collect { it.getIndex('typeDeclarations')?.get(typeName) }.flatten().grep { it!=null }
-        def rootUri = entry.container.root.uri.toString()
-        def sameContainerEntries = entries?.grep { Container.Entry e -> e.uri.toString().startsWith(rootUri) }
-
-        if (sameContainerEntries) {
-            return searchTypeHavingMember(typeName, name, descriptor, sameContainerEntries)
-        } else {
-            return searchTypeHavingMember(typeName, name, descriptor, entries)
-        }
-    }
-
-    @CompileStatic
-    protected String searchTypeHavingMember(String typeName, String name, String descriptor, List<Container.Entry> entries) {
-        for (def entry : entries) {
-            def type = api.getTypeFactory(entry).make(api, entry, null)
-
-            if (type) {
-                if (descriptor.indexOf('(') == -1) {
-                    // Search a field
-                    for (def field : type.fields) {
-                        if (field.name.equals(name) && field.descriptor.equals(descriptor)) {
-                            // Field found
-                            return typeName
-                        }
-                    }
-                } else {
-                    // Search a method
-                    for (def method : type.methods) {
-                        if (method.name.equals(name) && method.descriptor.equals(descriptor)) {
-                            // Method found
-                            return typeName
-                        }
-                    }
-                }
-
-                // Not found -> Search in super type
-                def typeOwnerName = searchTypeHavingMember(type.superName, name, descriptor, entry)
-                if (typeOwnerName) {
-                    return typeOwnerName
-                }
-            }
-        }
-
-        return null
     }
 
     // --- LineNumberNavigable --- //
@@ -253,218 +128,6 @@ class ClassFilePage
 
     boolean checkLineNumber(int lineNumber) { lineNumber <= maximumLineNumber }
 
-    // --- UriOpenable --- //
-    /**
-     * @param uri for URI format, @see jd.gui.api.feature.UriOpenable
-     */
-    boolean openUri(URI uri) {
-        List<DocumentRange> ranges = []
-        def fragment = uri.fragment
-        def query = uri.query
-
-        textArea.highlighter.clearMarkAllHighlights()
-
-        if (fragment) {
-            matchFragmentAndAddDocumentRange(fragment, declarations, ranges)
-        }
-
-        if (query) {
-            Map<String, String> parameters = parseQuery(query)
-
-            if (parameters.containsKey('lineNumber')) {
-                def lineNumber = parameters.get('lineNumber')
-                if (lineNumber.isNumber()) {
-                    goToLineNumber(lineNumber.toInteger())
-                    return true
-                }
-            } else if (parameters.containsKey('position')) {
-                def position = parameters.get('position')
-                if (position.isNumber()) {
-                    int pos = position.toInteger()
-                    if (textArea.document.length > pos) {
-                        ranges.add(new DocumentRange(pos, pos))
-                    }
-                }
-            } else {
-                matchQueryAndAddDocumentRange(parameters, declarations, hyperlinks, strings, ranges)
-            }
-        }
-
-        if (ranges) {
-            textArea.markAllHighlightColor = SELECT_HIGHLIGHT_COLOR
-            textArea.markAll(ranges)
-            setCaretPositionAndCenter(ranges.sort().get(0))
-        }
-
-        return true
-    }
-
-    @CompileStatic
-    static void matchFragmentAndAddDocumentRange(
-            String fragment, HashMap<String, DeclarationData> declarations, List<DocumentRange> ranges) {
-
-        if ((fragment.indexOf('?') != -1) || (fragment.indexOf('*') != -1)) {
-            // Unknown type and/or descriptor ==> Select all and scroll to the first one
-            int lastDash = fragment.lastIndexOf('-')
-
-            if (lastDash == -1) {
-                // Search types
-                String slashAndTypeName = fragment.substring(1)
-                String typeName = fragment.substring(2)
-
-                for (def entry : declarations.entrySet()) {
-                    if (entry.key.endsWith(slashAndTypeName) || entry.key.equals(typeName)) {
-                        ranges.add(new DocumentRange(entry.value.startPosition, entry.value.endPosition))
-                    }
-                }
-            } else {
-                def prefix = fragment.substring(0, lastDash+1)
-                def suffix = fragment.substring(lastDash+1)
-                def addRangeClosure
-
-                if (suffix.charAt(0) == '(') {
-                    addRangeClosure = { String key, DeclarationData value ->
-                        int index = key.lastIndexOf('-') + 1
-                        if (DescriptorMatcher.matchMethodDescriptors(suffix, key.substring(index))) {
-                            ranges.add(new DocumentRange(value.startPosition, value.endPosition))
-                        }
-                    }
-                } else {
-                    addRangeClosure = { String key, DeclarationData value ->
-                        int index = key.lastIndexOf('-') + 1
-                        if (DescriptorMatcher.matchFieldDescriptors(suffix, key.substring(index))) {
-                            ranges.add(new DocumentRange(value.startPosition, value.endPosition))
-                        }
-                    }
-                }
-
-                if (fragment.charAt(0) == '*') {
-                    // Unknown type
-                    String slashAndTypeNameAndName = prefix.substring(1)
-                    String typeNameAndName = prefix.substring(2)
-
-                    for (def entry : declarations.entrySet()) {
-                        if ((entry.key.indexOf(slashAndTypeNameAndName) != -1) || (entry.key.startsWith(typeNameAndName))) {
-                            addRangeClosure(entry.key, entry.value)
-                        }
-                    }
-                } else {
-                    // Known type
-                    for (def entry : declarations.entrySet()) {
-                        if (entry.key.startsWith(prefix)) {
-                            addRangeClosure(entry.key, entry.value)
-                        }
-                    }
-                }
-            }
-        } else {
-            // Known type and descriptor ==> Search and high light item
-            def data = declarations.get(fragment)
-            if (data) {
-                ranges.add(new DocumentRange(data.startPosition, data.endPosition))
-            }
-        }
-    }
-
-    @CompileStatic
-    static void matchQueryAndAddDocumentRange(
-            Map<String, String> parameters,
-            HashMap<String, DeclarationData> declarations, TreeMap<Integer, HyperlinkPage.HyperlinkData> hyperlinks, ArrayList<StringData> strings,
-            List<DocumentRange> ranges) {
-
-        def highlightFlags = parameters.get('highlightFlags')
-        def highlightPattern = parameters.get('highlightPattern')
-
-        if (highlightFlags && highlightPattern) {
-            def highlightScope = parameters.get('highlightScope')
-            def regexp = createRegExp(highlightPattern)
-            def pattern = Pattern.compile(regexp + '.*')
-
-            if (highlightFlags.indexOf('s') != -1) {
-                // Highlight strings
-                def patternForString = Pattern.compile(regexp)
-
-                for (def data : strings) {
-                    if (matchScope(highlightScope, data.owner)) {
-                        def matcher = patternForString.matcher(data.text)
-                        int offset = data.startPosition
-
-                        while(matcher.find()) {
-                            ranges.add(new DocumentRange(offset + matcher.start(), offset + matcher.end()))
-                        }
-                    }
-                }
-            }
-
-            boolean t = (highlightFlags.indexOf('t') != -1) // Highlight types
-            boolean f = (highlightFlags.indexOf('f') != -1) // Highlight fields
-            boolean m = (highlightFlags.indexOf('m') != -1) // Highlight methods
-            boolean c = (highlightFlags.indexOf('c') != -1) // Highlight constructors
-
-            if (highlightFlags.indexOf('d') != -1) {
-                // Highlight declarations
-                for (def entry : declarations.entrySet()) {
-                    def declaration = entry.value
-
-                    if (matchScope(highlightScope, declaration.type)) {
-                        if ((t && declaration.isAType()) || (c && declaration.isAConstructor())) {
-                            matchAndAddDocumentRange(pattern, getMostInnerTypeName(declaration.type), declaration.startPosition, declaration.endPosition, ranges)
-                        }
-                        if ((f && declaration.isAField()) || (m && declaration.isAMethod())) {
-                            matchAndAddDocumentRange(pattern, declaration.name, declaration.startPosition, declaration.endPosition, ranges)
-                        }
-                    }
-                }
-            }
-
-            if (highlightFlags.indexOf('r') != -1) {
-                // Highlight references
-                for (def entry : hyperlinks.entrySet()) {
-                    def hyperlink = entry.value
-                    def reference = ((HyperlinkReferenceData)hyperlink).reference
-
-                    if (matchScope(highlightScope, reference.owner)) {
-                        if ((t && reference.isAType()) || (c && reference.isAConstructor())) {
-                            matchAndAddDocumentRange(pattern, getMostInnerTypeName(reference.type), hyperlink.startPosition, hyperlink.endPosition, ranges)
-                        }
-                        if ((f && reference.isAField()) || (m && reference.isAMethod())) {
-                            matchAndAddDocumentRange(pattern, reference.name, hyperlink.startPosition, hyperlink.endPosition, ranges)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @CompileStatic
-    static boolean matchScope(String scope, String type) {
-        if (!scope)
-            return true
-        if (scope.charAt(0) == '*')
-            return type.endsWith(scope.substring(1)) || type.equals(scope.substring(2))
-        return type.equals(scope)
-    }
-
-    @CompileStatic
-    static void matchAndAddDocumentRange(Pattern pattern, String text, int start, int end, List<DocumentRange> ranges) {
-        if (pattern.matcher(text).matches()) {
-            ranges.add(new DocumentRange(start, end))
-        }
-    }
-
-    @CompileStatic
-    static String getMostInnerTypeName(String typeName) {
-        int lastPackageSeparatorIndex = typeName.lastIndexOf('/') + 1
-        int lastTypeNameSeparatorIndex = typeName.lastIndexOf('$') + 1
-        int lastIndex = Math.max(lastPackageSeparatorIndex, lastTypeNameSeparatorIndex)
-        return typeName.substring(lastIndex)
-    }
-
-    // --- FocusedTypeGettable --- //
-    String getFocusedTypeName() { typeDeclarations.floorEntry(textArea.caretPosition)?.value?.type }
-
-    Container.Entry getEntry() { entry }
-
     // --- PreferencesChangeListener --- //
     void preferencesChanged(Map<String, String> preferences) {
         def caret = textArea.caret
@@ -477,18 +140,16 @@ class ClassFilePage
 
     @CompileStatic
     class Printer extends ClassFileSourcePrinter {
-        protected StringBuffer stringBuffer
+        protected StringBuffer stringBuffer = new StringBuffer(10*1024)
         protected boolean realignmentLineNumber
         protected boolean showPrefixThis
         protected boolean unicodeEscape
-        protected HashMap<String, ReferenceData> referencesCache
+        protected HashMap<String, TypePage.ReferenceData> referencesCache = new HashMap<>()
 
         Printer(GuiPreferences preferences) {
-            this.stringBuffer = new StringBuffer(10*1024)
             this.realignmentLineNumber = preferences.getRealignmentLineNumber()
             this.showPrefixThis = preferences.isShowPrefixThis()
             this.unicodeEscape = preferences.isUnicodeEscape()
-            this.referencesCache = new HashMap<>()
         }
 
         boolean getRealignmentLineNumber() { realignmentLineNumber }
@@ -496,8 +157,7 @@ class ClassFilePage
         boolean isUnicodeEscape() { unicodeEscape }
 
         void append(char c) { stringBuffer.append(c) }
-        void append(String s) {
-            stringBuffer.append(s) }
+        void append(String s) { stringBuffer.append(s) }
 
         // Manage line number and misalignment
         int textAreaLineNumber = 1
@@ -526,52 +186,52 @@ class ClassFilePage
             }
         }
 
-        // --- Manage strings --- //
+        // --- Add strings --- //
         void printString(String s, String scopeInternalName)  {
-            strings.add(new StringData(stringBuffer.length(), s.length(), s, scopeInternalName))
+            strings.add(new TypePage.StringData(stringBuffer.length(), s.length(), s, scopeInternalName))
             super.printString(s, scopeInternalName)
         }
 
-        // --- Manage references --- //
+        // --- Add references --- //
         void printTypeImport(String internalName, String name) {
-            addHyperlink(new HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, null, null, null)))
+            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, null, null, null)))
             super.printTypeImport(internalName, name)
         }
 
         void printType(String internalName, String name, String scopeInternalName) {
-            addHyperlink(new HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, null, null, scopeInternalName)))
+            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, null, null, scopeInternalName)))
             super.printType(internalName, name, scopeInternalName)
         }
 
         void printField(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)))
+            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)))
             super.printField(internalName, name, descriptor, scopeInternalName)
         }
         void printStaticField(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)))
+            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)))
             super.printStaticField(internalName, name, descriptor, scopeInternalName)
         }
 
         void printConstructor(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, "<init>", descriptor, scopeInternalName)))
+            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, "<init>", descriptor, scopeInternalName)))
             super.printConstructor(internalName, name, descriptor, scopeInternalName)
         }
 
         void printMethod(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)))
+            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)))
             super.printMethod(internalName, name, descriptor, scopeInternalName)
         }
         void printStaticMethod(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)))
+            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)))
             super.printStaticMethod(internalName, name, descriptor, scopeInternalName)
         }
 
-        ReferenceData newReferenceData(String internalName, String name, String descriptor, String scopeInternalName) {
+        TypePage.ReferenceData newReferenceData(String internalName, String name, String descriptor, String scopeInternalName) {
             def key = internalName + '-' + name + '-'+ descriptor + '-' + scopeInternalName
             def reference = referencesCache.get(key)
 
             if (reference == null) {
-                reference = new ReferenceData(internalName, name, descriptor, scopeInternalName)
+                reference = new TypePage.ReferenceData(internalName, name, descriptor, scopeInternalName)
                 referencesCache.put(key, reference)
                 references.add(reference)
             }
@@ -579,132 +239,37 @@ class ClassFilePage
             return reference
         }
 
-        // --- Manage declarations --- //
+        // --- Add declarations --- //
         void printTypeDeclaration(String internalName, String name) {
-            def data = new DeclarationData(stringBuffer.length(), name.length(), internalName, null, null)
+            def data = new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, null, null)
             declarations.put(internalName, data)
             typeDeclarations.put(stringBuffer.length(), data)
             super.printTypeDeclaration(internalName, name)
         }
 
         void printFieldDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + '-' + name + '-' + descriptor, new DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor))
+            declarations.put(internalName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor))
             super.printFieldDeclaration(internalName, name, descriptor)
         }
         void printStaticFieldDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + '-' + name + '-' + descriptor, new DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor))
+            declarations.put(internalName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor))
             super.printStaticFieldDeclaration(internalName, name, descriptor)
         }
 
         void printConstructorDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + '-<init>-' + descriptor, new DeclarationData(stringBuffer.length(), name.length(), internalName, "<init>", descriptor))
+            declarations.put(internalName + '-<init>-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, "<init>", descriptor))
             super.printConstructorDeclaration(internalName, name, descriptor)
         }
 
         void printMethodDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + '-' + name + '-' + descriptor, new DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor))
+            declarations.put(internalName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor))
             super.printMethodDeclaration(internalName, name, descriptor)
         }
         void printStaticMethodDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + '-' + name + '-' + descriptor, new DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor))
+            declarations.put(internalName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor))
             super.printStaticMethodDeclaration(internalName, name, descriptor)
         }
 
         String toString() { stringBuffer.toString() }
-    }
-
-    @CompileStatic
-    static class StringData {
-        int startPosition
-        int endPosition
-        String text
-        String owner
-
-        StringData(int startPosition, int length, String text, String owner) {
-            this.startPosition = startPosition
-            this.endPosition = startPosition + length
-            this.text = text
-            this.owner = owner
-        }
-    }
-
-    @CompileStatic
-    static class DeclarationData {
-        int startPosition
-        int endPosition
-        String type
-        /**
-         * Field or method name or null for type
-         */
-        String name
-        String descriptor
-
-        DeclarationData(int startPosition, int length, String type, String name, String descriptor) {
-            this.startPosition = startPosition
-            this.endPosition = startPosition + length
-            this.type = type
-            this.name = name
-            this.descriptor = descriptor
-        }
-
-        boolean isAType() { name == null }
-        boolean isAField() { descriptor && descriptor.charAt(0) != '('}
-        boolean isAMethod() { descriptor && descriptor.charAt(0) == '('}
-        boolean isAConstructor() { "<init>".equals(name) }
-    }
-
-    @CompileStatic
-    static class HyperlinkReferenceData extends HyperlinkPage.HyperlinkData {
-        ReferenceData reference
-
-        HyperlinkReferenceData(int startPosition, int length, ReferenceData reference) {
-            super(startPosition, startPosition+length)
-            this.reference = reference
-        }
-    }
-
-    @CompileStatic
-    static class ReferenceData {
-        String type
-        /**
-         * Field or method name or null for type
-         */
-        String name
-        /**
-         * Field or method descriptor or null for type
-         */
-        String descriptor
-        /**
-         * Internal type name containing reference or null for "import" statement.
-         * Used to high light items matching with URI like "file://dir1/dir2/file?highlightPattern=hello&highlightFlags=drtcmfs&highlightScope=type".
-         */
-        String owner
-        /**
-         * "Enabled" flag for link of reference
-         */
-        boolean enabled = false
-
-        ReferenceData(String type, String name, String descriptor, String owner) {
-            this.type = type
-            this.name = name
-            this.descriptor = descriptor
-            this.owner = owner
-        }
-
-        boolean isAType() { name == null }
-        boolean isAField() { descriptor && descriptor.charAt(0) != '('}
-        boolean isAMethod() { descriptor && descriptor.charAt(0) == '('}
-        boolean isAConstructor() { "<init>".equals(name) }
-    }
-
-    @CompileStatic
-    protected static boolean getPreferenceValue(Map<String, String> preferences, String key, boolean defaultValue) {
-        String v = preferences.get(key);
-
-        if (v == null) {
-            return defaultValue;
-        } else {
-            return Boolean.valueOf(v);
-        }
     }
 }

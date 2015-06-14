@@ -16,7 +16,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import java.awt.Point
 
 
-class WebXmlFilePage extends TypeHyperlinkPage implements UriGettable, IndexesChangeListener {
+class WebXmlFilePage extends TypeReferencePage implements UriGettable, IndexesChangeListener {
     protected API api
     protected Container.Entry entry
     protected Collection<Indexes> collectionOfIndexes
@@ -47,7 +47,7 @@ class WebXmlFilePage extends TypeHyperlinkPage implements UriGettable, IndexesCh
             api.addURI(new URI(uri.scheme, uri.authority, uri.path, 'position=' + offset, null))
 
             // Open link
-            if (hyperlinkData instanceof TypeHyperlinkPage.TypeHyperlinkData) {
+            if (hyperlinkData instanceof TypeReferencePage.TypeHyperlinkData) {
                 def internalTypeName = hyperlinkData.internalTypeName
                 def entries = collectionOfIndexes?.collect { it.getIndex('typeDeclarations')?.get(internalTypeName) }.flatten().grep { it!=null }
                 def rootUri = entry.container.root.uri.toString()
@@ -163,7 +163,7 @@ class WebXmlFilePage extends TypeHyperlinkPage implements UriGettable, IndexesCh
                     addHyperlink(new PathHyperlinkData(startIndex, endIndex, trim))
                 } else {
                     def internalTypeName = trim.replace('.', '/')
-                    addHyperlink(new TypeHyperlinkPage.TypeHyperlinkData(startIndex, endIndex, internalTypeName))
+                    addHyperlink(new TypeReferencePage.TypeHyperlinkData(startIndex, endIndex, internalTypeName))
                 }
             }
         }

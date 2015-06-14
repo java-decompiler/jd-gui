@@ -32,6 +32,16 @@
 			<dict>
 				<key>CFBundleTypeExtensions</key>
 				<array>
+					<string>java</string>
+				</array>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>CFBundleTypeName</key>			<string>Java File</string>
+				<key>LSIsAppleDefaultForType</key>	<false/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
 					<string>jar</string>
 				</array>
 				<key>CFBundleTypeName</key>			<string>Jar File</string>

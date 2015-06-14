@@ -10,7 +10,10 @@ import org.fife.ui.rsyntaxtextarea.DocumentRange
 
 import java.util.regex.Pattern
 
-abstract class TypeHyperlinkPage extends HyperlinkPage {
+/**
+ * Page containing type references (Hyperlinks to pages of type)
+ */
+abstract class TypeReferencePage extends HyperlinkPage {
 
     // --- UriOpenable --- //
     boolean openUri(URI uri) {

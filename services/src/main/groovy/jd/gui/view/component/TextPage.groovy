@@ -213,7 +213,7 @@ class TextPage extends JPanel implements ContentCopyable, ContentSelectable, Lin
 
     // --- LineNumberNavigable --- //
     int getMaximumLineNumber() {
-        return textArea.getLineOfOffset(textArea.document.length)
+        return textArea.getLineOfOffset(textArea.document.length) + 1
     }
 
     void goToLineNumber(int lineNumber) {

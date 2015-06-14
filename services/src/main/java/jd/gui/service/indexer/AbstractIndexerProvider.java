@@ -5,13 +5,13 @@
 
 package jd.gui.service.indexer;
 
+import jd.gui.api.model.Container;
+import jd.gui.api.model.Indexes;
 import jd.gui.spi.Indexer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public abstract class AbstractIndexerProvider implements Indexer {
@@ -51,4 +51,15 @@ public abstract class AbstractIndexerProvider implements Indexer {
         return (externalSelectors==null) ? null : externalSelectors.toArray(new String[externalSelectors.size()]);
     }
     public Pattern getPathPattern() { return externalPathPattern; }
+
+    @SuppressWarnings("unchecked")
+    protected static void addToIndex(Indexes indexes, String indexName, Set<String> set, Container.Entry entry) {
+        if (set.size() > 0) {
+            Map<String, Collection> index = indexes.getIndex(indexName);
+
+            for (String key : set) {
+                index.get(key).add(entry);
+            }
+        }
+    }
 }

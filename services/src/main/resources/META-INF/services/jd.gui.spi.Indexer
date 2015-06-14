@@ -1,6 +1,7 @@
 jd.gui.service.indexer.DirectoryIndexerProvider
 jd.gui.service.indexer.ClassFileIndexerProvider
 jd.gui.service.indexer.EjbJarXmlFileIndexerProvider
+jd.gui.service.indexer.JavaFileIndexerProvider
 jd.gui.service.indexer.MetainfServiceFileIndexerProvider
 jd.gui.service.indexer.TextFileIndexerProvider
 jd.gui.service.indexer.WebXmlFileIndexerProvider

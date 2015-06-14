@@ -7,11 +7,8 @@ package jd.gui.service.fileloader
 
 import groovyjarjarasm.asm.ClassReader
 import jd.gui.api.API
-import jd.gui.api.feature.UriOpenable
 
-import java.nio.file.Paths
-
-class ClassFileLoaderProvider extends AbstractFileLoaderProvider {
+class ClassFileLoaderProvider extends AbstractTypeFileLoaderProvider {
 
     String[] getExtensions() { ['class'] }
     String getDescription() { 'Class files (*.class)' }
@@ -22,48 +19,10 @@ class ClassFileLoaderProvider extends AbstractFileLoaderProvider {
 
     boolean load(API api, File file) {
         file.withInputStream { is ->
-            ClassReader classReader = new ClassReader(is)
+            def classReader = new ClassReader(is)
+            def pathInFile = classReader.className.replace('/', File.separator) + '.class'
 
-            // Search root path
-            def pathSuffix = classReader.className.replace('/', File.separator) + '.class'
-            def path = file.path
-
-            while (! path.endsWith(pathSuffix)) {
-                int index = pathSuffix.indexOf(File.separator)
-
-                if (index == -1) {
-                    pathSuffix = ''
-                } else {
-                    pathSuffix = pathSuffix.substring(index+1)
-                }
-            }
-
-            if (pathSuffix) {
-                // Init root file
-                File rootFile = file
-                int index = pathSuffix.indexOf(File.separator)
-
-                while (index != -1) {
-                    rootFile = rootFile.parentFile
-                    pathSuffix = pathSuffix.substring(index+1)
-                    index = pathSuffix.indexOf(File.separator)
-                }
-                rootFile = rootFile.parentFile
-
-                // Create panel
-                def mainPanel = load(api, rootFile, Paths.get(rootFile.toURI()))
-
-                if (mainPanel instanceof UriOpenable) {
-                    // Open page
-                    pathSuffix = file.absolutePath.substring(rootFile.absolutePath.length()).replace(File.separator, '/')
-                    def rootUri = rootFile.toURI()
-                    def uri = new URI(rootUri.scheme, rootUri.host, rootUri.path + '!' + pathSuffix, null)
-                    mainPanel.openUri(uri)
-                    return true
-                } else {
-                    return mainPanel != null
-                }
-            }
+            return load(api, file, pathInFile)
         }
     }
 }
