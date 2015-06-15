@@ -113,40 +113,52 @@ class MainController implements API {
         swing.doLater {
             // Setup closures
             openAction.closure = { onOpen() }
+
+            saveAllSourcesController = new SaveAllSourcesController(swing, configuration, this)
+            saveAllSourcesAction.closure = { onSaveAllSources() }
+
+            containerChangeListeners.add(openTypeController = new OpenTypeController(swing, configuration, this))
+            openTypeAction.closure = { onOpenType() }
+
+            containerChangeListeners.add(openTypeHierarchyController = new OpenTypeHierarchyController(swing, configuration, this))
+            openTypeHierarchyAction.closure = { onOpenTypeHierarchy() }
+
             closeAction.closure = { onClose() }
             saveAction.closure = { onSaveSource() }
-            saveAllSourcesAction.closure = { onSaveAllSources() }
             copyAction.closure = { onCopy() }
             pasteAction.closure = { onPaste() }
             selectAllAction.closure = { onSelectAll() }
+
             findAction.closure = { onFind() }
             findNextAction.closure = { onFindNext() }
             findPreviousAction.closure = { onFindPrevious() }
             findCaseSensitiveAction.closure = { onFindCriteriaChanged() }
-            openTypeAction.closure = { onOpenType() }
-            openTypeHierarchyAction.closure = { onOpenTypeHierarchy() }
+
+            goToController = new GoToController(swing, configuration)
             goToAction.closure = { onGoTo() }
+
             backwardAction.closure = { openURI(history.backward()) }
             forwardAction.closure = { openURI(history.forward()) }
+
+            containerChangeListeners.add(searchInConstantPoolsController = new SearchInConstantPoolsController(swing, configuration, this))
             searchAction.closure = { onSearch() }
+
             wikipediaAction.closure = { onWikipedia() }
+
+            preferencesController = new PreferencesController(swing, configuration, this, PreferencesPanelService.instance.providers)
             preferencesAction.closure = { onPreferences() }
+
             // Add listeners
             mainFrame.addComponentListener(new MainFrameListener(configuration))
             // Set drop files transfer handler
             mainFrame.setTransferHandler(new FilesTransferHandler())
+
             // Create executor
             executor = Executors.newSingleThreadExecutor()
             // Background initializations
             executor.execute(new Runnable() {
                 void run() {
                     // Background controller creation
-                    goToController = new GoToController(swing, configuration)
-                    containerChangeListeners.add(openTypeController = new OpenTypeController(swing, configuration, MainController.this))
-                    containerChangeListeners.add(openTypeHierarchyController = new OpenTypeHierarchyController(swing, configuration, MainController.this))
-                    preferencesController = new PreferencesController(swing, configuration, MainController.this, PreferencesPanelService.instance.providers)
-                    containerChangeListeners.add(searchInConstantPoolsController = new SearchInConstantPoolsController(swing, configuration, MainController.this))
-                    saveAllSourcesController = new SaveAllSourcesController(swing, configuration, MainController.this)
                     selectLocationController = new SelectLocationController(swing, configuration, MainController.this)
                     // Background service initialization
                     ContainerFactoryService.instance
