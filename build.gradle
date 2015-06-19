@@ -16,14 +16,14 @@ allprojects {
 		sourceCompatibility = '1.7'
 		targetCompatibility = '1.7'
 	}
-	
+
 	repositories {
 		mavenCentral()
 		maven {
 			url 'https://raw.github.com/java-decompiler/mvn-repo/master'
 		}
 	}
-	
+
 	configurations {
 		provided
 		compile.extendsFrom provided
@@ -37,8 +37,8 @@ cleanIdea {
 }
 
 // All in one JAR //
-subprojects.each { subproject -> 
-	evaluationDependsOn(subproject.path) 
+subprojects.each { subproject ->
+	evaluationDependsOn(subproject.path)
 }
 
 jar {
@@ -54,8 +54,8 @@ jar {
 		deps -= subproject.jar.archivePath
 	}
 	deps = deps.unique().collect { it.isDirectory() ? it : zipTree(it) }
-	
-	manifest { 
+
+	manifest {
 		attributes 'Main-Class': 'jd.gui.App', 'SplashScreen-Image': 'images/jd_icon_128.png'
 	}
 	from deps
@@ -65,10 +65,10 @@ jar {
 		// Create temporary directory
 		def tmpSpiDir = file('build/tmp/spi')
 		tmpSpiDir.deleteDir()
-		tmpSpiDir.mkdirs()		
+		tmpSpiDir.mkdirs()
 		// Copy and merge SPI config files
 		subprojects.each { subproject ->
-			def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + File.separator + 'META-INF' + File.separator + 'services')	
+			def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + File.separator + 'META-INF' + File.separator + 'services')
 			if (servicesDir.exists()) {
 				servicesDir.eachFile { source ->
 					def target = file(tmpSpiDir.path + File.separator + source.name)
@@ -95,20 +95,27 @@ task launch4jConfig(type: Copy) {
 }
 
 task launch4j(type: Exec, dependsOn: [':jar', ':launch4jConfig']) {
-	def launch4jCfg = file('build/launch4j/launch4j.xml')
-	def launch4jExe = System.properties['LAUNCH4J_HOME'] + '/launch4j.exe'
-	commandLine 'cmd', '/c', launch4jExe, launch4jCfg
-	doFirst {
-		if (new File(launch4jExe).exists() == false) {
-			errorOutput.println "ERROR: 'LAUNCH4J_HOME' not defined or invalid. Launch4j (http://launch4j.sourceforge.net) is required to generare 'jd-gui.exe'."
-		}
-	}
+    def launch4jCfg = file('build/launch4j/launch4j.xml')
+    def launch4jExe = System.properties['LAUNCH4J_HOME'] + '/launch4j.exe'
+
+    onlyIf {
+        System.properties['os.name'].startsWith('Windows')
+    }
+
+    if (new File(launch4jExe).exists()) {
+        commandLine 'cmd', '/c', launch4jExe, launch4jCfg
+    } else {
+        commandLine 'cmd', '/c', 'echo', 'OFF'
+        doLast {
+            errorOutput.println "ERROR: 'LAUNCH4J_HOME' not defined or invalid. Launch4j (http://launch4j.sourceforge.net) is required to generare 'jd-gui.exe'."
+        }
+    }
 }
 
 // Distributions for OSX and Windows //
-task installOsxDistConfig(type: Copy) {
+task copyAndReplaceVariablesInInfoPlist(type: Copy) {
     from 'src/osx/resources/Info.plist'
-    into 'build/distributions/osx'
+    into 'build/tmp/distributions/osx'
     expand(
             VERSION: project.version
     )
@@ -117,18 +124,26 @@ task installOsxDistConfig(type: Copy) {
 distributions {
 	osx.contents {
 		into('JD-GUI.app/Contents') {
-			from 'build/distributions/osx'
+			from 'build/tmp/distributions/osx'
 		}
 		into('JD-GUI.app/Contents/Resources/Java') {
 			from jar.archivePath
 		}
 		from 'LICENSE', 'NOTICE', 'README.md'
+		doFirst {
+			ant.chmod(file:'src/osx/dist/JD-GUI.app/Contents/MacOS/universalJavaApplicationStub.sh', perm:'+x')
+		}
 	}
 	windows.contents {
 		from 'build/launch4j/jd-gui.exe'
 		from 'LICENSE', 'NOTICE', 'README.md'
 	}
 }
-installOsxDist.dependsOn build
-installOsxDist.dependsOn installOsxDistConfig
+
+installOsxDist.dependsOn jar, copyAndReplaceVariablesInInfoPlist
+osxDistTar.dependsOn jar, copyAndReplaceVariablesInInfoPlist
+osxDistZip.dependsOn jar, copyAndReplaceVariablesInInfoPlist
+
 installWindowsDist.dependsOn launch4j
+windowsDistTar.dependsOn launch4j
+windowsDistZip.dependsOn launch4j
