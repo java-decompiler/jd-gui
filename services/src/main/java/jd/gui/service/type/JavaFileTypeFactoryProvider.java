@@ -210,7 +210,12 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
                 superQualifiedTypeName = resolveInternalTypeName(superType.classOrInterfaceType().Identifier());
             }
 
-            access += getTypeDeclarationContextAccessFlag(ctx.getParent());
+            ParserRuleContext parent = ctx.getParent();
+
+            if (parent instanceof JavaParser.TypeDeclarationContext)
+                access += getTypeDeclarationContextAccessFlag(parent);
+            else if (parent instanceof JavaParser.MemberDeclarationContext)
+                access += getMemberDeclarationContextAccessFlag(parent.getParent());
 
             if (currentType == null) {
                 String internalTypeName = packageName.isEmpty() ? name : packageName + "/" + name;
@@ -317,8 +322,6 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
         public void enterConstructorDeclaration(JavaParser.ConstructorDeclarationContext ctx) {
             int access = getClassBodyDeclarationAccessFlag(ctx.getParent().getParent());
-            TerminalNode identifier = ctx.Identifier();
-            String name = identifier.getText();
             String paramDescriptors = createParamDescriptors(ctx.formalParameters().formalParameterList());
             String descriptor = paramDescriptors + "V";
 
@@ -344,25 +347,42 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         protected int getTypeDeclarationContextAccessFlag(ParserRuleContext ctx) {
             int access = 0;
 
-            for (JavaParser.ClassOrInterfaceModifierContext modifierContext : ctx.getRuleContexts(JavaParser.ClassOrInterfaceModifierContext.class)) {
-                access += getAccessFlag(modifierContext);
+            for (JavaParser.ClassOrInterfaceModifierContext coiModifierContext : ctx.getRuleContexts(JavaParser.ClassOrInterfaceModifierContext.class)) {
+                access += getAccessFlag(coiModifierContext);
+            }
+
+            return access;
+        }
+
+        protected int getMemberDeclarationContextAccessFlag(ParserRuleContext ctx) {
+            int access = 0;
+
+            for (JavaParser.ModifierContext modifierContext : ctx.getRuleContexts(JavaParser.ModifierContext.class)) {
+                JavaParser.ClassOrInterfaceModifierContext coiModifierContext = modifierContext.classOrInterfaceModifier();
+                if (coiModifierContext != null) {
+                    access += getAccessFlag(coiModifierContext);
+                }
             }
 
             return access;
         }
 
         protected int getClassBodyDeclarationAccessFlag(ParserRuleContext ctx) {
-            int access = 0;
+            if ((currentType.access & JavaType.FLAG_INTERFACE) == 0) {
+                int access = 0;
 
-            for (JavaParser.ModifierContext modifierContext : ctx.getRuleContexts(JavaParser.ModifierContext.class)) {
-                JavaParser.ClassOrInterfaceModifierContext coimc = modifierContext.classOrInterfaceModifier();
+                for (JavaParser.ModifierContext modifierContext : ctx.getRuleContexts(JavaParser.ModifierContext.class)) {
+                    JavaParser.ClassOrInterfaceModifierContext coimc = modifierContext.classOrInterfaceModifier();
 
-                if (coimc != null) {
-                    access += getAccessFlag(coimc);
+                    if (coimc != null) {
+                        access += getAccessFlag(coimc);
+                    }
                 }
-            }
 
-            return access;
+                return access;
+            } else {
+                return JavaType.FLAG_PUBLIC;
+            }
         }
 
         protected int getAccessFlag(JavaParser.ClassOrInterfaceModifierContext ctx) {
