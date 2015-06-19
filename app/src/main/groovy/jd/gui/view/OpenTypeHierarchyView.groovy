@@ -187,10 +187,7 @@ class OpenTypeHierarchyView {
         def type = api.getTypeFactory(treeNode.entry).make(api, treeNode.entry, treeNode.typeName)
         def superTypeName = type.superName
 
-        if (superTypeName == null) {
-            // super type undefined
-            return treeNode
-        } else {
+        if (superTypeName) {
             def superEntries = getEntriesClosure(superTypeName)
 
             // Search entry in the sane container of 'entry'
@@ -207,8 +204,15 @@ class OpenTypeHierarchyView {
                 superEntry = null
             }
 
-            if (superEntry == null) {
-                // Entry not found --> Most likely hypothesis : Java type entry
+            if (superEntry) {
+                // Create parent tree node
+                def superTreeNode = createTreeNode(superEntry, superTypeName)
+                // Populate parent tree node
+                populateTreeNode(superTreeNode, treeNode)
+                // Recursive call
+                return createParentTreeNode(superTreeNode)
+            } else {
+                // Entry not found --> Most probable hypothesis : Java type entry
                 int lastPackageSeparatorIndex = superTypeName.lastIndexOf('/')
                 def package_ = superTypeName.substring(0, lastPackageSeparatorIndex).replace('/', '.')
                 def name = superTypeName.substring(lastPackageSeparatorIndex + 1).replace('$', '.')
@@ -224,14 +228,10 @@ class OpenTypeHierarchyView {
                 }
 
                 return rootTreeNode
-            } else {
-                // Create parent tree node
-                def superTreeNode = createTreeNode(superEntry, superTypeName)
-                // Populate parent tree node
-                populateTreeNode(superTreeNode, treeNode)
-                // Recursive call
-                return createParentTreeNode(superTreeNode)
             }
+        } else {
+            // super type undefined
+            return treeNode
         }
     }
 
