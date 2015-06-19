@@ -134,7 +134,7 @@ class JavaFilePage extends TypePage {
                     if (first.getSymbol().type == JavaParser.STATIC) {
                         String name = first.text
                         int position = first.getSymbol().startIndex
-                        declarations.put(currentInternalTypeName + '-<clinit>-()V', new TypePage.DeclarationData(position, 5, currentInternalTypeName, name, '()V'))
+                        declarations.put(currentInternalTypeName + '-<clinit>-()V', new TypePage.DeclarationData(position, 6, currentInternalTypeName, name, '()V'))
                     }
                 }
             }

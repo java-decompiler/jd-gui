@@ -185,6 +185,11 @@ abstract class TypePage extends CustomLineNumbersPage implements UriGettable, Ur
             def data = declarations.get(fragment)
             if (data) {
                 ranges.add(new DocumentRange(data.startPosition, data.endPosition))
+            } else if (fragment.endsWith('-<clinit>-()V')) {
+                // 'static' bloc not found ==> Select type declaration
+                String typeName = fragment.substring(0, fragment.indexOf('-'));
+                data = declarations.get(typeName)
+                ranges.add(new DocumentRange(data.startPosition, data.endPosition))
             }
         }
     }

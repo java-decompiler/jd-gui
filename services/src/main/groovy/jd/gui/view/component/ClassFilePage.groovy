@@ -260,6 +260,10 @@ class ClassFilePage extends TypePage implements PreferencesChangeListener {
             declarations.put(internalName + '-<init>-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, "<init>", descriptor))
             super.printConstructorDeclaration(internalName, name, descriptor)
         }
+        void printStaticConstructorDeclaration(String internalName, String name) {
+            declarations.put(internalName + '-<clinit>-()V', new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, "<clinit>", '()V'))
+            super.printStaticConstructorDeclaration(internalName, name)
+        }
 
         void printMethodDeclaration(String internalName, String name, String descriptor) {
             declarations.put(internalName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor))
