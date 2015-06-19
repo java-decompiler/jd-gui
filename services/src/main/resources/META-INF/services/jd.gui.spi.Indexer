@@ -6,3 +6,4 @@ jd.gui.service.indexer.MetainfServiceFileIndexerProvider
 jd.gui.service.indexer.TextFileIndexerProvider
 jd.gui.service.indexer.WebXmlFileIndexerProvider
 jd.gui.service.indexer.ZipFileIndexerProvider
+jd.gui.service.indexer.XmlFileIndexerProvider
