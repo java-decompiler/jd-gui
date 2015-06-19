@@ -555,14 +555,14 @@ class JavaFilePage extends TypePage {
 
                     if (identifier) {
                         String name = identifier.getSymbol().text
-                        String descriptor = currentContext.getDescriptor(name);
+                        String descriptor = currentContext?.getDescriptor(name);
 
                         if (descriptor) {
                             // Is a local variable or a method parameter
                             if (descriptor.charAt(0) == 'L') {
                                 return descriptor.substring(1, descriptor.length() - 1)
                             }
-                        } else {
+                        } else if (currentInternalTypeName) {
                             String internalTypeName = searchInternalTypeNameForThisFieldName(currentInternalTypeName, name)
 
                             if (internalTypeName) {
