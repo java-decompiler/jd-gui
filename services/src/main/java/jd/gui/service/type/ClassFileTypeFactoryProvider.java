@@ -107,7 +107,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
                 }
             }
 
-            return new JavaType(entry, classReader);
+            return new JavaType(entry, classReader, -1);
         } catch (IOException ignore) {
             return null;
         }
@@ -131,13 +131,13 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         protected List<Type.Method> methods = null;
 
         @SuppressWarnings("unchecked")
-        protected JavaType(Container.Entry entry, ClassReader classReader) {
+        protected JavaType(Container.Entry entry, ClassReader classReader, int outerAccess) {
             this.classNode = new ClassNode();
             this.entry = entry;
 
             classReader.accept(classNode, ClassReader.SKIP_CODE|ClassReader.SKIP_DEBUG|ClassReader.SKIP_FRAMES);
 
-            this.access = classNode.access;
+            this.access = (outerAccess == -1) ? classNode.access : outerAccess;
             this.name = classNode.name;
 
             this.superName = ((access & Opcodes.ACC_INTERFACE) != 0) && "java/lang/Object".equals(classNode.superName) ? null : classNode.superName;
@@ -227,7 +227,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
                         if (innerEntry != null) {
                             try (InputStream is = innerEntry.getInputStream()) {
                                 ClassReader classReader = new ClassReader(is);
-                                innerTypes.add(new JavaType(innerEntry, classReader));
+                                innerTypes.add(new JavaType(innerEntry, classReader, innerClassNode.access));
                             } catch (IOException ignore) {
                             }
                         }
