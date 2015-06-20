@@ -11,7 +11,6 @@ import jd.core.loader.Loader
 import jd.core.loader.LoaderException
 import jd.core.process.DecompilerImpl
 import jd.gui.api.API
-import jd.gui.api.feature.*
 import jd.gui.api.model.Container
 import jd.gui.util.decompiler.ClassFileSourcePrinter
 import jd.gui.util.decompiler.ContainerLoader
@@ -22,7 +21,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import javax.swing.text.DefaultCaret
 import java.awt.Color
 
-class ClassFilePage extends TypePage implements PreferencesChangeListener {
+class ClassFilePage extends TypePage {
 
     protected static final String ESCAPE_UNICODE_CHARACTERS   = 'ClassFileViewerPreferences.escapeUnicodeCharacters'
     protected static final String OMIT_THIS_PREFIX            = 'ClassFileViewerPreferences.omitThisPrefix'
@@ -136,6 +135,8 @@ class ClassFilePage extends TypePage implements PreferencesChangeListener {
         caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         decompile(preferences)
         caret.setUpdatePolicy(updatePolicy)
+
+        super.preferencesChanged(preferences)
     }
 
     @CompileStatic
