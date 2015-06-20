@@ -3,7 +3,7 @@ apply plugin: 'distribution'
 
 // Common configuration //
 allprojects {
-	version='1.1.0'
+	version='1.2.0'
 
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
@@ -56,7 +56,10 @@ jar {
 	deps = deps.unique().collect { it.isDirectory() ? it : zipTree(it) }
 
 	manifest {
-		attributes 'Main-Class': 'jd.gui.App', 'SplashScreen-Image': 'images/jd_icon_128.png'
+		attributes 'Main-Class': 'jd.gui.App',
+                   'SplashScreen-Image': 'images/jd_icon_128.png',
+                   'JD-GUI-Version': project.version,
+                   'JD-Core-Version': '0.7.1'
 	}
 	from deps
 	exclude 'META-INF/services/jd.gui.spi.*'

@@ -19,6 +19,8 @@ import javax.swing.WindowConstants
 import jd.gui.Constants
 import jd.gui.service.platform.PlatformService
 
+import java.util.jar.Manifest
+
 actions {
 	action(
 		id:'openAction',
@@ -262,10 +264,21 @@ dialog(
                     }
                     hbox {
                         panel(layout:new GridLayout(2,2), opaque:false, border:emptyBorder([5,10,5,50])) {
+                            def jdGuiVersion = 'SNAPSHOT'
+                            def jdCoreVersion = 'SNAPSHOT'
+
+                            getClass().classLoader.getResources('META-INF/MANIFEST.MF').each { uri ->
+                                uri.openStream().withStream { is ->
+                                    def attributes = new Manifest(is).mainAttributes
+                                    jdGuiVersion = attributes.getValue('JD-GUI-Version') ?: jdGuiVersion
+                                    jdCoreVersion = attributes.getValue('JD-Core-Version') ?: jdCoreVersion
+                                }
+                            }
+
                             label(text: 'JD-GUI')
-                            label(text: 'version 1.1.0')
+                            label(text: 'version ' + jdGuiVersion)
                             label(text: 'JD-Core')
-                            label(text: 'version 0.7.1')
+                            label(text: 'version ' + jdCoreVersion)
                         }
                         hglue()
                     }
