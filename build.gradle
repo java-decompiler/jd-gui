@@ -1,5 +1,21 @@
+ buildscript {
+        repositories {
+            jcenter()
+        }
+
+        dependencies {
+            classpath 'com.netflix.nebula:gradle-ospackage-plugin:2.2.6' 
+			classpath 'org.spockframework:spock-core:1.0-groovy-2.3'
+            
+        }
+    }
+    
 apply plugin: 'java'
 apply plugin: 'distribution'
+apply plugin: "nebula.os-package" 
+
+
+
 
 // Common configuration //
 allprojects {
@@ -28,7 +44,9 @@ allprojects {
 		provided
 		compile.extendsFrom provided
 	}
+			
 }
+
 
 // 'cleanIdea' task extension //
 cleanIdea {
@@ -140,6 +158,34 @@ distributions {
 	}
 }
 
+ospackage {
+	packageName = project.name
+	description = 'A Java Decompoler ' 
+    version = '0.0.1'
+    release = 1
+    os = LINUX
+    url = 'https://github.com/java-decompiler/jd-gui'
+    license = file('LICENSE')
+    
+	into '/opt/'+ project.name
+	from ('build/libs/'){
+    	fileMode = 0755		
+	}
+	from ('src/linux/resources/'){
+    	fileMode = 0755		
+	}
+	from ('app/src/main/resources/images/jd_icon_128.png'){
+    	fileMode = 0755		
+	}
+	from 'LICENSE', 'NOTICE', 'README.md'
+	
+	
+	
+	postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui ; xdg-desktop-menu install ./*.desktop' 
+	preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; xdg-desktop-menu uninstall ./*.desktop' 
+	
+}
+
 installOsxDist.dependsOn jar, copyAndReplaceVariablesInInfoPlist
 osxDistTar.dependsOn jar, copyAndReplaceVariablesInInfoPlist
 osxDistZip.dependsOn jar, copyAndReplaceVariablesInInfoPlist
@@ -147,3 +193,5 @@ osxDistZip.dependsOn jar, copyAndReplaceVariablesInInfoPlist
 installWindowsDist.dependsOn launch4j
 windowsDistTar.dependsOn launch4j
 windowsDistZip.dependsOn launch4j
+
+buildDeb.dependsOn jar
