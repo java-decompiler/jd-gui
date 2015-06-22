@@ -32,7 +32,7 @@ generate _"build/install/jd-gui-windows/jd-gui.exe"_
 ```
 > gradle buildDeb
 ```
-generate Ubuntu/Debian Installer
+generate Ubuntu/Debian installer
 
 ##How to launch JD-GUI ?
 - Double-click on _"jd-gui-x.y.z.jar"_
