@@ -73,10 +73,35 @@ class AbstractTextPage extends JPanel implements LineNumberNavigable, ContentSea
                 }
             }
         })
-        textArea.addMouseWheelListener(new MouseWheelListener() {
+
+        def ctrlA = KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.defaultToolkit.menuShortcutKeyMask)
+        def ctrlC = KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.defaultToolkit.menuShortcutKeyMask)
+        def ctrlV = KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.defaultToolkit.menuShortcutKeyMask)
+        def inputMap = textArea.inputMap
+        inputMap.put(ctrlA, 'none')
+        inputMap.put(ctrlC, 'none')
+        inputMap.put(ctrlV, 'none')
+
+        def theme = Theme.load(getClass().classLoader.getResourceAsStream('rsyntaxtextarea/themes/eclipse.xml'))
+        theme.apply(textArea)
+
+        scrollPane = new RTextScrollPane(textArea)
+        scrollPane.foldIndicatorEnabled = true
+        scrollPane.font = textArea.font
+
+        def mouseWheelListeners = scrollPane.getMouseWheelListeners()
+
+        // Remove default listeners
+        for (def listener : mouseWheelListeners) {
+            scrollPane.removeMouseWheelListener(listener)
+        }
+
+        scrollPane.addMouseWheelListener(new MouseWheelListener() {
             void mouseWheelMoved(MouseWheelEvent e) {
                 if ((e.modifiers & (Event.META_MASK|Event.CTRL_MASK)) != 0) {
-                    int offset = textArea.viewToModel(new Point(e.x, e.y))
+                    int x = e.x + scrollPane.x - textArea.x
+                    int y = e.y + scrollPane.y - textArea.y
+                    int offset = textArea.viewToModel(new Point(x, y))
 
                     // Update font size
                     if (e.wheelRotation > 0) {
@@ -95,26 +120,16 @@ class AbstractTextPage extends JPanel implements LineNumberNavigable, ContentSea
 
                     // Scroll
                     Point viewPosition = scrollPane.viewport.viewPosition
-                    viewPosition.@y = Math.max(viewPosition.@y + newY - e.y, 0)
+                    viewPosition.@y = Math.max(viewPosition.@y + newY - y, 0)
                     scrollPane.viewport.viewPosition = viewPosition
+                } else {
+                    // Call default listeners
+                    for (def listener : mouseWheelListeners) {
+                        listener.mouseWheelMoved(e)
+                    }
                 }
             }
         })
-
-        def ctrlA = KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.defaultToolkit.menuShortcutKeyMask)
-        def ctrlC = KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.defaultToolkit.menuShortcutKeyMask)
-        def ctrlV = KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.defaultToolkit.menuShortcutKeyMask)
-        def inputMap = textArea.inputMap
-        inputMap.put(ctrlA, 'none')
-        inputMap.put(ctrlC, 'none')
-        inputMap.put(ctrlV, 'none')
-
-        def theme = Theme.load(getClass().classLoader.getResourceAsStream('rsyntaxtextarea/themes/eclipse.xml'))
-        theme.apply(textArea)
-
-        scrollPane = new RTextScrollPane(textArea)
-        scrollPane.foldIndicatorEnabled = true
-        scrollPane.font = textArea.font
 
         def gutter = scrollPane.gutter
         gutter.setFoldIcons(COLLAPSED_ICON, EXPANDED_ICON)
