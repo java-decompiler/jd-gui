@@ -161,7 +161,6 @@ distributions {
 ospackage {
 	packageName = project.name
 	description = 'A Java Decompoler ' 
-    version = '0.0.1'
     release = 1
     os = LINUX
     url = 'https://github.com/java-decompiler/jd-gui'
