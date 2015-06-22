@@ -28,8 +28,9 @@ generate _"build/install/jd-gui-osx/JD-GUI.app"_
 > gradle -DLAUNCH4J_HOME=.../path/to/launch4j-3.7-win32 installWindowsDist
 ```
 generate _"build/install/jd-gui-windows/jd-gui.exe"_
-
-###Generate Ubuntu/Debian Installer
+```
+###### Generate Ubuntu/Debian Installer
+```
 > gradle buildDeb
 ```
 ##How to launch JD-GUI ?
