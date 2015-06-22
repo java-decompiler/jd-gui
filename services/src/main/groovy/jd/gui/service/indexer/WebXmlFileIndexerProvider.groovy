@@ -10,7 +10,7 @@ import jd.gui.api.model.Container
 import jd.gui.api.model.Indexes
 import jd.gui.util.xml.AbstractXmlPathFinder
 
-class WebXmlFileIndexerProvider extends XmlFileIndexerProvider {
+class WebXmlFileIndexerProvider extends XmlBasedFileIndexerProvider {
 
     /**
      * @return local + optional external selectors

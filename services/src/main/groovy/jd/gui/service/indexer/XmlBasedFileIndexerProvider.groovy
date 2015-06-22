@@ -13,10 +13,10 @@ import jd.gui.api.model.Indexes
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLStreamConstants
 
-class XmlFileIndexerProvider extends AbstractIndexerProvider {
+class XmlBasedFileIndexerProvider extends AbstractIndexerProvider {
     XMLInputFactory factory
 
-    XmlFileIndexerProvider() {
+    XmlBasedFileIndexerProvider() {
         factory = XMLInputFactory.newInstance()
         factory.setProperty(XMLInputFactory.SUPPORT_DTD, false)
     }
@@ -24,12 +24,11 @@ class XmlFileIndexerProvider extends AbstractIndexerProvider {
     /**
      * @return local + optional external selectors
      */
-    String[] getSelectors() { ['*:file:*.xml'] + externalSelectors }
+    String[] getSelectors() { ['*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd'] + externalSelectors }
 
     @CompileStatic
     void index(API api, Container.Entry entry, Indexes indexes) {
         def stringSet = new HashSet<String>()
-        def typeReferenceSet = new HashSet<String>()
         def reader
 
         try {
@@ -42,20 +41,10 @@ class XmlFileIndexerProvider extends AbstractIndexerProvider {
             while (reader.hasNext()) {
                 switch (reader.next()) {
                     case XMLStreamConstants.START_ELEMENT:
-                        boolean beanFlag = reader.localName.equals('bean')
-
                         stringSet.add(reader.localName)
                         for (int i = reader.attributeCount - 1; i >= 0; i--) {
-                            def attributeName = reader.getAttributeLocalName(i)
-
-                            stringSet.add(attributeName)
-
-                            if (beanFlag && attributeName.equals('class')) {
-                                // String bean reference
-                                typeReferenceSet.add(reader.getAttributeValue(i).replace('.', '/'))
-                            } else {
-                                stringSet.add(reader.getAttributeValue(i))
-                            }
+                            stringSet.add(reader.getAttributeLocalName(i))
+                            stringSet.add(reader.getAttributeValue(i))
                         }
                         for (int i = reader.namespaceCount - 1; i >= 0; i--) {
                             stringSet.add(reader.getNamespacePrefix(i))
@@ -101,17 +90,10 @@ class XmlFileIndexerProvider extends AbstractIndexerProvider {
         }
 
         def stringIndex = indexes.getIndex('strings')
-        def typeReferenceIndex = indexes.getIndex('typeReferences')
 
         for (def string : stringSet) {
             if (string) {
                 stringIndex.get(string).add(entry)
-            }
-        }
-
-        for (def ref : typeReferenceSet) {
-            if (ref) {
-                typeReferenceIndex.get(ref).add(entry)
             }
         }
     }

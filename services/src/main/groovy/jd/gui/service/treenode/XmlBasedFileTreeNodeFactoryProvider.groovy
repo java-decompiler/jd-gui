@@ -8,19 +8,19 @@ package jd.gui.service.treenode
 import jd.gui.api.API
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
-import jd.gui.view.component.XmlFilePage
 import jd.gui.view.data.TreeNodeBean
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 
-class XmlFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
-    static final ImageIcon ICON = new ImageIcon(XmlFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
+class XmlBasedFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
+    static final ImageIcon ICON = new ImageIcon(XmlBasedFileTreeNodeFactoryProvider.class.classLoader.getResource('images/xml_obj.gif'))
 
     /**
      * @return local + optional external selectors
      */
-    String[] getSelectors() { ['*:file:*.xml'] + externalSelectors }
+    String[] getSelectors() { ['*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.tld', '*:file:*.wsdl'] + externalSelectors }
 
     public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
@@ -34,7 +34,11 @@ class XmlFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
         }
 
         public <T extends JComponent & UriGettable> T createPage(API api) {
-            return new XmlFilePage(api, entry)
+            return new TextFileTreeNodeFactoryProvider.Page(entry) {
+                String getSyntaxStyle() {
+                    SyntaxConstants.SYNTAX_STYLE_XML
+                }
+            }
         }
     }
 }

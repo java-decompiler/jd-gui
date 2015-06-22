@@ -23,5 +23,6 @@ jd.gui.service.treenode.WarPackageTreeNodeFactoryProvider
 jd.gui.service.treenode.WebinfClassesDirectoryTreeNodeFactoryProvider
 jd.gui.service.treenode.WebinfLibDirectoryTreeNodeFactoryProvider
 jd.gui.service.treenode.WebXmlFileTreeNodeFactoryProvider
+jd.gui.service.treenode.XmlBasedFileTreeNodeFactoryProvider
 jd.gui.service.treenode.XmlFileTreeNodeFactoryProvider
 jd.gui.service.treenode.ZipFileTreeNodeFactoryProvider
