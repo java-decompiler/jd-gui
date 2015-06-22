@@ -29,6 +29,11 @@ generate _"build/install/jd-gui-osx/JD-GUI.app"_
 ```
 generate _"build/install/jd-gui-windows/jd-gui.exe"_
 
+```
+> gradle buildDeb
+```
+generate Ubuntu/Debian Installer
+
 ##How to launch JD-GUI ?
 - Double-click on _"jd-gui-x.y.z.jar"_
 - Double-click on _"JD-GUI"_ application from Mac OSX
