@@ -187,3 +187,4 @@ windowsDistTar.dependsOn launch4j
 windowsDistZip.dependsOn launch4j
 
 buildDeb.dependsOn jar
+buildRpm.dependsOn jar
