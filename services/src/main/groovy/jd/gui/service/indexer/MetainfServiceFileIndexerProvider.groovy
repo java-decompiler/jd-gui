@@ -29,7 +29,13 @@ class MetainfServiceFileIndexerProvider extends AbstractIndexerProvider {
         def index = indexes.getIndex('typeReferences')
 
         entry.inputStream.text.eachLine { String line ->
-            index.get(line).add(entry)
+            def trim = line.trim()
+
+            if (trim && (trim.charAt(0) != '#')) {
+                def internalTypeName = trim.replace('.', '/')
+
+                index.get(internalTypeName).add(entry)
+            }
         }
     }
 }
