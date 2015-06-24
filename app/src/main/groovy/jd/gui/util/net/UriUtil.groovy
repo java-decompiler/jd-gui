@@ -3,7 +3,7 @@
  * This program is made available under the terms of the GPLv3 License.
  */
 
-package jd.gui.util
+package jd.gui.util.net
 
 import jd.gui.api.API
 import jd.gui.api.model.Container

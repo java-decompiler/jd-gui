@@ -11,7 +11,7 @@ import jd.gui.api.feature.IndexesChangeListener
 import jd.gui.api.model.Container
 import jd.gui.api.model.Indexes
 import jd.gui.model.configuration.Configuration
-import jd.gui.util.UriUtil
+import jd.gui.util.net.UriUtil
 import jd.gui.view.OpenTypeHierarchyView
 
 import java.awt.Cursor

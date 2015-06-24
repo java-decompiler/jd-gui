@@ -40,7 +40,7 @@ import jd.gui.spi.SourceSaver
 import jd.gui.spi.TreeNodeFactory
 import jd.gui.spi.TypeFactory
 import jd.gui.spi.UriLoader
-import jd.gui.util.UriUtil
+import jd.gui.util.net.UriUtil
 
 import javax.swing.Icon
 import javax.swing.JComponent
