@@ -137,14 +137,23 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         public String getName() { return name; }
         public String getDescriptor() { return descriptor; }
         public Icon getIcon() { return getFieldIcon(access); }
+
+        public String getDisplayName() {
+            StringBuffer sb = new StringBuffer();
+            sb.append(name).append(" : ");
+            writeSignature(sb, descriptor, descriptor.length(), 0, false);
+            return sb.toString();
+        }
     }
 
     protected static class JavaMethod implements Type.Method {
+        protected JavaType type;
         protected int access;
         protected String name;
         protected String descriptor;
 
-        public JavaMethod(int access, String name, String descriptor) {
+        public JavaMethod(JavaType type, int access, String name, String descriptor) {
+            this.type = type;
             this.access = access;
             this.name = name;
             this.descriptor = descriptor;
@@ -154,6 +163,18 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         public String getName() { return name; }
         public String getDescriptor() { return descriptor; }
         public Icon getIcon() { return getMethodIcon(access); }
+
+        public String getDisplayName() {
+            String constructorName = type.getDisplayInnerTypeName();
+            boolean isInnerClass = (constructorName != null);
+
+            if (constructorName == null)
+                constructorName = type.getDisplayTypeName();
+
+            StringBuffer sb = new StringBuffer();
+            writeMethodSignature(sb, access, access, isInnerClass, constructorName, name, descriptor);
+            return sb.toString();
+        }
     }
 
     protected static class Listener extends AbstractJavaListener {
@@ -264,7 +285,7 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
                 if (first instanceof TerminalNode) {
                     if (((TerminalNode)first).getSymbol().getType() == JavaParser.STATIC) {
-                        currentType.getMethods().add(new JavaMethod(JavaType.FLAG_STATIC, "<clinit>", "()V"));
+                        currentType.getMethods().add(new JavaMethod(currentType, JavaType.FLAG_STATIC, "<clinit>", "()V"));
                     }
                 }
             }
@@ -317,7 +338,7 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             String returnDescriptor = createDescriptor(returnType, 0);
             String descriptor = paramDescriptors + returnDescriptor;
 
-            currentType.getMethods().add(new JavaMethod(access, name, descriptor));
+            currentType.getMethods().add(new JavaMethod(currentType, access, name, descriptor));
         }
 
         public void enterConstructorDeclaration(JavaParser.ConstructorDeclarationContext ctx) {
@@ -325,7 +346,7 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             String paramDescriptors = createParamDescriptors(ctx.formalParameters().formalParameterList());
             String descriptor = paramDescriptors + "V";
 
-            currentType.getMethods().add(new JavaMethod(access, "<init>", descriptor));
+            currentType.getMethods().add(new JavaMethod(currentType, access, "<init>", descriptor));
         }
 
         protected String createParamDescriptors(JavaParser.FormalParameterListContext formalParameterList) {

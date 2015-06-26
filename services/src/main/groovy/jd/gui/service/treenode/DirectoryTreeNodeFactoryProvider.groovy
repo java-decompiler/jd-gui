@@ -6,6 +6,7 @@
 package jd.gui.service.treenode
 
 import jd.gui.api.API
+import jd.gui.api.feature.ContainerEntryGettable
 import jd.gui.api.feature.TreeNodeExpandable
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
@@ -25,7 +26,7 @@ class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
      */
     String[] getSelectors() { ['*:dir:*'] + externalSelectors }
 
-    public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
+    public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
         Collection<Container.Entry> entries = entry.children
 
@@ -51,7 +52,7 @@ class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
     ImageIcon getIcon() { ICON }
     ImageIcon getOpenIcon() { OPEN_ICON }
 
-    static class TreeNode extends DefaultMutableTreeNode implements UriGettable, TreeNodeExpandable {
+    static class TreeNode extends DefaultMutableTreeNode implements ContainerEntryGettable, UriGettable, TreeNodeExpandable {
         Container.Entry entry
         boolean initialized
 
@@ -60,6 +61,9 @@ class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
             this.entry = entry
             this.initialized = false
         }
+
+        // --- ContainerEntryGettable --- //
+        Container.Entry getEntry() { entry }
 
         // --- UriGettable --- //
         URI getUri() { entry.uri }

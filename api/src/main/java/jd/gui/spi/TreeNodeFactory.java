@@ -8,6 +8,7 @@ package jd.gui.spi;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import jd.gui.api.API;
+import jd.gui.api.feature.ContainerEntryGettable;
 import jd.gui.api.feature.UriGettable;
 import jd.gui.api.model.Container;
 
@@ -18,5 +19,5 @@ public interface TreeNodeFactory {
 
     public Pattern getPathPattern();
 
-	public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry);
+	public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry);
 }

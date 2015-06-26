@@ -7,6 +7,7 @@ package jd.gui.view
 
 import groovy.swing.SwingBuilder
 import jd.gui.Constants
+import jd.gui.api.API
 import jd.gui.api.feature.ContentSearchable
 import jd.gui.api.feature.ContentSelectable
 import jd.gui.api.feature.LineNumberNavigable
@@ -50,7 +51,7 @@ class MainView implements UriOpenable, PreferencesChangeListener {
     Color findErrorBackgroundColor
 
 	MainView(
-            SwingBuilder swing, Configuration configuration, History history,
+            SwingBuilder swing, Configuration configuration, API api, History history,
             Closure panelClosedClosure,
             Closure currentPageChangedClosure,
             Closure openFilesClosure,
@@ -63,6 +64,7 @@ class MainView implements UriOpenable, PreferencesChangeListener {
             // Setup
             registerBeanFactory('iconButton', IconButton.class)
             registerBeanFactory('mainTabbedPanel', MainTabbedPanel.class)
+            registerExplicitProperty('api', { api }, {}) // Used to init 'mainTabbedPanel.api'
             // Load GUI description
             build(MainDescription)
             // Add listeners

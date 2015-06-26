@@ -5,6 +5,7 @@
 
 package jd.gui.view.component.panel
 
+import jd.gui.api.API
 import jd.gui.api.feature.PreferencesChangeListener
 import jd.gui.api.feature.UriGettable
 import jd.gui.service.platform.PlatformService
@@ -37,6 +38,7 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
 
     static final String TAB_LAYOUT = 'UITabsPreferencesProvider.singleLineTabs'
 
+    API api
 	JTabbedPane tabbedPane
     Map<String, String> preferences
 
@@ -158,6 +160,7 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
 
     class PopupTabMenu extends JPopupMenu {
         PopupTabMenu(Component component) {
+            // Add default popup menu entries
             def menuItem = new JMenuItem('Close', null)
             menuItem.addActionListener(new ActionListener() {
                 void actionPerformed(ActionEvent e) { removeComponent(component) }
@@ -175,6 +178,21 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
                 void actionPerformed(ActionEvent e) { removeAllComponents() }
             })
             add(menuItem)
+
+            // Add SPI popup menu entries
+            def actions = api.getContextualActions(component.entry, null)
+
+            if (actions) {
+                addSeparator()
+
+                for (def action : actions) {
+                    if (action) {
+                        add(action)
+                    } else {
+                        addSeparator()
+                    }
+                }
+            }
         }
     }
 

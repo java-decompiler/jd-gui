@@ -49,6 +49,8 @@ public interface Type {
 
         public String getDescriptor();
 
+        public String getDisplayName();
+
         public Icon getIcon();
     }
 
@@ -58,6 +60,8 @@ public interface Type {
         public String getName();
 
         public String getDescriptor();
+
+        public String getDisplayName();
 
         public Icon getIcon();
     }

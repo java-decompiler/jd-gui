@@ -26,6 +26,8 @@ public interface API {
 
     public <T extends JComponent & UriGettable> void addPanel(String title, Icon icon, String tip, T component);
 
+    public Collection<Action> getContextualActions(Container.Entry entry, String fragment);
+
     public UriLoader getUriLoader(URI uri);
 
     public FileLoader getFileLoader(File file);

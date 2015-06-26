@@ -261,6 +261,13 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
                             public String getName() { return fieldNode.name; }
                             public String getDescriptor() { return fieldNode.desc; }
                             public Icon getIcon() { return getFieldIcon(fieldNode.access); }
+
+                            public String getDisplayName() {
+                                StringBuffer sb = new StringBuffer();
+                                sb.append(fieldNode.name).append(" : ");
+                                writeSignature(sb, fieldNode.desc, fieldNode.desc.length(), 0, false);
+                                return sb.toString();
+                            }
                         });
                     }
                 }
@@ -280,6 +287,18 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
                             public String getName() { return methodNode.name; }
                             public String getDescriptor() { return methodNode.desc; }
                             public Icon getIcon() { return getMethodIcon(methodNode.access); }
+
+                            public String getDisplayName() {
+                                String constructorName = displayInnerTypeName;
+                                boolean isInnerClass = (constructorName != null);
+
+                                if (constructorName == null)
+                                    constructorName = getDisplayTypeName();
+
+                                StringBuffer sb = new StringBuffer();
+                                writeMethodSignature(sb, access, methodNode.access, isInnerClass, constructorName, methodNode.name, methodNode.desc);
+                                return sb.toString();
+                            }
                         });
                     }
                 }

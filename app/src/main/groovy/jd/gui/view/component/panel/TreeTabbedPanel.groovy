@@ -27,6 +27,8 @@ import javax.swing.event.TreeSelectionEvent
 import javax.swing.event.TreeSelectionListener
 import javax.swing.tree.DefaultMutableTreeNode
 import java.awt.*
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.util.List
 
 class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageChangeable, PageClosable, PreferencesChangeListener {
@@ -72,8 +74,33 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
             }
             void treeCollapsed(TreeExpansionEvent e) {}
         })
+        tree.addMouseListener(new MouseAdapter() {
+            void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    def path = tree.getClosestPathForLocation(e.x, e.y)
+
+                    if (path) {
+                        def node = path.lastPathComponent
+                        def actions = api.getContextualActions(node.entry, node.uri.fragment)
+
+                        if (actions) {
+                            def popup = new JPopupMenu()
+                            for (def action : actions) {
+                                if (action) {
+                                    popup.add(action)
+                                } else {
+                                    popup.addSeparator()
+                                }
+                            }
+                            popup.show(e.component, e.x, e.y)
+                        }
+                    }
+                }
+            }
+        })
 
         tabbedPanel = new TabbedPanel()
+        tabbedPanel.api = api
         tabbedPanel.setMinimumSize([150, 10] as Dimension)
         tabbedPanel.tabbedPane.addChangeListener(new ChangeListener() {
             void stateChanged(ChangeEvent e) { pageChanged() }

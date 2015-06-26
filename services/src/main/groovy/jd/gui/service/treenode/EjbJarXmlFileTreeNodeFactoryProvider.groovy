@@ -6,6 +6,7 @@
 package jd.gui.service.treenode
 
 import jd.gui.api.API
+import jd.gui.api.feature.ContainerEntryGettable
 import jd.gui.api.feature.PageCreator
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
@@ -23,7 +24,7 @@ class EjbJarXmlFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
      */
     String[] getSelectors() { ['jar:file:META-INF/ejb-jar.xml'] + externalSelectors }
 
-    public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
+    public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         return new TreeNode(entry, new TreeNodeBean(label:'ejb-jar.xml', icon:ICON, tip:"Location: $entry.uri.path"))
     }
 

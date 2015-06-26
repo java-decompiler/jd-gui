@@ -6,6 +6,7 @@
 package jd.gui.service.treenode
 
 import jd.gui.api.API
+import jd.gui.api.feature.ContainerEntryGettable
 import jd.gui.api.feature.PageCreator
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
@@ -25,7 +26,7 @@ class WebXmlFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
      */
     String[] getSelectors() { ['war:file:WEB-INF/web.xml'] + externalSelectors }
 
-    public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
+    public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         return new TreeNode(entry, new TreeNodeBean(label:'web.xml', icon:ICON, tip:"Location: $entry.uri.path"))
     }
 

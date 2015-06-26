@@ -6,6 +6,7 @@
 package jd.gui.service.treenode
 
 import jd.gui.api.API
+import jd.gui.api.feature.ContainerEntryGettable
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
 import jd.gui.view.data.TreeNodeBean
@@ -22,7 +23,7 @@ class XmlBasedFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvide
      */
     String[] getSelectors() { ['*:file:*.xsl', '*:file:*.xslt', '*:file:*.xsd', '*:file:*.tld', '*:file:*.wsdl'] + externalSelectors }
 
-    public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
+    public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
         def name = entry.path.substring(lastSlashIndex+1)
         return new TreeNode(entry, new TreeNodeBean(label:name, icon:ICON, tip:"Location: $entry.uri.path"))

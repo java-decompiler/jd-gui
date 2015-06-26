@@ -7,6 +7,7 @@ package jd.gui.service.treenode
 
 import groovy.transform.CompileStatic
 import jd.gui.api.API
+import jd.gui.api.feature.ContainerEntryGettable
 import jd.gui.api.feature.UriGettable
 import jd.gui.api.model.Container
 import jd.gui.view.component.ClassFilePage
@@ -32,7 +33,7 @@ class ClassFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFactoryPr
      */
     String[] getSelectors() { ['*:file:*.class'] + externalSelectors }
 
-    public <T extends DefaultMutableTreeNode & UriGettable> T make(API api, Container.Entry entry) {
+    public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.path.lastIndexOf('/')
         def name = entry.path.substring(lastSlashIndex+1)
 

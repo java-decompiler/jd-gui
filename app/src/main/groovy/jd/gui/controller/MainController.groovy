@@ -27,6 +27,7 @@ import jd.gui.service.fileloader.FileLoaderService
 import jd.gui.service.indexer.IndexerService
 import jd.gui.service.mainpanel.PanelFactoryService
 import jd.gui.service.pastehandler.PasteHandlerService
+import jd.gui.service.actions.ContextualActionsFactoryService
 import jd.gui.service.preferencespanel.PreferencesPanelService
 import jd.gui.service.sourcesaver.SourceSaverService
 import jd.gui.service.treenode.TreeNodeFactoryService
@@ -42,6 +43,7 @@ import jd.gui.spi.TypeFactory
 import jd.gui.spi.UriLoader
 import jd.gui.util.net.UriUtil
 
+import javax.swing.Action
 import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.JFileChooser
@@ -92,6 +94,7 @@ class MainController implements API {
         mainView = new MainView(
             swing,
             configuration,
+            this,
             history,
             { panelClosed() },                      // panelClosedClosure
             { page -> onCurrentPageChanged(page) }, // currentPageChangedClosure
@@ -161,6 +164,7 @@ class MainController implements API {
                     // Background controller creation
                     selectLocationController = new SelectLocationController(swing, configuration, MainController.this)
                     // Background service initialization
+                    ContextualActionsFactoryService.instance
                     ContainerFactoryService.instance
                     FileLoaderService.instance
                     IndexerService.instance
@@ -514,6 +518,9 @@ class MainController implements API {
 
         checkIndexesChange(currentPage)
     }
+
+    @CompileStatic
+    Collection<Action> getContextualActions(Container.Entry entry, String fragment) { ContextualActionsFactoryService.instance.get(this, entry, fragment) }
 
     @CompileStatic
     FileLoader getFileLoader(File file) { FileLoaderService.instance.get(this, file) }

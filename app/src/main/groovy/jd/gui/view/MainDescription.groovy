@@ -217,7 +217,7 @@ frame(
             iconButton(action:backwardAction, text:null, icon:imageIcon(resource:'/images/backward_nav.png'))
             iconButton(action:forwardAction, text:null, icon:imageIcon(resource:'/images/forward_nav.png'))
         }
-        mainTabbedPanel(id:'mainTabbedPanel', constraints:CENTER)
+        mainTabbedPanel(id:'mainTabbedPanel', constraints:CENTER, api:api)
         hbox(id:'findPanel', constraints:PAGE_END, border:emptyBorder(2), visible:false) {
             label(text:'Find: ')
             comboBox(id:'findComboBox', editable: true)
