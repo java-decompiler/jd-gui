@@ -77,9 +77,11 @@ class TreeTabbedPanel extends JPanel implements UriGettable, UriOpenable, PageCh
         tree.addMouseListener(new MouseAdapter() {
             void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    def path = tree.getClosestPathForLocation(e.x, e.y)
+                    def path = tree.getPathForLocation(e.x, e.y)
 
                     if (path) {
+                        tree.selectionPath = path
+
                         def node = path.lastPathComponent
                         def actions = api.getContextualActions(node.entry, node.uri.fragment)
 
