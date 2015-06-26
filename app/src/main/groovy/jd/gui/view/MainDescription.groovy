@@ -27,7 +27,8 @@ actions {
 		name:'Open File...',
 		mnemonic:'O',
 		accelerator:shortcut('O'),
-		shortDescription:'Open a file'
+		shortDescription:'Open a file',
+        smallIcon:imageIcon(resource:'/images/open.png')
 	)
     action(
         id:'closeAction',
@@ -39,12 +40,14 @@ actions {
         id:'saveAction',
         name:'Save',
         accelerator:shortcut('S'),
+        smallIcon:imageIcon(resource:'/images/save.png'),
         enabled:false
     )
     action(
         id:'saveAllSourcesAction',
         name:'Save All Sources',
         accelerator:shortcut('alt S'),
+        smallIcon:imageIcon(resource:'/images/save_all.png'),
         enabled:false
     )
 	action(
@@ -59,11 +62,13 @@ actions {
         id:'copyAction',
         name:'Copy',
         accelerator:shortcut('C'),
+        smallIcon:imageIcon(resource:'/images/copy.png'),
         enabled:false
     )
     action(
         id:'pasteAction',
         name:'Paste Log',
+        smallIcon:imageIcon(resource:'/images/paste.png'),
         accelerator:shortcut('V')
     )
     action(
@@ -82,6 +87,7 @@ actions {
         id:'openTypeAction',
         name:'Open Type...',
         accelerator:shortcut('shift T'),
+        smallIcon:imageIcon(resource:'/images/open_type.png'),
         enabled:false
     )
     action(
@@ -100,18 +106,21 @@ actions {
         id:'backwardAction',
         name:'Back',
         accelerator:'alt LEFT',
+        smallIcon:imageIcon(resource:'/images/backward_nav.png'),
         enabled:false
     )
     action(
         id:'forwardAction',
         name:'Forward',
         accelerator:'alt RIGHT',
+        smallIcon:imageIcon(resource:'/images/forward_nav.png'),
         enabled:false
     )
     action(
         id:'searchAction',
         name:'Search...',
         accelerator:shortcut('shift S'),
+        smallIcon:imageIcon(resource:'/images/search_src.png'),
         enabled:false
     )
     action(
@@ -124,7 +133,8 @@ actions {
 		id:'preferencesAction',
 		name:'Preferences...',
 		accelerator:shortcut('shift P'),
-		shortDescription:'Preferences'
+		shortDescription:'Preferences',
+        smallIcon:imageIcon(resource:'/images/preferences.png')
 	)
 	action(
 		id:'aboutAction',
@@ -209,13 +219,13 @@ frame(
     panel {
         borderLayout()
         toolBar(constraints:PAGE_START, floatable:false, rollover:true) {
-            iconButton(action:openAction, text:null, icon:imageIcon(resource:'/images/open.png'))
+            iconButton(action:openAction, text:null)
             separator()
-            iconButton(action:openTypeAction, text:null, icon:imageIcon(resource:'/images/open_type.png'))
-            iconButton(action:searchAction, text:null, icon:imageIcon(resource:'/images/search_src.png'))
+            iconButton(action:openTypeAction, text:null)
+            iconButton(action:searchAction, text:null)
             separator()
-            iconButton(action:backwardAction, text:null, icon:imageIcon(resource:'/images/backward_nav.png'))
-            iconButton(action:forwardAction, text:null, icon:imageIcon(resource:'/images/forward_nav.png'))
+            iconButton(action:backwardAction, text:null)
+            iconButton(action:forwardAction, text:null)
         }
         mainTabbedPanel(id:'mainTabbedPanel', constraints:CENTER, api:api)
         hbox(id:'findPanel', constraints:PAGE_END, border:emptyBorder(2), visible:false) {
