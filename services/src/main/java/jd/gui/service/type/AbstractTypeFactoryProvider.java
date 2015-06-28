@@ -13,9 +13,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
 
 public abstract class AbstractTypeFactoryProvider implements TypeFactory {
@@ -398,4 +397,17 @@ public abstract class AbstractTypeFactoryProvider implements TypeFactory {
     protected static final ImageIcon[] INTERFACE_ICONS = mergeIcons(FINAL_STATIC_INTERFACE_ICONS, ABSTRACT_OVERLAY_ICON, 0, 100);
     protected static final ImageIcon[] FIELD_ICONS = mergeIcons(FINAL_STATIC_FIELD_ICONS, ABSTRACT_OVERLAY_ICON, 0, 100);
     protected static final ImageIcon[] METHOD_ICONS = mergeIcons(FINAL_STATIC_METHOD_ICONS, ABSTRACT_OVERLAY_ICON, 0, 100);
+
+    // Cache
+    protected static class Cache<K, V> extends LinkedHashMap<K, V> {
+        public static final int CACHE_MAX_ENTRIES = 100;
+
+        public Cache() {
+            super(CACHE_MAX_ENTRIES*3/2, 0.7f, true);
+        }
+
+        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+            return size() > CACHE_MAX_ENTRIES;
+        }
+    }
 }

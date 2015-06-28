@@ -18,10 +18,8 @@ import jd.gui.api.model.Type;
 import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.net.URI;
+import java.util.*;
 
 public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
@@ -29,6 +27,9 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         // Early class loading
         JavaType.class.getName();
     }
+
+    // Create cache
+    protected Cache<URI, JavaType> cache = new Cache();
 
     /**
      * @return local + optional external selectors
@@ -52,64 +53,75 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
     }
 
     public Type make(API api, Container.Entry entry, String fragment) {
-        try (InputStream is = entry.getInputStream()) {
-            ClassReader classReader = new ClassReader(is);
+        URI key = entry.getUri();
 
-            if ((fragment != null) && (fragment.length() > 0)) {
-                // Search type name in fragment. URI format : see jd.gui.api.feature.UriOpener
-                int index = fragment.indexOf('-');
-                if (index != -1) {
-                    // Keep type name only
-                    fragment = fragment.substring(0, index);
-                }
+        if (cache.containsKey(key)) {
+            return cache.get(key);
+        } else {
+            JavaType type;
 
-                if (! classReader.getClassName().equals(fragment)) {
-                    // Search entry for type name
-                    String entryTypePath = classReader.getClassName() + ".class";
-                    String fragmentTypePath = fragment + ".class";
+            try (InputStream is = entry.getInputStream()) {
+                ClassReader classReader = new ClassReader(is);
 
-                    while (true) {
-                        if (entry.getPath().endsWith(entryTypePath)) {
-                            // Entry path ends with the internal class name
-                            String pathToFound = entry.getPath().substring(0, entry.getPath().length() - entryTypePath.length()) + fragmentTypePath;
-                            Container.Entry entryFound = null;
+                if ((fragment != null) && (fragment.length() > 0)) {
+                    // Search type name in fragment. URI format : see jd.gui.api.feature.UriOpener
+                    int index = fragment.indexOf('-');
+                    if (index != -1) {
+                        // Keep type name only
+                        fragment = fragment.substring(0, index);
+                    }
 
-                            for (Container.Entry e : entry.getParent().getChildren()) {
-                                if (e.getPath().equals(pathToFound)) {
-                                    entryFound = e;
-                                    break;
+                    if (!classReader.getClassName().equals(fragment)) {
+                        // Search entry for type name
+                        String entryTypePath = classReader.getClassName() + ".class";
+                        String fragmentTypePath = fragment + ".class";
+
+                        while (true) {
+                            if (entry.getPath().endsWith(entryTypePath)) {
+                                // Entry path ends with the internal class name
+                                String pathToFound = entry.getPath().substring(0, entry.getPath().length() - entryTypePath.length()) + fragmentTypePath;
+                                Container.Entry entryFound = null;
+
+                                for (Container.Entry e : entry.getParent().getChildren()) {
+                                    if (e.getPath().equals(pathToFound)) {
+                                        entryFound = e;
+                                        break;
+                                    }
                                 }
+
+                                if (entryFound == null)
+                                    return null;
+
+                                entry = entryFound;
+
+                                try (InputStream is2 = entry.getInputStream()) {
+                                    classReader = new ClassReader(is2);
+                                } catch (IOException ignore) {
+                                    return null;
+                                }
+                                break;
                             }
 
-                            if (entryFound == null)
-                                return null;
-
-                            entry = entryFound;
-
-                            try (InputStream is2 = entry.getInputStream()) {
-                                classReader = new ClassReader(is2);
-                            } catch (IOException ignore) {
+                            // Truncated path ? Cut first package name and retry
+                            int firstPackageSeparatorIndex = entryTypePath.indexOf('/');
+                            if (firstPackageSeparatorIndex == -1) {
+                                // Nothing to cut -> Stop
                                 return null;
                             }
-                            break;
-                        }
 
-                        // Truncated path ? Cut first package name and retry
-                        int firstPackageSeparatorIndex = entryTypePath.indexOf('/');
-                        if (firstPackageSeparatorIndex == -1) {
-                            // Nothing to cut -> Stop
-                            return null;
+                            entryTypePath = entryTypePath.substring(firstPackageSeparatorIndex + 1);
+                            fragmentTypePath = fragmentTypePath.substring(fragmentTypePath.indexOf('/') + 1);
                         }
-
-                        entryTypePath = entryTypePath.substring(firstPackageSeparatorIndex+1);
-                        fragmentTypePath = fragmentTypePath.substring(fragmentTypePath.indexOf('/')+1);
                     }
                 }
+
+                type = new JavaType(entry, classReader, -1);
+            } catch (IOException ignore) {
+                type = null;
             }
 
-            return new JavaType(entry, classReader, -1);
-        } catch (IOException ignore) {
-            return null;
+            cache.put(key, type);
+            return type;
         }
     }
 

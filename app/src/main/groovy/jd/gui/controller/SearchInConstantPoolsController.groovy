@@ -120,8 +120,9 @@ class SearchInConstantPoolsController implements IndexesChangeListener {
         searchInConstantPoolsView.updateTree(filteredContainerWrappers, matchingTypeCount)
     }
 
+    @CompileStatic
     Collection<Container.Entry> getOuterEntries(Set<Container.Entry> matchingEntries) {
-        def innerTypeEntryToOuterTypeEntry = [:]
+        def innerTypeEntryToOuterTypeEntry = new HashMap<Container.Entry, Container.Entry>()
         def matchingOuterEntriesSet = new HashSet<Container.Entry>()
 
         for (def entry : matchingEntries) {
@@ -131,8 +132,8 @@ class SearchInConstantPoolsController implements IndexesChangeListener {
                 def outerTypeEntry = innerTypeEntryToOuterTypeEntry.get(entry)
 
                 if (outerTypeEntry == null) {
-                    def typeNameToEntry = [:]
-                    def innerTypeNameToOuterTypeName = [:]
+                    def typeNameToEntry = new HashMap<String, Container.Entry>()
+                    def innerTypeNameToOuterTypeName = new HashMap<String, String>()
 
                     // Populate "typeNameToEntry" and "innerTypeNameToOuterTypeName"
                     for (def e : entry.parent.children) {
@@ -181,7 +182,9 @@ class SearchInConstantPoolsController implements IndexesChangeListener {
         }
 
         // Return outer type entries sorted by path
-        return matchingOuterEntriesSet.sort { e1, e2 -> e1.path.compareTo(e2.path) }
+        def array = matchingOuterEntriesSet.toArray(new Container.Entry[0])
+        Arrays.sort(array, new ContainerEntryPathComparator())
+        return Arrays.asList(array)
     }
 
     void filter(Indexes indexes, String pattern, int flags, Set<Container.Entry> matchingEntries) {
@@ -421,5 +424,11 @@ class SearchInConstantPoolsController implements IndexesChangeListener {
             // And refresh
             updateTree(searchInConstantPoolsView.pattern, searchInConstantPoolsView.flags)
         }
+    }
+
+    @CompileStatic
+    static class ContainerEntryPathComparator implements Comparator<Container.Entry> {
+        int compare(Container.Entry e1, Container.Entry e2) { e1.path.compareTo(e2.path) }
+        boolean equals(Object other) { this == other }
     }
 }

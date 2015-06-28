@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.*;
 
 public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
@@ -25,6 +26,9 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         // Early class loading
         ANTLRParser.parse(new ANTLRInputStream("class EarlyLoading{}"), new Listener(null));
     }
+
+    // Create cache
+    protected Cache<URI, Listener> cache = new Cache();
 
     /**
      * @return local + optional external selectors
@@ -44,21 +48,21 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
     }
 
     public Collection<Type> make(API api, Container.Entry entry) {
-        try (InputStream inputStream = entry.getInputStream()) {
-            Listener listener = new Listener(entry);
-            ANTLRParser.parse(new ANTLRInputStream(inputStream), listener);
+        Listener listener = getListener(entry);
 
-            return listener.getRootTypes();
-        } catch (IOException ignore) {
+        if (listener == null) {
             return Collections.emptyList();
+        } else {
+            return listener.getRootTypes();
         }
     }
 
     public Type make(API api, Container.Entry entry, String fragment) {
-        try (InputStream inputStream = entry.getInputStream()) {
-            Listener listener = new Listener(entry);
-            ANTLRParser.parse(new ANTLRInputStream(inputStream), listener);
+        Listener listener = getListener(entry);
 
+        if (listener == null) {
+            return null;
+        } else {
             if ((fragment != null) && (fragment.length() > 0)) {
                 // Search type name in fragment. URI format : see jd.gui.api.feature.UriOpener
                 int index = fragment.indexOf('-');
@@ -72,8 +76,25 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             } else {
                 return listener.getMainType();
             }
-        } catch (IOException ignore) {
-            return null;
+        }
+    }
+
+    protected Listener getListener(Container.Entry entry) {
+        URI key = entry.getUri();
+
+        if (cache.containsKey(key)) {
+            return cache.get(key);
+        } else {
+            Listener listener;
+
+            try (InputStream inputStream = entry.getInputStream()) {
+                ANTLRParser.parse(new ANTLRInputStream(inputStream), listener = new Listener(entry));
+            } catch (IOException ignore) {
+                listener = null;
+            }
+
+            cache.put(key, listener);
+            return listener;
         }
     }
 
