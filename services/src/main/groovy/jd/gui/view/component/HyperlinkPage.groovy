@@ -12,7 +12,6 @@ import org.fife.ui.rsyntaxtextarea.Token
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.awt.event.MouseWheelEvent
 
 @CompileStatic
 abstract class HyperlinkPage extends TextPage {
@@ -69,18 +68,10 @@ abstract class HyperlinkPage extends TextPage {
                     }
                 }
             }
-
-            void mouseWheelMoved(MouseWheelEvent e) {
-                if (e.modifiers == 0) {
-                    mouseMoved(e)
-                    textArea.parent.dispatchEvent(e)
-                }
-            }
         }
 
         textArea.addMouseListener(listener)
         textArea.addMouseMotionListener(listener)
-        textArea.addMouseWheelListener(listener)
     }
 
     protected RSyntaxTextArea newRSyntaxTextArea() { new HyperlinkSyntaxTextArea() }
