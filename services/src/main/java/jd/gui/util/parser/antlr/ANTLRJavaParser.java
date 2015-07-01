@@ -10,13 +10,19 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-public class ANTLRParser {
+public class ANTLRJavaParser {
 
     public static void parse(CharStream input, JavaListener listener) {
         try {
             JavaLexer lexer = new JavaLexer(input);
+
+            lexer.removeErrorListeners();
+
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             JavaParser parser = new JavaParser(tokens);
+
+            parser.removeErrorListeners();
+
             ParseTree tree = parser.compilationUnit();
 
             ParseTreeWalker.DEFAULT.walk(listener, tree);

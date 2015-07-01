@@ -24,7 +24,7 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
     static {
         // Early class loading
-        ANTLRParser.parse(new ANTLRInputStream("class EarlyLoading{}"), new Listener(null));
+        ANTLRJavaParser.parse(new ANTLRInputStream("class EarlyLoading{}"), new Listener(null));
     }
 
     // Create cache
@@ -88,7 +88,7 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             Listener listener;
 
             try (InputStream inputStream = entry.getInputStream()) {
-                ANTLRParser.parse(new ANTLRInputStream(inputStream), listener = new Listener(entry));
+                ANTLRJavaParser.parse(new ANTLRInputStream(inputStream), listener = new Listener(entry));
             } catch (IOException ignore) {
                 listener = null;
             }

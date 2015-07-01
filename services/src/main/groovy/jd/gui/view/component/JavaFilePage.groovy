@@ -8,7 +8,7 @@ package jd.gui.view.component
 import groovy.transform.CompileStatic
 import jd.gui.api.API
 import jd.gui.api.model.Container
-import jd.gui.util.parser.antlr.ANTLRParser
+import jd.gui.util.parser.antlr.ANTLRJavaParser
 import jd.gui.util.parser.antlr.AbstractJavaListener
 import jd.gui.util.parser.antlr.JavaParser
 import org.antlr.v4.runtime.ANTLRInputStream
@@ -27,9 +27,9 @@ class JavaFilePage extends TypePage {
         def declarationListener = new DeclarationListener(entry)
         def referenceListener = new ReferenceListener(entry)
 
-        ANTLRParser.parse(new ANTLRInputStream(text), declarationListener)
+        ANTLRJavaParser.parse(new ANTLRInputStream(text), declarationListener)
         referenceListener.init(declarationListener)
-        ANTLRParser.parse(new ANTLRInputStream(text), referenceListener)
+        ANTLRJavaParser.parse(new ANTLRInputStream(text), referenceListener)
         // Display
         setText(text)
         // Show hyperlinks

@@ -44,7 +44,7 @@ task antlr4GenerateGrammarSource(dependsOn: antlr4OutputDir, type: JavaExec) {
 
     main = 'org.antlr.v4.Tool'
     classpath = configurations.antlr4
-    args = ['-o', "${antlr4.destinationDir}/${pkg}", '-atn', '-package', antlr4.grammarPackage, grammars.files].flatten()
+    args = ['-o', "${antlr4.destinationDir}/${pkg}", '-package', antlr4.grammarPackage, grammars.files].flatten()
 }
 
 compileJava {
