@@ -205,7 +205,7 @@ class SelectLocationView {
 
         // --- MouseListener --- //
         void mouseClicked(MouseEvent e) {
-            if (e.clickCount == 2) {
+            if (e.clickCount > 0) {
                 callClosure(e.source)
             }
         }
