@@ -10,7 +10,9 @@ import jd.gui.api.feature.PreferencesChangeListener
 import jd.gui.api.feature.UriGettable
 import jd.gui.service.platform.PlatformService
 
+import javax.swing.AbstractAction
 import javax.swing.JComponent
+import javax.swing.JMenu
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import javax.swing.ToolTipManager
@@ -19,6 +21,7 @@ import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.Color
 import java.awt.Component
+import java.awt.Font
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 
@@ -178,6 +181,27 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
                 void actionPerformed(ActionEvent e) { removeAllComponents() }
             })
             add(menuItem)
+
+            // Add 'Select Tab' popup menu entry
+            if ((tabbedPane.tabCount > 1) && (PlatformService.instance.isMac || 'true'.equals(preferences.get(TAB_LAYOUT)))) {
+                addSeparator()
+                def menu = new JMenu('Select Tab')
+                int count = tabbedPane.tabCount
+
+                for (int i=0; i<count; i++) {
+                    def subMenuItem = new JMenuItem(tabbedPane.getTitleAt(i), null)
+                    subMenuItem.addActionListener(new ActionListener() {
+                        final int index = i
+                        void actionPerformed(ActionEvent e) { tabbedPane.setSelectedIndex(index) }
+                    })
+                    if (component == tabbedPane.getComponentAt(i)) {
+                        subMenuItem.font = subMenuItem.font.deriveFont(Font.BOLD)
+                    }
+                    menu.add(subMenuItem)
+                }
+
+                add(menu)
+            }
 
             // Add SPI popup menu entries
             def actions = api.getContextualActions(component.entry, null)
