@@ -118,7 +118,9 @@ abstract class AbstractTypeFileTreeNodeFactoryProvider extends AbstractTreeNodeF
                 }
 
                 // Create methods
-                type.methods.collect {
+                type.methods.grep {
+                    !it.name.equals('<clinit>')
+                }.collect {
                     def fragment = typeName + '-' + it.name + '-' + it.descriptor
                     return new FieldOrMethodBean(fragment:fragment, label:it.displayName, icon:it.icon)
                 }.sort { m1, m2 ->
