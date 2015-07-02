@@ -15,7 +15,7 @@ dependencies {
 ext.antlr4 = [
         antlrSource: 'src/main/antlr',
         destinationDir: 'src-generated/antlr/java',
-        grammarPackage: 'jd.gui.util.parser.antlr'
+        grammarPackage: 'org.jd.gui.util.parser.antlr'
 ]
 
 configurations {

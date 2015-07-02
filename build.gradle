@@ -68,8 +68,8 @@ jar {
 	deps = deps.unique().collect { it.isDirectory() ? it : zipTree(it) }
 
 	manifest {
-		attributes 'Main-Class': 'jd.gui.App',
-                   'SplashScreen-Image': 'images/jd_icon_128.png',
+		attributes 'Main-Class': 'org.jd.gui.App',
+                   'SplashScreen-Image': 'org/jd/gui/images/jd_icon_128.png',
                    'JD-GUI-Version': project.version,
                    'JD-Core-Version': '0.7.1'
 	}

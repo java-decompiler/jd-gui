@@ -1,0 +1,4 @@
+org.jd.gui.service.preferencespanel.DirectoryIndexerPreferencesProvider
+org.jd.gui.service.preferencespanel.ClassFileSaverPreferencesProvider
+org.jd.gui.service.preferencespanel.ClassFileViewerPreferencesProvider
+org.jd.gui.service.preferencespanel.ViewerPreferencesProvider

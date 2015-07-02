@@ -1,7 +1,0 @@
-jd.gui.service.fileloader.ClassFileLoaderProvider
-jd.gui.service.fileloader.EarFileLoaderProvider
-jd.gui.service.fileloader.JarFileLoaderProvider
-jd.gui.service.fileloader.JavaFileLoaderProvider
-jd.gui.service.fileloader.LogFileLoaderProvider
-jd.gui.service.fileloader.WarFileLoaderProvider
-jd.gui.service.fileloader.ZipFileLoaderProvider

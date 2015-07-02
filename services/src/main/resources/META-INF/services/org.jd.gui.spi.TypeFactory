@@ -1,0 +1,2 @@
+org.jd.gui.service.type.ClassFileTypeFactoryProvider
+org.jd.gui.service.type.JavaFileTypeFactoryProvider
