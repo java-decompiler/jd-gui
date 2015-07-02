@@ -41,52 +41,55 @@ class CopyQualifiedNameContextualActionsFactory implements ContextualActionsFact
         }
 
         void actionPerformed(ActionEvent e) {
-            def type = api.getTypeFactory(entry)?.make(api, entry, fragment)
+            if (fragment) {
+                def type = api.getTypeFactory(entry)?.make(api, entry, fragment)
 
-            if (type) {
-                def sb = new StringBuffer(type.displayPackageName)
-                int dashIndex = fragment.indexOf('-')
+                if (type) {
+                    def sb = new StringBuffer(type.displayPackageName)
+                    int dashIndex = fragment.indexOf('-')
 
-                if (sb.length() > 0) {
-                    sb.append('.')
-                }
+                    if (sb.length() > 0) {
+                        sb.append('.')
+                    }
 
-                sb.append(type.displayTypeName)
+                    sb.append(type.displayTypeName)
 
-                if (dashIndex != -1) {
-                    int lastDashIndex = fragment.lastIndexOf('-')
+                    if (dashIndex != -1) {
+                        int lastDashIndex = fragment.lastIndexOf('-')
 
-                    if (dashIndex == lastDashIndex) {
-                        // See jd.gui.api.feature.UriOpenable
-                        throw new InvalidFormatException('fragment: ' + fragment)
-                    } else {
-                        def name = fragment.substring(dashIndex+1, lastDashIndex)
-                        def descriptor = fragment.substring(lastDashIndex+1)
-
-                        if (descriptor.startsWith('(')) {
-                            for (def method : type.methods) {
-                                if (method.name.equals(name) && method.descriptor.equals(descriptor)) {
-                                    sb.append('.').append(method.displayName)
-                                    break
-                                }
-                            }
+                        if (dashIndex == lastDashIndex) {
+                            // See jd.gui.api.feature.UriOpenable
+                            throw new InvalidFormatException('fragment: ' + fragment)
                         } else {
-                            for (def field : type.fields) {
-                                if (field.name.equals(name) && field.descriptor.equals(descriptor)) {
-                                    sb.append('.').append(field.displayName)
-                                    break
+                            def name = fragment.substring(dashIndex + 1, lastDashIndex)
+                            def descriptor = fragment.substring(lastDashIndex + 1)
+
+                            if (descriptor.startsWith('(')) {
+                                for (def method : type.methods) {
+                                    if (method.name.equals(name) && method.descriptor.equals(descriptor)) {
+                                        sb.append('.').append(method.displayName)
+                                        break
+                                    }
+                                }
+                            } else {
+                                for (def field : type.fields) {
+                                    if (field.name.equals(name) && field.descriptor.equals(descriptor)) {
+                                        sb.append('.').append(field.displayName)
+                                        break
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                Toolkit.defaultToolkit.systemClipboard.setContents(new StringSelection(sb.toString()), null)
-            } else {
-                // Copy path of entry
-                def path = new File(entry.uri).absolutePath
-                Toolkit.defaultToolkit.systemClipboard.setContents(new StringSelection(path), null)
+                    Toolkit.defaultToolkit.systemClipboard.setContents(new StringSelection(sb.toString()), null)
+                    return
+                }
             }
+
+            // Copy path of entry
+            def path = new File(entry.uri).absolutePath
+            Toolkit.defaultToolkit.systemClipboard.setContents(new StringSelection(path), null)
         }
     }
 }
