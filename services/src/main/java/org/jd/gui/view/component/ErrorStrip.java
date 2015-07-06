@@ -335,7 +335,7 @@ public class ErrorStrip extends JComponent {
         int line = yToLine(e.getY());
         if (line>-1) {
             text = msg.getString("Line");
-            text = MessageFormat.format(text, Integer.valueOf(line+1));
+            text = MessageFormat.format(text, line+1);
         }
         return text;
     }
@@ -408,7 +408,7 @@ public class ErrorStrip extends JComponent {
         for (ParserNotice notice : notices) {
             if (notice.getLevel().isEqualToOrWorseThan(levelThreshold) ||
                     (notice instanceof TaskNotice)) {
-                Integer key = Integer.valueOf(notice.getLine());
+                Integer key = notice.getLine();
                 Marker m = markerMap.get(key);
                 if (m==null) {
                     m = new Marker(notice);
@@ -456,7 +456,7 @@ public class ErrorStrip extends JComponent {
                 continue;
             }
             ParserNotice notice = new MarkedOccurrenceNotice(range, color);
-            Integer key = Integer.valueOf(line);
+            Integer key = line;
             Marker m = markerMap.get(key);
             if (m==null) {
                 m = new Marker(notice);
