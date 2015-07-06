@@ -35,7 +35,7 @@ class UISingleInstancePreferencesProvider extends JPanel implements PreferencesP
     public void init(Color errorBackgroundColor) {}
 
     public boolean isActivated() {
-        System.getProperty('os.name').toLowerCase().contains('mac os') == false
+        !System.getProperty('os.name').toLowerCase().contains('mac os')
     }
 
     void loadPreferences(Map<String, String> preferences) {

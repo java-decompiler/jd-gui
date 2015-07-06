@@ -223,7 +223,7 @@ public class PlainTextPrinter implements Printer {
 	public void endOfAnnotationName() {}
 	
 	public void startOfOptionalPrefix() {
-		if (this.preferences.isShowPrefixThis() == false)
+		if (!this.preferences.isShowPrefixThis())
 			this.display = false;
 	}
 	

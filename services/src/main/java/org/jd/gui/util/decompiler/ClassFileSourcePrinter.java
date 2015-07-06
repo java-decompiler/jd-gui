@@ -154,7 +154,7 @@ public abstract class ClassFileSourcePrinter implements Printer
     public void endOfAnnotationName() {}
 
     public void startOfOptionalPrefix() {
-        if (isShowPrefixThis() == false)
+        if (!isShowPrefixThis())
             this.display = false;
     }
 
