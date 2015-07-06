@@ -17,9 +17,9 @@ public interface SourcesSavable {
 
     public interface Controller {
         public boolean isCancelled();
-    };
+    }
 
     public interface Listener {
         public void pathSaved(Path path);
-    };
+    }
 }
