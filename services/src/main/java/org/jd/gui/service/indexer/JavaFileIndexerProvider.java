@@ -10,7 +10,6 @@ import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
 import org.jd.gui.util.parser.antlr.ANTLRJavaParser;
 import org.jd.gui.util.parser.antlr.AbstractJavaListener;
-import org.jd.gui.util.parser.antlr.JavaParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
