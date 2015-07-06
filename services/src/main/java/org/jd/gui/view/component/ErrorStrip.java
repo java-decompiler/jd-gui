@@ -791,8 +791,8 @@ public class ErrorStrip extends JComponent {
 
         public boolean containsMarkedOccurence() {
             boolean result = false;
-            for (int i=0; i<notices.size(); i++) {
-                if (notices.get(i) instanceof MarkedOccurrenceNotice) {
+            for (ParserNotice notice : notices) {
+                if (notice instanceof MarkedOccurrenceNotice) {
                     result = true;
                     break;
                 }
@@ -831,8 +831,7 @@ public class ErrorStrip extends JComponent {
                 StringBuilder sb = new StringBuilder("<html>");
                 sb.append(msg.getString("MultipleMarkers"));
                 sb.append("<br>");
-                for (int i=0; i<notices.size(); i++) {
-                    ParserNotice pn = notices.get(i);
+                for (ParserNotice pn : notices) {
                     sb.append("&nbsp;&nbsp;&nbsp;- ");
                     sb.append(pn.getMessage());
                     sb.append("<br>");
