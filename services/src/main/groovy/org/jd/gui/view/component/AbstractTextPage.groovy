@@ -165,7 +165,7 @@ class AbstractTextPage extends JPanel implements LineNumberNavigable, ContentSea
             foldsExpanded |= fm.ensureOffsetNotInClosedFold(end)
         }
 
-        if (foldsExpanded == false) {
+        if (!foldsExpanded) {
             try {
                 Rectangle r = textArea.modelToView(start)
 

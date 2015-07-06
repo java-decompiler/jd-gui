@@ -53,7 +53,7 @@ public class DescriptorMatcher {
 
         // Check parameter descriptors
         while (cb2.get() != ')') {
-            if (matchDescriptors(cb1, cb2) == false)
+            if (!matchDescriptors(cb1, cb2))
                 return false;
         }
 
@@ -138,7 +138,7 @@ public class DescriptorMatcher {
                     int otherStart = other.offset;
 
                     // Search ';'
-                    if ((searchEndOfType() == false) || (other.searchEndOfType() == false))
+                    if (!searchEndOfType() || !other.searchEndOfType())
                         return false;
 
                     int current = offset - 1;

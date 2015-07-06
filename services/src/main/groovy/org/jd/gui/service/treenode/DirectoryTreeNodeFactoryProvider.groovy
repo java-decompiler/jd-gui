@@ -33,7 +33,7 @@ class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
         // Aggregate directory names
         while (entries.size() == 1) {
             Entry child = entries[0]
-            if ((child.isDirectory() == false) || (api.getTreeNodeFactory(child) != this) || (entry.container != child.container)) break
+            if (!child.isDirectory() || api.getTreeNodeFactory(child) != this || entry.container != child.container) break
             entry = child
             entries = entry.children
         }
@@ -77,7 +77,9 @@ class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
 
                 while (entries.size() == 1) {
                     Entry child = entries[0]
-                    if ((child.isDirectory() == false) || (api.getTreeNodeFactory(child) != this)) break
+                    if (!child.isDirectory() || api.getTreeNodeFactory(child) != this) {
+                        break
+                    }
                     entries = child.children
                 }
 
