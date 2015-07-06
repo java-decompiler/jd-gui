@@ -392,7 +392,7 @@ public class ErrorStrip extends JComponent {
      * @return A possibly brighter value for the component.
      */
     private static final int possiblyDarker(int i) {
-        return i -= (int)(i*0.4f);
+        return i - (int)(i*0.4f);
     }
 
 
@@ -449,7 +449,7 @@ public class ErrorStrip extends JComponent {
     private void addMarkersForRanges(List<DocumentRange> ranges,
                                      Map<Integer, Marker> markerMap, Color color) {
         for (DocumentRange range : ranges) {
-            int line = 0;
+            int line;
             try {
                 line = textArea.getLineOfOffset(range.getStartOffset());
             } catch (BadLocationException ble) { // Never happens
@@ -821,8 +821,7 @@ public class ErrorStrip extends JComponent {
 
         @Override
         public String getToolTipText() {
-
-            String text = null;
+            String text;
 
             if (notices.size()==1) {
                 text = notices.get(0).getMessage();
