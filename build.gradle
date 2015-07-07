@@ -15,87 +15,87 @@ apply plugin: 'nebula.os-package'
 
 // Common configuration //
 allprojects {
-	version='1.2.0'
+    version='1.2.0'
 
-	apply plugin: 'eclipse'
-	apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
 
-	tasks.withType(JavaCompile) {
-		sourceCompatibility = '1.7'
-		targetCompatibility = '1.7'
-	}
-	tasks.withType(GroovyCompile) {
-		sourceCompatibility = '1.7'
-		targetCompatibility = '1.7'
-	}
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = '1.7'
+        targetCompatibility = '1.7'
+    }
+    tasks.withType(GroovyCompile) {
+        sourceCompatibility = '1.7'
+        targetCompatibility = '1.7'
+    }
 
-	repositories {
-		mavenCentral()
-		maven {
-			url 'https://raw.github.com/java-decompiler/mvn-repo/master'
-		}
-	}
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://raw.github.com/java-decompiler/mvn-repo/master'
+        }
+    }
 
-	configurations {
-		provided
-		compile.extendsFrom provided
-	}
+    configurations {
+        provided
+        compile.extendsFrom provided
+    }
 }
 
 // 'cleanIdea' task extension //
 cleanIdea {
-	file(project.name + '.iws').delete()
-	ant.delete(dir: 'out')
+    file(project.name + '.iws').delete()
+    ant.delete(dir: 'out')
 }
 
 // All in one JAR //
 subprojects.each { subproject ->
-	evaluationDependsOn(subproject.path)
+    evaluationDependsOn(subproject.path)
 }
 
 jar {
-	dependsOn subprojects.tasks['jar']
+    dependsOn subprojects.tasks['jar']
 
-	def deps = []
-	subprojects.each { subproject ->
-		from subproject.sourceSets.main.output.classesDir
-		from subproject.sourceSets.main.output.resourcesDir
-		deps += subproject.configurations.runtime - subproject.configurations.provided
-	}
-	subprojects.each { subproject ->
-		deps -= subproject.jar.archivePath
-	}
-	deps = deps.unique().collect { it.isDirectory() ? it : zipTree(it) }
+    def deps = []
+    subprojects.each { subproject ->
+        from subproject.sourceSets.main.output.classesDir
+        from subproject.sourceSets.main.output.resourcesDir
+        deps += subproject.configurations.runtime - subproject.configurations.provided
+    }
+    subprojects.each { subproject ->
+        deps -= subproject.jar.archivePath
+    }
+    deps = deps.unique().collect { it.isDirectory() ? it : zipTree(it) }
 
-	manifest {
-		attributes 'Main-Class': 'org.jd.gui.App',
+    manifest {
+        attributes 'Main-Class': 'org.jd.gui.App',
                    'SplashScreen-Image': 'org/jd/gui/images/jd_icon_128.png',
                    'JD-GUI-Version': project.version,
                    'JD-Core-Version': '0.7.1'
-	}
-	from deps
-	exclude 'META-INF/services/org.jd.gui.spi.*'
-	duplicatesStrategy DuplicatesStrategy.EXCLUDE
-	doFirst {
-		// Create temporary directory
-		def tmpSpiDir = file('build/tmp/spi')
-		tmpSpiDir.deleteDir()
-		tmpSpiDir.mkdirs()
-		// Copy and merge SPI config files
-		subprojects.each { subproject ->
-			def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + File.separator + 'META-INF' + File.separator + 'services')
-			if (servicesDir.exists()) {
-				servicesDir.eachFile { source ->
-					def target = file(tmpSpiDir.path + File.separator + source.name)
-					target << source.text
-				}
-			}
-		}
-		// Add to JAR file
-		into('META-INF/services') {
-			from tmpSpiDir
-		}
-	}
+    }
+    from deps
+    exclude 'META-INF/services/org.jd.gui.spi.*'
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
+    doFirst {
+        // Create temporary directory
+        def tmpSpiDir = file('build/tmp/spi')
+        tmpSpiDir.deleteDir()
+        tmpSpiDir.mkdirs()
+        // Copy and merge SPI config files
+        subprojects.each { subproject ->
+            def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + File.separator + 'META-INF' + File.separator + 'services')
+            if (servicesDir.exists()) {
+                servicesDir.eachFile { source ->
+                    def target = file(tmpSpiDir.path + File.separator + source.name)
+                    target << source.text
+                }
+            }
+        }
+        // Add to JAR file
+        into('META-INF/services') {
+            from tmpSpiDir
+        }
+    }
 }
 
 // Windows wrapper configuration to generate "jd-gui.exe" //
@@ -103,10 +103,10 @@ task launch4jConfig(type: Copy) {
     from 'src/launch4j/resources/config/launch4j.xml'
     into 'build/launch4j'
     expand(
-		JAR_FILE: project.jar.archivePath,
-		VERSION: project.version,
-		ICON: file('src/launch4j/resources/images/jd-gui.ico')
-	)
+        JAR_FILE: project.jar.archivePath,
+        VERSION: project.version,
+        ICON: file('src/launch4j/resources/images/jd-gui.ico')
+    )
 }
 
 task launch4j(type: Exec, dependsOn: [':jar', ':launch4jConfig']) {
@@ -137,45 +137,45 @@ task copyAndReplaceVariablesInInfoPlist(type: Copy) {
 }
 
 distributions {
-	osx.contents {
-		into('JD-GUI.app/Contents') {
-			from 'build/tmp/distributions/osx'
-		}
-		into('JD-GUI.app/Contents/Resources/Java') {
-			from jar.archivePath
-		}
-		from 'LICENSE', 'NOTICE', 'README.md'
-		doFirst {
-			ant.chmod(file:'src/osx/dist/JD-GUI.app/Contents/MacOS/universalJavaApplicationStub.sh', perm:'+x')
-		}
-	}
-	windows.contents {
-		from 'build/launch4j/jd-gui.exe'
-		from 'LICENSE', 'NOTICE', 'README.md'
-	}
+    osx.contents {
+        into('JD-GUI.app/Contents') {
+            from 'build/tmp/distributions/osx'
+        }
+        into('JD-GUI.app/Contents/Resources/Java') {
+            from jar.archivePath
+        }
+        from 'LICENSE', 'NOTICE', 'README.md'
+        doFirst {
+            ant.chmod(file:'src/osx/dist/JD-GUI.app/Contents/MacOS/universalJavaApplicationStub.sh', perm:'+x')
+        }
+    }
+    windows.contents {
+        from 'build/launch4j/jd-gui.exe'
+        from 'LICENSE', 'NOTICE', 'README.md'
+    }
 }
 
 ospackage {
-	packageName = project.name
-	description = 'A Java Decompiler'
+    packageName = project.name
+    description = 'A Java Decompiler'
     os = LINUX
     url = 'https://github.com/java-decompiler/jd-gui'
     license = file('LICENSE')
     
-	into '/opt/' + project.name
-	from ('build/libs/') {
-    	fileMode = 0755
-	}
-	from ('src/linux/resources/') {
-    	fileMode = 0755
-	}
-	from ('app/src/main/resources/images/jd_icon_128.png') {
-    	fileMode = 0755
-	}
-	from 'LICENSE', 'NOTICE', 'README.md'
+    into '/opt/' + project.name
+    from ('build/libs/') {
+        fileMode = 0755
+    }
+    from ('src/linux/resources/') {
+        fileMode = 0755
+    }
+    from ('app/src/main/resources/images/jd_icon_128.png') {
+        fileMode = 0755
+    }
+    from 'LICENSE', 'NOTICE', 'README.md'
 
-	postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui ; xdg-desktop-menu install ./*.desktop' 
-	preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; xdg-desktop-menu uninstall ./*.desktop'
+    postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui ; xdg-desktop-menu install ./*.desktop' 
+    preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; xdg-desktop-menu uninstall ./*.desktop'
 }
 
 installOsxDist.dependsOn jar, copyAndReplaceVariablesInInfoPlist
