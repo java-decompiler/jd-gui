@@ -37,7 +37,7 @@ class ConfigurationXmlPersisterProvider implements ConfigurationPersister {
         return new File(Constants.CONFIG_FILENAME)
     }
 
-	Configuration load() {
+    Configuration load() {
         // Default values
         def screenSize = Toolkit.defaultToolkit.screenSize
 
@@ -100,10 +100,10 @@ class ConfigurationXmlPersisterProvider implements ConfigurationPersister {
             config.preferences.put(ERROR_BACKGROUND_COLOR, '0xFF6666')
         }
 
-		return config
-	}
-	
-	void save(Configuration configuration) {
+        return config
+    }
+
+    void save(Configuration configuration) {
         Point l = configuration.mainWindowLocation
         Dimension s = configuration.mainWindowSize
         Writer writer = new StringWriter()
