@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jd.gui.util.parser.antlr.JavaParser;
 
 import java.io.IOException;
 import java.io.InputStream;
