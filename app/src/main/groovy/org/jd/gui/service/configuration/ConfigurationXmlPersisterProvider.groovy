@@ -32,12 +32,21 @@ class ConfigurationXmlPersisterProvider implements ConfigurationPersister {
             if (userConfigFile.exists()) {
                 return new File(userConfigFile, Constants.CONFIG_FILENAME)
             }
+        } else if (PlatformService.instance.isWindows) {
+            // See: http://blogs.msdn.com/b/patricka/archive/2010/03/18/where-should-i-store-my-data-and-configuration-files-if-i-target-multiple-os-versions.aspx
+            def roamingConfigHome = System.getenv('APPDATA')
+            if (roamingConfigHome) {
+                def roamingConfigHomeFile = new File(roamingConfigHome)
+                if (roamingConfigHomeFile.exists()) {
+                    return new File(roamingConfigHomeFile, Constants.CONFIG_FILENAME)
+                }
+            }
         }
 
         return new File(Constants.CONFIG_FILENAME)
     }
 
-	Configuration load() {
+    Configuration load() {
         // Default values
         def screenSize = Toolkit.defaultToolkit.screenSize
 
@@ -100,10 +109,10 @@ class ConfigurationXmlPersisterProvider implements ConfigurationPersister {
             config.preferences.put(ERROR_BACKGROUND_COLOR, '0xFF6666')
         }
 
-		return config
-	}
-	
-	void save(Configuration configuration) {
+        return config
+    }
+
+    void save(Configuration configuration) {
         Point l = configuration.mainWindowLocation
         Dimension s = configuration.mainWindowSize
         Writer writer = new StringWriter()

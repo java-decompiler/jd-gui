@@ -15,25 +15,25 @@ for instant access to methods and fields.
 
 ##How to build JD-GUI ?
 ```
-> gradle build 
+> ./gradlew build 
 ```
 generate _"build/libs/jd-gui-x.y.z.jar"_
 ```
-> gradle installOsxDist
+> ./gradlew installOsxDist
 ```
 generate _"build/install/jd-gui-osx/JD-GUI.app"_
 ```
 > iexplore http://sourceforge.net/projects/launch4j/files/launch4j-3/3.7/launch4j-3.7-win32.zip/download
 > unzip launch4j-3.7-win32.zip
-> gradle -DLAUNCH4J_HOME=.../path/to/launch4j-3.7-win32 installWindowsDist
+> ./gradlew -DLAUNCH4J_HOME=.../path/to/launch4j-3.7-win32 installWindowsDist
 ```
 generate _"build/install/jd-gui-windows/jd-gui.exe"_
 ```
-> gradle buildDeb
+> ./gradlew buildDeb
 ```
 generate Ubuntu/Debian installer
 ```
-> gradle buildRpm
+> ./gradlew buildRpm
 ```
 generate RedHat/CentOS/Fedora installer
 
@@ -50,11 +50,11 @@ generate RedHat/CentOS/Fedora installer
 
 ##How to extend JD-GUI ?
 ```
-> gradle idea 
+> ./gradlew idea 
 ```
 generate Idea Intellij project
 ```
-> gradle eclipse
+> ./gradlew eclipse
 ```
 generate Eclipse project
 ```
