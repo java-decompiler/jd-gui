@@ -32,6 +32,15 @@ class ConfigurationXmlPersisterProvider implements ConfigurationPersister {
             if (userConfigFile.exists()) {
                 return new File(userConfigFile, Constants.CONFIG_FILENAME)
             }
+        } else if (PlatformService.instance.isWindows) {
+            // See: http://blogs.msdn.com/b/patricka/archive/2010/03/18/where-should-i-store-my-data-and-configuration-files-if-i-target-multiple-os-versions.aspx
+            def roamingConfigHome = System.getenv('APPDATA')
+            if (roamingConfigHome) {
+                def roamingConfigHomeFile = new File(roamingConfigHome)
+                if (roamingConfigHomeFile.exists()) {
+                    return new File(roamingConfigHomeFile, Constants.CONFIG_FILENAME)
+                }
+            }
         }
 
         return new File(Constants.CONFIG_FILENAME)
