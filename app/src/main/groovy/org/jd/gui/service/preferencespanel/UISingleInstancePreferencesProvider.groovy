@@ -11,8 +11,7 @@ import javax.swing.*
 import java.awt.*
 
 /**
- * JTabbedPane.WRAP_TAB_LAYOUT is not supported by Aqua L&F.
- * This panel is not activated on Mac OSX.
+ * Single instance is the default mode on Mac OSX, so this panel is not activated.
  */
 class UISingleInstancePreferencesProvider extends JPanel implements PreferencesPanel {
 
