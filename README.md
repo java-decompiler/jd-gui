@@ -41,7 +41,7 @@ generate RedHat/CentOS/Fedora installer
 - Double-click on _"jd-gui-x.y.z.jar"_
 - Double-click on _"JD-GUI"_ application from Mac OSX
 - Double-click on _"jd-gui.exe"_ application from Windows
-- Execute _"java -jar jd-gui-x.y.z.jar"_ or _"java -classpath jd-gui-x.y.z.jar jd.gui.App"_
+- Execute _"java -jar jd-gui-x.y.z.jar"_ or _"java -classpath jd-gui-x.y.z.jar org.jd.gui.App"_
 
 ##How to use JD-GUI ?
 - Open a file with menu "File > Open File..."
@@ -58,7 +58,7 @@ generate Idea Intellij project
 ```
 generate Eclipse project
 ```
-> java -classpath jd-gui-x.y.z.jar;myextension1.jar;myextension2.jar jd.gui.App
+> java -classpath jd-gui-x.y.z.jar;myextension1.jar;myextension2.jar org.jd.gui.App
 ```
 launch JD-GUI with your extensions
 
