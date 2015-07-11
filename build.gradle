@@ -169,9 +169,6 @@ ospackage {
     from ('src/linux/resources/') {
         fileMode = 0755
     }
-    from ('app/src/main/resources/images/jd_icon_128.png') {
-        fileMode = 0755
-    }
     from 'LICENSE', 'NOTICE', 'README.md'
 
     postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui ; xdg-desktop-menu install ./*.desktop' 
