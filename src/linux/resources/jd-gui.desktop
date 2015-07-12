@@ -1,5 +1,5 @@
 [Desktop Entry]
-Comment= Java Decompiler JD-GUI
+Comment=Java Decompiler JD-GUI
 Terminal=false
 Name=JD-GUI
 Exec=java -jar /opt/jd-gui/jd-gui.jar

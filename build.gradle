@@ -158,6 +158,7 @@ distributions {
 ospackage {
     packageName = project.name
     description = 'A Java Decompiler'
+    release = '0'
     os = LINUX
     url = 'https://github.com/java-decompiler/jd-gui'
     license = file('LICENSE')
@@ -171,7 +172,7 @@ ospackage {
     }
     from 'LICENSE', 'NOTICE', 'README.md'
 
-    postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui ; xdg-desktop-menu install ./*.desktop' 
+    postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui ; xdg-desktop-menu install ./*.desktop'
     preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; xdg-desktop-menu uninstall ./*.desktop'
 }
 
