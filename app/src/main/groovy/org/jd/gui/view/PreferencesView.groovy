@@ -84,7 +84,7 @@ class PreferencesView implements PreferencesPanel.PreferencesPanelChangeListener
                 int taskBarHeight = scnMax.bottom + scnMax.top
                 int maxHeight = screenSize.height - taskBarHeight
 
-                int preferredHeight = preferencesPanels.preferredSize.height
+                int preferredHeight = preferencesPanels.preferredSize.height + 2
                 if (preferredHeight > maxHeight)
                     preferredHeight = maxHeight
                 preferencesScrollPane.preferredSize = new Dimension(400, preferredHeight)
