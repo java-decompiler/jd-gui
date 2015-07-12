@@ -5,6 +5,7 @@
 
 package org.jd.gui.service.preferencespanel
 
+import groovy.transform.CompileStatic
 import org.jd.gui.spi.PreferencesPanel
 
 import javax.swing.JLabel
@@ -15,6 +16,7 @@ import javax.swing.event.DocumentListener
 import java.awt.BorderLayout
 import java.awt.Color
 
+@CompileStatic
 class DirectoryIndexerPreferencesProvider extends JPanel implements PreferencesPanel, DocumentListener {
     static final int MAX_VALUE = 30
     static final String MAXIMUM_DEPTH_KEY = 'DirectoryIndexerPreferences.maximumDepth'

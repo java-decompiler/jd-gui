@@ -5,6 +5,7 @@
 
 package org.jd.gui.service.preferencespanel
 
+import groovy.transform.CompileStatic
 import org.jd.gui.spi.PreferencesPanel
 
 import javax.swing.JCheckBox
@@ -12,6 +13,7 @@ import javax.swing.JPanel
 import java.awt.Color
 import java.awt.GridLayout
 
+@CompileStatic
 class ClassFileViewerPreferencesProvider extends JPanel implements PreferencesPanel {
     static final String ESCAPE_UNICODE_CHARACTERS = 'ClassFileViewerPreferences.escapeUnicodeCharacters'
     static final String OMIT_THIS_PREFIX = 'ClassFileViewerPreferences.omitThisPrefix'

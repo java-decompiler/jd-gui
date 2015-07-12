@@ -5,6 +5,7 @@
 
 package org.jd.gui.service.preferencespanel
 
+import groovy.transform.CompileStatic
 import org.jd.gui.spi.PreferencesPanel
 
 import javax.swing.*
@@ -13,6 +14,7 @@ import java.awt.*
 /**
  * Single instance is the default mode on Mac OSX, so this panel is not activated.
  */
+@CompileStatic
 class UISingleInstancePreferencesProvider extends JPanel implements PreferencesPanel {
 
     static final String SINGLE_INSTANCE = 'UIMainWindowPreferencesProvider.singleInstance'

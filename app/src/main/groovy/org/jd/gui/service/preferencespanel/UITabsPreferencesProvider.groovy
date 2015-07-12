@@ -5,6 +5,7 @@
 
 package org.jd.gui.service.preferencespanel
 
+import groovy.transform.CompileStatic
 import org.jd.gui.spi.PreferencesPanel
 
 import javax.swing.JCheckBox
@@ -16,6 +17,7 @@ import java.awt.GridLayout
  * JTabbedPane.WRAP_TAB_LAYOUT is not supported by Aqua L&F.
  * This panel is not activated on Mac OSX.
  */
+@CompileStatic
 class UITabsPreferencesProvider extends JPanel implements PreferencesPanel {
 
     static final String TAB_LAYOUT = 'UITabsPreferencesProvider.singleLineTabs'

@@ -5,6 +5,7 @@
 
 package org.jd.gui.service.preferencespanel
 
+import groovy.transform.CompileStatic
 import org.jd.gui.spi.PreferencesPanel
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.Theme
@@ -14,6 +15,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import java.awt.*
 
+@CompileStatic
 class ViewerPreferencesProvider extends JPanel implements PreferencesPanel, DocumentListener {
     static final int MIN_VALUE = 2
     static final int MAX_VALUE = 40
