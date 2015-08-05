@@ -31,6 +31,7 @@ target/
 # Gradle
 .gradle/
 build/
+!gradle/wrapper/*
 
 # WinMerge
 *.bak
