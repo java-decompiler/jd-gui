@@ -110,15 +110,10 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
         })
 
 		JPanel tab = new JPanel(new BorderLayout())
-        if (PlatformService.instance.isMac) {
-            tab.border = BorderFactory.createEmptyBorder(2, 0, 3, 0)
-        } else {
-            tab.border = BorderFactory.createEmptyBorder(1, 0, 1, 0)
-        }
+        tab.border = BorderFactory.createEmptyBorder(2, 0, 3, 0)
 		tab.opaque = false
         tab.toolTipText = tip
-        // Show label and icon: panel.add(new JLabel(title, icon, JLabel.LEADING), BorderLayout.CENTER)
-        tab.add(new JLabel(title), BorderLayout.CENTER)
+        tab.add(new JLabel(title, icon, JLabel.LEADING), BorderLayout.CENTER)
 		tab.add(tabCloseButton, BorderLayout.EAST)
         ToolTipManager.sharedInstance().unregisterComponent(tab)
 
@@ -189,7 +184,9 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
                 int count = tabbedPane.tabCount
 
                 for (int i=0; i<count; i++) {
-                    def subMenuItem = new JMenuItem(tabbedPane.getTitleAt(i), null)
+                    JPanel tab = tabbedPane.getTabComponentAt(i)
+                    JLabel label = tab.getComponent(0)
+                    JMenuItem subMenuItem = new JMenuItem(label.text, label.icon)
                     subMenuItem.addActionListener(new ActionListener() {
                         final int index = i
                         void actionPerformed(ActionEvent e) { tabbedPane.setSelectedIndex(index) }

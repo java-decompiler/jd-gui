@@ -8,6 +8,7 @@ package org.jd.gui.service.fileloader
 import org.jd.gui.api.API
 import org.jd.gui.api.feature.UriGettable
 import org.jd.gui.api.model.Container
+import org.jd.gui.api.model.TreeNodeData
 import org.jd.gui.spi.FileLoader
 
 import javax.swing.*
@@ -46,7 +47,10 @@ abstract class AbstractFileLoaderProvider implements FileLoader {
 
             def mainPanel = api.getMainPanelFactory(container)?.make(api, container)
             if (mainPanel) {
-                api.addPanel(file.name, null, 'Location: ' + file.absolutePath, mainPanel)
+                def data = api.getTreeNodeFactory(parentEntry)?.make(api, parentEntry).userObject
+                def icon = (data instanceof TreeNodeData) ? data.icon : null
+
+                api.addPanel(file.name, icon, 'Location: ' + file.absolutePath, mainPanel)
                 return mainPanel
             }
         }
