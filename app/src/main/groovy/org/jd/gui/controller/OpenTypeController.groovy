@@ -41,6 +41,7 @@ class OpenTypeController implements IndexesChangeListener {
         selectLocationController = new SelectLocationController(swing, configuration, api)
         // Create result cache
         cache = new LinkedHashMap<String, Collection<Container.Entry>>(CACHE_MAX_ENTRIES*3/2, 0.7f, true) {
+            @Override
             protected boolean removeEldestEntry(Map.Entry<String, Collection<Container.Entry>> eldest) {
                 return size() > CACHE_MAX_ENTRIES
             }

@@ -406,6 +406,7 @@ public abstract class AbstractTypeFactoryProvider implements TypeFactory {
             super(CACHE_MAX_ENTRIES*3/2, 0.7f, true);
         }
 
+        @Override
         protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
             return size() > CACHE_MAX_ENTRIES;
         }
