@@ -6,13 +6,14 @@
 package org.jd.gui.service.fileloader
 
 import org.jd.gui.api.API
+import org.jd.gui.service.extension.ExtensionService
 import org.jd.gui.spi.FileLoader
 
 @Singleton(lazy = true)
 class FileLoaderService {
-	final List<FileLoader> providers = ServiceLoader.load(FileLoader).toList()
+    protected final Collection<FileLoader> providers = ExtensionService.instance.load(FileLoader)
 	
-	private Map<String, FileLoader> mapProviders = providers.collectEntries { provider ->
+	protected Map<String, FileLoader> mapProviders = providers.collectEntries { provider ->
 		provider.extensions.collectEntries { [it, provider] }
 	}
 

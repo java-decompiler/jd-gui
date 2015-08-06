@@ -6,13 +6,14 @@
 package org.jd.gui.service.uriloader
 
 import org.jd.gui.api.API
+import org.jd.gui.service.extension.ExtensionService
 import org.jd.gui.spi.UriLoader
 
 @Singleton(lazy = true)
 class UriLoaderService {
-	final List<UriLoader> providers = ServiceLoader.load(UriLoader).toList()
+    protected final Collection<UriLoader> providers = ExtensionService.instance.load(UriLoader)
 	
-	private Map<String, UriLoader> mapProviders = providers.collectEntries { provider ->
+	protected Map<String, UriLoader> mapProviders = providers.collectEntries { provider ->
 		provider.schemes.collectEntries { [it, provider] }
 	}
 

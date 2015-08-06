@@ -7,16 +7,16 @@ package org.jd.gui.service.indexer
 
 import groovy.transform.CompileStatic
 import org.jd.gui.api.model.Container
+import org.jd.gui.service.extension.ExtensionService
 import org.jd.gui.spi.Indexer
 
 @CompileStatic
 @Singleton(lazy = true)
 class IndexerService {
-	protected List<Indexer> providers = ServiceLoader.load(Indexer).toList()
+    protected Map<String, Indexers> mapProviders = populate()
 
-    protected Map<String, Indexers> mapProviders = populate(providers)
-
-    protected Map<String, Indexers> populate(List<Indexer> providers) {
+    protected Map<String, Indexers> populate() {
+        Collection<Indexer> providers = ExtensionService.instance.load(Indexer)
         Map<String, Indexers> mapProviders = [:]
 
         def mapProvidersWithDefault = mapProviders.withDefault { new Indexers() }
@@ -63,19 +63,19 @@ class IndexerService {
     }
 
     static class Indexers {
-        ArrayList<Indexer> indexers = []
+        HashMap<String, Indexer> indexers = [:]
         Indexer defaultIndexer
 
         void add(Indexer indexer) {
             if (indexer.pathPattern) {
-                indexers << indexer
+                indexers.put(indexer.pathPattern.pattern(), indexer)
             } else {
                 defaultIndexer = indexer
             }
         }
 
         Indexer match(String path) {
-            for (def indexer : indexers) {
+            for (def indexer : indexers.values()) {
                 if (path ==~ indexer.pathPattern) {
                     return indexer
                 }

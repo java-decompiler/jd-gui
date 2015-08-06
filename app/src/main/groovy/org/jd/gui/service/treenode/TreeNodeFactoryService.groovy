@@ -7,16 +7,16 @@ package org.jd.gui.service.treenode
 
 import groovy.transform.CompileStatic
 import org.jd.gui.api.model.Container
+import org.jd.gui.service.extension.ExtensionService
 import org.jd.gui.spi.TreeNodeFactory
 
 @CompileStatic
 @Singleton(lazy = true)
 class TreeNodeFactoryService {
-	protected List<TreeNodeFactory> providers = ServiceLoader.load(TreeNodeFactory).toList()
+	protected Map<String, TreeNodeFactories> mapProviders = populate()
 
-    protected Map<String, TreeNodeFactories> mapProviders = populate(providers)
-
-    protected Map<String, TreeNodeFactories> populate(List<TreeNodeFactory> providers) {
+    protected Map<String, TreeNodeFactories> populate() {
+        Collection<TreeNodeFactory> providers = ExtensionService.instance.load(TreeNodeFactory)
         Map<String, TreeNodeFactories> mapProviders = [:]
 
         def mapProvidersWithDefault = mapProviders.withDefault { new TreeNodeFactories() }
@@ -64,19 +64,19 @@ class TreeNodeFactoryService {
     }
 
     static class TreeNodeFactories {
-        ArrayList<TreeNodeFactory> factories = []
+        HashMap<String, TreeNodeFactory> factories = [:]
         TreeNodeFactory defaultFactory
 
         void add(TreeNodeFactory factory) {
             if (factory.pathPattern) {
-                factories << factory
+                factories.put(factory.pathPattern.pattern(), factory)
             } else {
                 defaultFactory = factory
             }
         }
 
         TreeNodeFactory match(String path) {
-            for (def factory : factories) {
+            for (def factory : factories.values()) {
                 if (path ==~ factory.pathPattern) {
                     return factory
                 }

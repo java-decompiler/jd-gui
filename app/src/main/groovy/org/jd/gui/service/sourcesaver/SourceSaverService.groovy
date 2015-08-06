@@ -7,16 +7,16 @@ package org.jd.gui.service.sourcesaver
 
 import groovy.transform.CompileStatic
 import org.jd.gui.api.model.Container
+import org.jd.gui.service.extension.ExtensionService
 import org.jd.gui.spi.SourceSaver
 
 @CompileStatic
 @Singleton(lazy = true)
 class SourceSaverService {
-	protected List<SourceSaver> providers = ServiceLoader.load(SourceSaver).toList()
+    protected Map<String, SourceSavers> mapProviders = populate()
 
-    protected Map<String, SourceSavers> mapProviders = populate(providers)
-
-    protected Map<String, SourceSavers> populate(List<SourceSaver> providers) {
+    protected Map<String, SourceSavers> populate() {
+        Collection<SourceSaver> providers = ExtensionService.instance.load(SourceSaver)
         Map<String, SourceSavers> mapProviders = [:]
 
         def mapProvidersWithDefault = mapProviders.withDefault { new SourceSavers() }
@@ -63,19 +63,19 @@ class SourceSaverService {
     }
 
     static class SourceSavers {
-        ArrayList<SourceSaver> savers = []
+        HashMap<String, SourceSaver> savers = [:]
         SourceSaver defaultSaver
 
         void add(SourceSaver saver) {
             if (saver.pathPattern) {
-                savers << saver
+                savers.put(saver.pathPattern.pattern(), saver)
             } else {
                 defaultSaver = saver
             }
         }
 
         SourceSaver match(String path) {
-            for (def saver : savers) {
+            for (def saver : savers.values()) {
                 if (path ==~ saver.pathPattern) {
                     return saver
                 }

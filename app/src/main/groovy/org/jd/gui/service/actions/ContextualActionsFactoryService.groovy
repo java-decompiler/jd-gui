@@ -8,15 +8,16 @@ package org.jd.gui.service.actions
 import groovy.transform.CompileStatic
 import org.jd.gui.api.API
 import org.jd.gui.api.model.Container
+import org.jd.gui.service.extension.ExtensionService
 import org.jd.gui.spi.ContextualActionsFactory
 
 import javax.swing.Action
 
 @Singleton(lazy = true)
 class ContextualActionsFactoryService {
-    static final ActionNameComparator COMPARATOR = new ActionNameComparator()
+    protected static final ActionNameComparator COMPARATOR = new ActionNameComparator()
 
-    final List<ContextualActionsFactory> providers = ServiceLoader.load(ContextualActionsFactory).toList()
+    protected final Collection<ContextualActionsFactory> providers = ExtensionService.instance.load(ContextualActionsFactory)
 
     @CompileStatic
     Collection<Action> get(API api, Container.Entry entry, String fragment) {

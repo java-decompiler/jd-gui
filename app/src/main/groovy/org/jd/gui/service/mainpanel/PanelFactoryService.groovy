@@ -6,15 +6,15 @@
 package org.jd.gui.service.mainpanel
 
 import org.jd.gui.api.model.Container
+import org.jd.gui.service.extension.ExtensionService
 import org.jd.gui.spi.PanelFactory
 
 @Singleton(lazy = true)
 class PanelFactoryService {
-    protected List<PanelFactory> providers = ServiceLoader.load(PanelFactory).toList()
+    protected Map<String, PanelFactory> mapProviders = populate()
 
-    protected Map<String, PanelFactory> mapProviders = populate(providers)
-
-    protected Map<String, PanelFactory> populate(List<PanelFactory> providers) {
+    protected Map<String, PanelFactory> populate() {
+        Collection<PanelFactory> providers = ExtensionService.instance.load(PanelFactory)
         Map<String, PanelFactory> mapProviders = [:]
 
         for (def provider : providers) {

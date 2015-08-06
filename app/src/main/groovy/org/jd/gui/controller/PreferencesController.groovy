@@ -14,7 +14,7 @@ import org.jd.gui.view.PreferencesView
 class PreferencesController {
     PreferencesView preferencesView
 
-    PreferencesController(SwingBuilder swing, Configuration configuration, API api, List<PreferencesPanel> panels) {
+    PreferencesController(SwingBuilder swing, Configuration configuration, API api, Collection<PreferencesPanel> panels) {
         // Create UI
         preferencesView = new PreferencesView(swing, configuration, panels)
     }

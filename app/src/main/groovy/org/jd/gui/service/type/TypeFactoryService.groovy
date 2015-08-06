@@ -8,15 +8,15 @@ package org.jd.gui.service.type
 import groovy.transform.CompileStatic
 import org.jd.gui.api.model.Container
 import org.jd.gui.api.model.Type
+import org.jd.gui.service.extension.ExtensionService
 import org.jd.gui.spi.TypeFactory
 
 @Singleton(lazy = true)
 class TypeFactoryService {
-	protected List<TypeFactory> providers = ServiceLoader.load(TypeFactory).toList()
+	protected Map<String, TypeFactories> mapProviders = populate()
 
-    protected Map<String, TypeFactories> mapProviders = populate(providers)
-
-    protected Map<String, TypeFactories> populate(List<TypeFactory> providers) {
+    protected Map<String, TypeFactories> populate() {
+        Collection<TypeFactory> providers = ExtensionService.instance.load(TypeFactory)
         Map<String, TypeFactories> mapProviders = [:]
 
         def mapProvidersWithDefault = mapProviders.withDefault { new TypeFactories() }
@@ -70,19 +70,19 @@ class TypeFactoryService {
     }
 
     static class TypeFactories {
-        ArrayList<TypeFactory> factories = []
+        HashMap<String, TypeFactory> factories = [:]
         TypeFactory defaultFactory
 
         void add(TypeFactory factory) {
             if (factory.pathPattern) {
-                factories << factory
+                factories.put(factory.pathPattern.pattern(), factory)
             } else {
                 defaultFactory = factory
             }
         }
 
         TypeFactory match(String path) {
-            for (def factory : factories) {
+            for (def factory : factories.values()) {
                 if (path ==~ factory.pathPattern) {
                     return factory
                 }

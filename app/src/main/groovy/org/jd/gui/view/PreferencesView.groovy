@@ -23,10 +23,10 @@ import java.awt.event.KeyEvent
 class PreferencesView implements PreferencesPanel.PreferencesPanelChangeListener {
     SwingBuilder swing
     Map<String, String> preferences
-    List<PreferencesPanel> panels
+    Collection<PreferencesPanel> panels
     Map<PreferencesPanel, Boolean> valids
 
-    PreferencesView(SwingBuilder swing, Configuration configuration, List<PreferencesPanel> panels) {
+    PreferencesView(SwingBuilder swing, Configuration configuration, Collection<PreferencesPanel> panels) {
         this.swing = swing
         this.preferences = configuration.preferences
         this.panels = panels
