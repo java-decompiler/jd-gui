@@ -61,8 +61,8 @@ class SelectLocationController {
                 URI getUri() { parentEntry.uri }
                 String getPath() { parentEntry.path }
                 boolean isDirectory() { parentEntry.isDirectory() }
-                long length() { 0 }
-                InputStream getInputStream() { null }
+                long length() { parentEntry.length() }
+                InputStream getInputStream() { parentEntry.inputStream }
                 Collection<Container.Entry> getChildren() { children }
             }
             // Create a filtered container

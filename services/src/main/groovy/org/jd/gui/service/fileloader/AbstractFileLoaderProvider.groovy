@@ -36,8 +36,8 @@ abstract class AbstractFileLoaderProvider implements FileLoader {
             URI getUri() { uri }
             String getPath() { path }
             boolean isDirectory() { file.isDirectory() }
-            long length() { 0 }
-            InputStream getInputStream() { null }
+            long length() { file.length() }
+            InputStream getInputStream() { file.newInputStream() }
             Collection<Container.Entry> getChildren() { children }
         }
         def container = api.getContainerFactory(rootPath)?.make(api, parentEntry, rootPath)
