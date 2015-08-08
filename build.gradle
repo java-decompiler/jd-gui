@@ -172,8 +172,8 @@ ospackage {
     }
     from 'LICENSE', 'NOTICE', 'README.md'
 
-    postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui ; xdg-desktop-menu install ./*.desktop'
-    preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; xdg-desktop-menu uninstall ./*.desktop'
+    postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui; xdg-desktop-menu install ./*.desktop'
+    preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; rm -fr ./ext; xdg-desktop-menu uninstall ./*.desktop'
 }
 
 installOsxDist.dependsOn jar, copyAndReplaceVariablesInInfoPlist

@@ -13,7 +13,9 @@ class ExtensionService {
     protected ClassLoader extensionClassLoader = initClassLoader()
 
     protected ClassLoader initClassLoader() {
-        def extDirectory = new File("ext");
+        def jarUri = ExtensionService.class.protectionDomain.codeSource.location.toURI()
+        def baseDirectory = new File(jarUri).parent
+        def extDirectory = new File(baseDirectory, 'ext')
 
         if (extDirectory.exists() && extDirectory.isDirectory()) {
             List<URL> urls = []
