@@ -156,13 +156,16 @@ distributions {
 }
 
 ospackage {
-    packageName = project.name
-    description = 'A Java Decompiler'
-    release = '0'
-    os = LINUX
-    url = 'https://github.com/java-decompiler/jd-gui'
     license = file('LICENSE')
-    
+    maintainer = 'Emmanuel Dupuy <emmanue1@users.noreply.github.com>'
+    os = LINUX
+    packageDescription = 'JD-GUI, a standalone graphical utility that displays Java sources from CLASS files'
+    packageGroup = 'java'
+    packageName = project.name
+    release = '0'
+    summary = 'A Java Decompiler'
+    url = 'https://github.com/java-decompiler/jd-gui'
+
     into '/opt/' + project.name
     from ('build/libs/') {
         fileMode = 0755
