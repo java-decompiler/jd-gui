@@ -89,6 +89,8 @@ class PreferencesView implements PreferencesPanel.PreferencesPanelChangeListener
                     preferredHeight = maxHeight
                 preferencesScrollPane.preferredSize = new Dimension(400, preferredHeight)
 
+                minimumSize = new Dimension(300, 200)
+
                 pack()
                 locationRelativeTo = parent
             }

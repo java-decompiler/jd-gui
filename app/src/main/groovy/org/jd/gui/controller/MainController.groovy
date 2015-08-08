@@ -28,6 +28,7 @@ import org.jd.gui.service.indexer.IndexerService
 import org.jd.gui.service.mainpanel.PanelFactoryService
 import org.jd.gui.service.pastehandler.PasteHandlerService
 import org.jd.gui.service.actions.ContextualActionsFactoryService
+import org.jd.gui.service.platform.PlatformService
 import org.jd.gui.service.preferencespanel.PreferencesPanelService
 import org.jd.gui.service.sourcesaver.SourceSaverService
 import org.jd.gui.service.treenode.TreeNodeFactoryService
@@ -42,6 +43,7 @@ import org.jd.gui.spi.TreeNodeFactory
 import org.jd.gui.spi.TypeFactory
 import org.jd.gui.spi.UriLoader
 import org.jd.gui.util.net.UriUtil
+import org.jd.gui.util.swing.SwingUtil
 
 import javax.swing.Action
 import javax.swing.Icon
@@ -90,6 +92,12 @@ class MainController implements API {
 	MainController(SwingBuilder swing, Configuration configuration) {
         this.swing = swing
         this.configuration = configuration
+
+        if (PlatformService.instance.isLinux) {
+            // Fix for GTKLookAndFeel
+            SwingUtil.installGtkPopupBugWorkaround()
+        }
+
         // Create main frame
         mainView = new MainView(
             swing,
