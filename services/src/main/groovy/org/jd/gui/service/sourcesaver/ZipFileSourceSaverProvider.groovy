@@ -20,31 +20,32 @@ class ZipFileSourceSaverProvider extends DirectorySourceSaverProvider {
     /**
      * @return local + optional external selectors
      */
-    String[] getSelectors() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war', '*:file:*.ear'] + externalSelectors }
+    @Override String[] getSelectors() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war', '*:file:*.ear'] + externalSelectors }
 
-    String getSourcePath(Container.Entry entry) { entry.path + '.src.zip' }
-
+    @Override
     @CompileStatic
-    void save(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path path, Container.Entry entry) {
+    public void save(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path rootPath, Container.Entry entry) {
+        def sourcePath = getSourcePath(entry)
+        def path = rootPath.resolve(sourcePath)
+        def parentPath = path.parent
+
+        if (parentPath && !Files.exists(parentPath)) {
+            Files.createDirectories(parentPath)
+        }
+
         def tmpFile = File.createTempFile('jd-gui.', '.tmp.zip')
         tmpFile.delete()
 
-        def env = new HashMap<String, String>()
-        env.put('create', 'true')
-
         def tmpFileUri = tmpFile.toURI()
-        def tmpURI = new URI('jar:' + tmpFileUri.scheme, tmpFileUri.host, tmpFileUri.path + '!/', null)
-        def tmpFs = FileSystems.newFileSystem(tmpURI, env);
+        def tmpArchiveUri = new URI('jar:' + tmpFileUri.scheme, tmpFileUri.host, tmpFileUri.path + '!/', null)
+        def tmpArchiveFs = FileSystems.newFileSystem(tmpArchiveUri, [create: 'true']);
+        def tmpArchiveRootPath = tmpArchiveFs.getPath('/')
 
-        super.save(api, controller, listener, tmpFs.getPath('/'), entry)
-        tmpFs.close()
+        saveContent(api, controller, listener, tmpArchiveRootPath, tmpArchiveRootPath, entry)
+
+        tmpArchiveFs.close()
 
         def tmpPath = Paths.get(tmpFile.absolutePath)
-        def srcZipParentPath = path.parent
-
-        if (srcZipParentPath && !Files.exists(srcZipParentPath)) {
-            Files.createDirectories(srcZipParentPath)
-        }
 
         Files.move(tmpPath, path)
     }

@@ -5,7 +5,6 @@
 
 package org.jd.gui.service.sourcesaver;
 
-import groovy.transform.CompileStatic;
 import jd.core.CoreConstants;
 import jd.core.Decompiler;
 import jd.core.process.DecompilerImpl;
@@ -41,6 +40,7 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
     /**
      * @return local + optional external selectors
      */
+    @Override
     public String[] getSelectors() {
         List<String> externalSelectors = getExternalSelectors();
 
@@ -55,6 +55,7 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
         }
     }
 
+    @Override
     public String getSourcePath(Container.Entry entry) {
         String path = entry.getPath();
         int index = path.lastIndexOf('.');
@@ -62,6 +63,7 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
         return prefix + ".java";
     }
 
+    @Override
     public int getFileCount(API api, Container.Entry entry) {
         if (entry.getPath().indexOf('$') == -1) {
             return 1;
@@ -70,7 +72,16 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
         }
     }
 
-    public void save(API api, Controller controller, Listener listener, Path path, Container.Entry entry) {
+    @Override
+    public void save(API api, Controller controller, Listener listener, Path rootPath, Container.Entry entry) {
+        String sourcePath = getSourcePath(entry);
+        Path path = rootPath.resolve(sourcePath);
+
+        saveContent(api, controller, listener, rootPath, path, entry);
+    }
+
+    @Override
+    public void saveContent(API api, Controller controller, Listener listener, Path rootPath, Path path, Container.Entry entry) {
         try {
             // Call listener
             if (path.toString().indexOf('$') == -1) {
@@ -137,7 +148,6 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
         }
     }
 
-    @CompileStatic
     protected static boolean getPreferenceValue(Map<String, String> preferences, String key, boolean defaultValue) {
         String v = preferences.get(key);
 

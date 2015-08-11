@@ -5,20 +5,17 @@
 
 package org.jd.gui.service.sourcesaver
 
-import org.jd.gui.api.API
 import org.jd.gui.api.model.Container
-import org.jd.gui.spi.SourceSaver
 import org.jd.gui.util.JarContainerEntryUtil
-
-import java.nio.file.Path
 
 class PackageSourceSaverProvider extends DirectorySourceSaverProvider {
     /**
      * @return local + optional external selectors
      */
-    String[] getSelectors() { ['jar:dir:*', 'war:dir:*', 'ear:dir:*'] + externalSelectors }
+    @Override String[] getSelectors() { ['jar:dir:*', 'war:dir:*', 'ear:dir:*'] + externalSelectors }
 
-    void save(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path path, Container.Entry entry) {
-        save(api, controller, listener, path, JarContainerEntryUtil.removeInnerTypeEntries(entry.children))
+    @Override
+    protected Collection<Container.Entry> getChildren(Container.Entry entry) {
+        JarContainerEntryUtil.removeInnerTypeEntries(entry.children)
     }
 }

@@ -18,11 +18,11 @@ class DirectorySourceSaverProvider extends AbstractSourceSaverProvider {
     /**
      * @return local + optional external selectors
      */
-    String[] getSelectors() { ['*:dir:*'] + externalSelectors }
+    @Override String[] getSelectors() { ['*:dir:*'] + externalSelectors }
 
-    String getSourcePath(Container.Entry entry) { entry.path }
+    @Override String getSourcePath(Container.Entry entry) { entry.path + '.src.zip' }
 
-    int getFileCount(API api, Container.Entry entry) { getFileCount(api, entry.children) }
+    @Override int getFileCount(API api, Container.Entry entry) { getFileCount(api, entry.children) }
 
     @CompileStatic
     protected int getFileCount(API api, Collection<Container.Entry> entries) {
@@ -35,26 +35,27 @@ class DirectorySourceSaverProvider extends AbstractSourceSaverProvider {
         return count
     }
 
-    void save(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path path, Container.Entry entry) {
-        save(api, controller, listener, path, entry.children)
-    }
-
+    @Override
     @CompileStatic
-    protected void save(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path path, Collection<Container.Entry> entries) {
+    public void save(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path rootPath, Container.Entry entry) {
+        Path path = rootPath.resolve(entry.getPath())
+
         Files.createDirectories(path)
 
-        for (def e : entries) {
+        saveContent(api, controller, listener, rootPath, path, entry);
+    }
+
+    @Override
+    @CompileStatic
+    public void saveContent(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path rootPath, Path path, Container.Entry entry) {
+        for (def e : getChildren(entry)) {
             if (controller.isCancelled()) {
                 break
             }
 
-            def saver = api.getSourceSaver(e)
-
-            if (saver) {
-                def sp = saver.getSourcePath(e)
-                def p = path.fileSystem.getPath(sp)
-                saver.save(api, controller, listener, p, e)
-            }
+            api.getSourceSaver(e)?.save(api, controller, listener, rootPath, e)
         }
     }
+
+    protected Collection<Container.Entry> getChildren(Container.Entry entry) { entry.children }
 }

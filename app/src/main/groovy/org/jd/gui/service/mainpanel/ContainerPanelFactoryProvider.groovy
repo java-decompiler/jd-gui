@@ -22,12 +22,15 @@ import org.jd.gui.view.component.panel.TreeTabbedPanel
 import javax.swing.JComponent
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
+import java.nio.file.FileSystems
+import java.nio.file.Files
 import java.nio.file.Path
 
 class ContainerPanelFactoryProvider implements PanelFactory {
 
-	String[] getTypes() { ['default'] }
+	@Override String[] getTypes() { ['default'] }
 
+    @Override
     public <T extends JComponent & UriGettable> T make(API api, Container container) {
         return new ContainerPanel(api, container)
 	}
@@ -53,6 +56,7 @@ class ContainerPanelFactoryProvider implements PanelFactory {
         }
 
         // --- ContentIndexable --- //
+        @Override
         @CompileStatic
         Indexes index(API api) {
             // Classic map
@@ -71,32 +75,43 @@ class ContainerPanelFactoryProvider implements PanelFactory {
             }
             // Index populating value automatically
             def indexesWithDefault = new Indexes() {
-                void waitIndexers() {}
-                Map<String, Collection> getIndex(String name) {
-                    mapWithDefault.get(name)
-                }
+                @Override void waitIndexers() {}
+                @Override Map<String, Collection> getIndex(String name) { mapWithDefault.get(name) }
             }
 
             api.getIndexer(entry)?.index(api, entry, indexesWithDefault)
 
             // To prevent memory leaks, return an index without the 'populate' behaviour
             return new Indexes() {
-                void waitIndexers() {}
-                Map<String, Collection> getIndex(String name) { map.get(name) }
+                @Override void waitIndexers() {}
+                @Override Map<String, Collection> getIndex(String name) { map.get(name) }
             }
         }
 
         // --- SourcesSavable --- //
+        @Override
         String getSourceFileName() {
             def path = api.getSourceSaver(entry)?.getSourcePath(entry)
             int index = path.lastIndexOf('/')
             return path.substring(index+1)
         }
 
-        int getFileCount() { api.getSourceSaver(entry)?.getFileCount(api, entry) }
+        @Override int getFileCount() { api.getSourceSaver(entry)?.getFileCount(api, entry) }
 
+        @Override
         void save(API api, Controller controller, Listener listener, Path path) {
-            api.getSourceSaver(entry)?.save(
+            def parentPath = path.parent
+
+            if (parentPath && !Files.exists(parentPath)) {
+                Files.createDirectories(parentPath)
+            }
+
+            def uri = path.toUri()
+            def archiveUri = new URI('jar:' + uri.scheme, uri.host, uri.path + '!/', null)
+            def archiveFs = FileSystems.newFileSystem(archiveUri, [create: 'true'])
+            def archiveRootPath = archiveFs.getPath('/')
+
+            api.getSourceSaver(entry)?.saveContent(
                     api,
                     new SourceSaver.Controller() {
                         boolean isCancelled() { controller.isCancelled() }
@@ -104,7 +119,10 @@ class ContainerPanelFactoryProvider implements PanelFactory {
                     new SourceSaver.Listener() {
                         void pathSaved(Path p) { listener.pathSaved(p) }
                     },
-                    path, entry)
+                archiveRootPath, archiveRootPath, entry
+            )
+
+            archiveFs.close()
         }
     }
 }

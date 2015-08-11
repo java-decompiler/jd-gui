@@ -19,14 +19,21 @@ class FileSourceSaverProvider extends AbstractSourceSaverProvider {
     /**
      * @return local + optional external selectors
      */
-    String[] getSelectors() { ['*:file:*'] + externalSelectors }
+    @Override String[] getSelectors() { ['*:file:*'] + externalSelectors }
 
-    String getSourcePath(Container.Entry entry) { entry.path }
+    @Override String getSourcePath(Container.Entry entry) { entry.path }
 
-    int getFileCount(API api, Container.Entry entry) { 1 }
+    @Override int getFileCount(API api, Container.Entry entry) { 1 }
 
+    @Override
     @CompileStatic
-    void save(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path path, Container.Entry entry) {
+    public void save(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path rootPath, Container.Entry entry) {
+        saveContent(api, controller, listener, rootPath, rootPath.resolve(entry.getPath()), entry);
+    }
+
+    @Override
+    @CompileStatic
+    void saveContent(API api, SourceSaver.Controller controller, SourceSaver.Listener listener, Path rootPath, Path path, Container.Entry entry) {
         listener.pathSaved(path)
 
         entry.inputStream.withStream { InputStream is ->
