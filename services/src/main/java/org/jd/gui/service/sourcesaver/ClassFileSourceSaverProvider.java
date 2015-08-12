@@ -110,8 +110,12 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
             // Metadata
             if (getPreferenceValue(p, WRITE_METADATA, true)) {
                 // Add location
+                String location =
+                    new File(entry.getUri()).getPath()
+                    // Escape "\ u" sequence to prevent "Invalid unicode" errors
+                    .replaceAll("(^|[^\\\\])\\\\u", "\\\\\\\\u");
                 ps.print("\n\n/* Location:              ");
-                ps.print(new File(entry.getUri()).getPath());
+                ps.print(location);
                 // Add Java compiler version
                 int majorVersion = printer.getMajorVersion();
 
