@@ -15,7 +15,6 @@ import org.jd.gui.view.SaveAllSourcesView
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 
 class SaveAllSourcesController implements SourcesSavable.Controller, SourcesSavable.Listener {
@@ -23,7 +22,7 @@ class SaveAllSourcesController implements SourcesSavable.Controller, SourcesSava
     SaveAllSourcesView saveAllSourcesView
     boolean cancel
     int counter
-    int step
+    int mask
 
     SaveAllSourcesController(SwingBuilder swing, Configuration configuration, API api) {
         this.api = api
@@ -39,19 +38,20 @@ class SaveAllSourcesController implements SourcesSavable.Controller, SourcesSava
         executor.execute(new Runnable() {
             void run() {
                 int fileCount = savable.fileCount
-                int quotient = (fileCount / 100)
+
+                saveAllSourcesView.updateProgressBar(0)
+                saveAllSourcesView.setMaxValue(fileCount)
 
                 cancel = false
                 counter = 0
-                step = 1
+                mask = 2
 
-                while (quotient > step) {
-                    step <<= 1
+                while (fileCount > 64) {
+                    fileCount >>= 1
+                    mask <<= 1
                 }
-                step = (step >> 1) - 1
 
-                saveAllSourcesView.updateProgressBar(counter)
-                saveAllSourcesView.setMaxValue(fileCount)
+                mask--
 
                 def path = Paths.get(file.toURI())
                 Files.deleteIfExists(path)
@@ -81,7 +81,7 @@ class SaveAllSourcesController implements SourcesSavable.Controller, SourcesSava
 
     // --- SourcesSavable.Listener --- //
     void pathSaved(Path path) {
-        if (((counter++) & step) == 0) {
+        if (((counter++) & mask) == 0) {
             saveAllSourcesView.updateProgressBar(counter)
         }
     }
