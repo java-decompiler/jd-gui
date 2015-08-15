@@ -35,8 +35,10 @@ abstract class TypePage extends CustomLineNumbersPage implements UriGettable, Ur
         this.entry = entry
     }
 
+    @Override
     protected boolean isHyperlinkEnabled(HyperlinkPage.HyperlinkData hyperlinkData) { hyperlinkData.reference.enabled }
 
+    @Override
     protected void openHyperlink(int x, int y, HyperlinkPage.HyperlinkData hyperlinkData) {
         if (hyperlinkData.reference.enabled) {
             // Save current position in history
@@ -74,12 +76,13 @@ abstract class TypePage extends CustomLineNumbersPage implements UriGettable, Ur
     }
 
     // --- UriGettable --- //
-    URI getUri() { entry.uri }
+    @Override URI getUri() { entry.uri }
 
     // --- UriOpenable --- //
     /**
      * @param uri for URI format, @see jd.gui.api.feature.UriOpenable
      */
+    @Override
     boolean openUri(URI uri) {
         List<DocumentRange> ranges = []
         def fragment = uri.fragment
@@ -289,11 +292,12 @@ abstract class TypePage extends CustomLineNumbersPage implements UriGettable, Ur
     }
 
     // --- FocusedTypeGettable --- //
-    String getFocusedTypeName() { typeDeclarations.floorEntry(textArea.caretPosition)?.value?.typeName }
+    @Override String getFocusedTypeName() { typeDeclarations.floorEntry(textArea.caretPosition)?.value?.typeName }
 
-    Container.Entry getEntry() { entry }
+    @Override Container.Entry getEntry() { entry }
 
     // --- IndexesChangeListener --- //
+    @Override
     @CompileStatic
     void indexesChanged(Collection<Indexes> collectionOfIndexes) {
         // Update the list of containers
@@ -306,12 +310,18 @@ abstract class TypePage extends CustomLineNumbersPage implements UriGettable, Ur
             boolean enabled
 
             if (reference.name) {
-                typeName = searchTypeHavingMember(typeName, reference.name, reference.descriptor, entry)
-                if (typeName) {
-                    // Replace type with the real type containing the referenced member
-                    reference.typeName = typeName
-                    enabled = true
-                } else {
+                try {
+                    // Recursive search
+                    typeName = searchTypeHavingMember(typeName, reference.name, reference.descriptor, entry)
+                    if (typeName) {
+                        // Replace type with the real type having the referenced member
+                        reference.typeName = typeName
+                        enabled = true
+                    } else {
+                        enabled = false
+                    }
+                } catch (Error ignore) {
+                    // Catch StackOverflowError or OutOfMemoryError
                     enabled = false
                 }
             } else {
