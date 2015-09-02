@@ -21,6 +21,8 @@ import javax.swing.JComponent
 import javax.swing.text.EditorKit
 import javax.swing.text.JTextComponent
 import java.awt.Color
+import java.awt.Dimension
+import java.awt.Font
 import java.awt.FontMetrics
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -45,6 +47,7 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
      * Map[textarea line number] = original line number
      */
     protected int[] lineNumberMap = null
+    protected int maxLineNumber = 0
 
     void setMaxLineNumber(int maxLineNumber) {
         if (maxLineNumber > 0) {
@@ -54,6 +57,10 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
                 int[] tmp = new int[maxLineNumber * 3 / 2]
                 System.arraycopy(lineNumberMap, 0, tmp, 0, lineNumberMap.length)
                 lineNumberMap = tmp
+            }
+
+            if (this.maxLineNumber < maxLineNumber) {
+                this.maxLineNumber = maxLineNumber
             }
         }
     }
@@ -71,15 +78,7 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
         }
     }
 
-    int getMaximumSourceLineNumber() {
-        int max = 0
-        for (int ln : lineNumberMap) {
-            if (max < ln) {
-                max = ln
-            }
-        }
-        return max
-    }
+    int getMaximumSourceLineNumber() { maxLineNumber }
 
     @CompileStatic
     int getTextAreaLineNumber(int originalLineNumber) {
@@ -100,13 +99,14 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
         return textAreaLineNumber
     }
 
-    protected RSyntaxTextArea newRSyntaxTextArea() { new SourceSyntaxTextArea() }
+    @Override protected RSyntaxTextArea newRSyntaxTextArea() { new SourceSyntaxTextArea() }
 
     @CompileStatic
     class SourceSyntaxTextArea extends RSyntaxTextArea {
         /**
          * @see HyperlinkPage.HyperlinkSyntaxTextArea#getUnderlineForToken(org.fife.ui.rsyntaxtextarea.Token)
          */
+        @Override
         boolean getUnderlineForToken(Token t) {
             def entry = hyperlinks.floorEntry(t.offset)
             if (entry) {
@@ -118,7 +118,7 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
             return super.getUnderlineForToken(t)
         }
 
-        protected RTextAreaUI createRTextAreaUI() { new SourceSyntaxTextAreaUI(this) }
+        @Override protected RTextAreaUI createRTextAreaUI() { new SourceSyntaxTextAreaUI(this) }
     }
 
     /**
@@ -127,13 +127,13 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
     @CompileStatic
     class SourceSyntaxTextAreaUI extends RSyntaxTextAreaUI {
         SourceSyntaxTextAreaUI(JComponent rSyntaxTextArea) { super(rSyntaxTextArea) }
-        EditorKit getEditorKit(JTextComponent tc) { new SourceSyntaxTextAreaEditorKit() }
-        Rectangle getVisibleEditorRect() { super.getVisibleEditorRect() }
+        @Override EditorKit getEditorKit(JTextComponent tc) { new SourceSyntaxTextAreaEditorKit() }
+        @Override Rectangle getVisibleEditorRect() { super.getVisibleEditorRect() }
     }
 
     @CompileStatic
     class SourceSyntaxTextAreaEditorKit extends RSyntaxTextAreaEditorKit {
-        LineNumberList createLineNumberList(RTextArea textArea) { new SourceLineNumberList(textArea) }
+        @Override LineNumberList createLineNumberList(RTextArea textArea) { new SourceLineNumberList(textArea) }
     }
 
     /**
@@ -145,6 +145,7 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
         protected Map<?,?> aaHints
         protected Rectangle visibleRect
         protected Insets textAreaInsets
+        protected Dimension preferredSize
 
         SourceLineNumberList(RTextArea textArea) {
             super(textArea, null)
@@ -297,5 +298,30 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
         }
 
         int getRhsBorderWidth() { ((RSyntaxTextArea)rTextArea).isCodeFoldingEnabled() ? 0 : 4 }
+
+        @Override
+        Dimension getPreferredSize() {
+            if (preferredSize == null) {
+                int lineCount = getMaximumSourceLineNumber()
+
+                if (lineCount > 0) {
+                    Font font = getFont()
+                    FontMetrics fontMetrics = getFontMetrics(font)
+                    int count = 1
+
+                    while (lineCount >= 10) {
+                        lineCount = lineCount / 10 as int
+                        count++
+                    }
+
+                    int preferredWidth = fontMetrics.charWidth('9' as char) * count + 10
+                    preferredSize = new Dimension(preferredWidth, 0)
+                } else {
+                    preferredSize = new Dimension(0, 0)
+                }
+            }
+
+            return preferredSize
+        }
     }
 }
