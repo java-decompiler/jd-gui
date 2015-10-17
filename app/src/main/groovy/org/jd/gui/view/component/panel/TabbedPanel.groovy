@@ -15,6 +15,7 @@ import javax.swing.JComponent
 import javax.swing.JMenu
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
+import javax.swing.SwingUtilities
 import javax.swing.ToolTipManager
 import javax.swing.event.ChangeEvent
 import java.awt.BorderLayout
@@ -31,7 +32,6 @@ import javax.swing.ImageIcon
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
-import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 
@@ -70,7 +70,7 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
             }
         }
         ToolTipManager.sharedInstance().registerComponent(tabPanel)
-        tabPanel.addMouseListener(new MouseAdapter() {
+        tabPanel.addMouseListener(new MouseListener() {
             void mousePressed(MouseEvent e) { showPopupTabMenu(e) }
             void mouseReleased(MouseEvent e) { showPopupTabMenu(e) }
             void showPopupTabMenu(MouseEvent e) {
@@ -79,6 +79,14 @@ class TabbedPanel extends JPanel implements PreferencesChangeListener {
                     if (index != -1) {
                         new PopupTabMenu(tabPanel.getComponentAt(index)).show(e.component, e.x, e.y)
                     }
+                }
+            }
+            void mouseEntered(MouseEvent e) {}
+            void mouseExited(MouseEvent e) {}
+            void mouseClicked(MouseEvent e) {
+                int index = tabPanel.indexAtLocation(e.x, e.y)
+                if (index != -1 && SwingUtilities.isMiddleMouseButton(e)) {
+                    removeComponent(tabPanel.getComponentAt(index))
                 }
             }
         })
