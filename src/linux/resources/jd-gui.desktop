@@ -2,6 +2,7 @@
 Comment=Java Decompiler JD-GUI
 Terminal=false
 Name=JD-GUI
-Exec=java -jar /opt/jd-gui/jd-gui.jar
+Exec=java -jar /opt/jd-gui/jd-gui.jar %F
 Type=Application
 Icon=jd-gui
+MimeType=application/java-archive;application/java-vm
