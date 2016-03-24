@@ -66,3 +66,5 @@ launch JD-GUI with your extensions
 - Java: Delete "jd-gui-x.y.z.jar" and "jd-gui.cfg".
 - Mac OSX: Drag and drop "JD-GUI" application into the trash.
 - Windows: Delete "jd-gui.exe" and "jd-gui.cfg".
+- 
+测试一下。
