@@ -9,7 +9,7 @@ import java.net.URI;
 
 /**
  * uri                : scheme '://' path ('?' query)? ('#' fragment)?<br>
- * scheme             : 'generic' | 'jar' | 'war' | 'ear' | 'dex' | ...<br>
+ * scheme             : 'generic' | 'jar' | 'aar' | 'war' | 'ear' | 'dex' | ...<br>
  * path               : singlePath('!' singlePath)*<br>
  * singlePath         : [path/to/dir/] | [path/to/file]<br>
  * query              : queryLineNumber | queryPosition | querySearch<br>

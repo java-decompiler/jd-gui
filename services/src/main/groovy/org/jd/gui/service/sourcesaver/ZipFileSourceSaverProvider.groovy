@@ -20,7 +20,7 @@ class ZipFileSourceSaverProvider extends DirectorySourceSaverProvider {
     /**
      * @return local + optional external selectors
      */
-    @Override String[] getSelectors() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.war', '*:file:*.ear'] + externalSelectors }
+    @Override String[] getSelectors() { ['*:file:*.zip', '*:file:*.jar', '*:file:*.aar', '*:file:*.war', '*:file:*.ear'] + externalSelectors }
 
     @Override
     @CompileStatic
