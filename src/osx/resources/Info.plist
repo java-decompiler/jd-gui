@@ -52,6 +52,16 @@
 			<dict>
 				<key>CFBundleTypeExtensions</key>
 				<array>
+					<string>aar</string>
+				</array>
+				<key>CFBundleTypeName</key>			<string>Aar File</string>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>	<false/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
 					<string>war</string>
 				</array>
 				<key>CFBundleTypeName</key>			<string>War File</string>
