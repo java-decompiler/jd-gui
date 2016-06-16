@@ -54,7 +54,7 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
             if (lineNumberMap == null) {
                 lineNumberMap = new int[maxLineNumber * 3 / 2]
             } else if (lineNumberMap.length <= maxLineNumber) {
-                lineNumberMap = Arrays.copyOf(lineNumberMap, lineNumberMap.length)
+                lineNumberMap = Arrays.copyOf(lineNumberMap, maxLineNumber * 3 / 2)
             }
 
             if (this.maxLineNumber < maxLineNumber) {
