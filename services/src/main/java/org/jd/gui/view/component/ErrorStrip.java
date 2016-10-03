@@ -335,7 +335,7 @@ public class ErrorStrip extends JComponent {
         int line = yToLine(e.getY());
         if (line>-1) {
             text = msg.getString("Line");
-            text = MessageFormat.format(text, Integer.valueOf(line+1));
+            text = MessageFormat.format(text, line+1);
         }
         return text;
     }
@@ -392,7 +392,7 @@ public class ErrorStrip extends JComponent {
      * @return A possibly brighter value for the component.
      */
     private static final int possiblyDarker(int i) {
-        return i -= (int)(i*0.4f);
+        return i - (int)(i*0.4f);
     }
 
 
@@ -408,7 +408,7 @@ public class ErrorStrip extends JComponent {
         for (ParserNotice notice : notices) {
             if (notice.getLevel().isEqualToOrWorseThan(levelThreshold) ||
                     (notice instanceof TaskNotice)) {
-                Integer key = Integer.valueOf(notice.getLine());
+                Integer key = notice.getLine();
                 Marker m = markerMap.get(key);
                 if (m==null) {
                     m = new Marker(notice);
@@ -449,14 +449,14 @@ public class ErrorStrip extends JComponent {
     private void addMarkersForRanges(List<DocumentRange> ranges,
                                      Map<Integer, Marker> markerMap, Color color) {
         for (DocumentRange range : ranges) {
-            int line = 0;
+            int line;
             try {
                 line = textArea.getLineOfOffset(range.getStartOffset());
             } catch (BadLocationException ble) { // Never happens
                 continue;
             }
             ParserNotice notice = new MarkedOccurrenceNotice(range, color);
-            Integer key = Integer.valueOf(line);
+            Integer key = line;
             Marker m = markerMap.get(key);
             if (m==null) {
                 m = new Marker(notice);
@@ -791,8 +791,8 @@ public class ErrorStrip extends JComponent {
 
         public boolean containsMarkedOccurence() {
             boolean result = false;
-            for (int i=0; i<notices.size(); i++) {
-                if (notices.get(i) instanceof MarkedOccurrenceNotice) {
+            for (ParserNotice notice : notices) {
+                if (notice instanceof MarkedOccurrenceNotice) {
                     result = true;
                     break;
                 }
@@ -821,8 +821,7 @@ public class ErrorStrip extends JComponent {
 
         @Override
         public String getToolTipText() {
-
-            String text = null;
+            String text;
 
             if (notices.size()==1) {
                 text = notices.get(0).getMessage();
@@ -831,8 +830,7 @@ public class ErrorStrip extends JComponent {
                 StringBuilder sb = new StringBuilder("<html>");
                 sb.append(msg.getString("MultipleMarkers"));
                 sb.append("<br>");
-                for (int i=0; i<notices.size(); i++) {
-                    ParserNotice pn = notices.get(i);
+                for (ParserNotice pn : notices) {
                     sb.append("&nbsp;&nbsp;&nbsp;- ");
                     sb.append(pn.getMessage());
                     sb.append("<br>");
