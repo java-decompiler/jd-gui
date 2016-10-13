@@ -6,6 +6,8 @@
 package org.jd.gui.view
 
 import javax.swing.BorderFactory
+import javax.swing.JComponent
+import javax.swing.KeyStroke
 import javax.swing.UIManager
 import java.awt.BorderLayout
 import java.awt.Color
@@ -19,6 +21,7 @@ import javax.swing.WindowConstants
 import org.jd.gui.Constants
 import org.jd.gui.service.platform.PlatformService
 
+import java.awt.event.KeyEvent
 import java.util.jar.Manifest
 
 actions {
@@ -144,6 +147,8 @@ actions {
         closure:{
             aboutDialog.pack()
             aboutDialog.setLocationRelativeTo(mainFrame)
+            aboutDialog.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 'AboutDialog.cancel')
+            aboutDialog.getRootPane().getActionMap().put("AboutDialog.cancel", aboutOkAction)
             aboutDialog.visible = true
         }
 	)
