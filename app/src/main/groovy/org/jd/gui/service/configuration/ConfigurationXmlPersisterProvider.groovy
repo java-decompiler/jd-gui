@@ -18,6 +18,13 @@ class ConfigurationXmlPersisterProvider implements ConfigurationPersister {
     static final File FILE = getConfigFile()
 
     static File getConfigFile() {
+        def cfg = System.getProperty("jd.gui.cfg")
+        if(cfg){
+            if(cfg.lastIndexOf(Constants.CONFIG_FILENAME) > 0){
+                return new File(cfg)
+            }
+        }
+
         if (PlatformService.instance.isLinux) {
             // See: http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
             def xdgConfigHome = System.getenv('XDG_CONFIG_HOME')
