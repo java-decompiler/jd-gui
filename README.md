@@ -25,12 +25,16 @@ for instant access to methods and fields.
 ```
 
 generate _"build/libs/jd-gui-x.y.z.jar"_
+</br>
+</br>
 
 ```
 > ./gradlew installOsxDist
 ```
 
 generate _"build/install/jd-gui-osx/JD-GUI.app"_
+</br>
+</br>
 
 ```
 > iexplore http://sourceforge.net/projects/launch4j/files/launch4j-3/3.7/launch4j-3.7-win32.zip/download
@@ -39,16 +43,22 @@ generate _"build/install/jd-gui-osx/JD-GUI.app"_
 ```
 
 generate _"build/install/jd-gui-windows/jd-gui.exe"_
+</br>
+</br>
 
 ```
 > ./gradlew buildDeb
 ```
 
 generate Ubuntu/Debian installer
+</br>
+</br>
 
 ```
 > ./gradlew buildRpm
 ```
+</br>
+</br>
 
 generate RedHat/CentOS/Fedora installer
 </br>
