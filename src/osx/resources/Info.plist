@@ -102,7 +102,7 @@
 				<key>apple.laf.useScreenMenuBar</key>
 				<string>true</string>
 			</dict>
-			<key>VMOptions</key>					<string>-Xms512m</string>
+			<key>VMOptions</key>					<string>-Xms512m --add-opens java.base/jdk.internal.loader=ALL-UNNAMED --add-opens jdk.zipfs/jdk.nio.zipfs=ALL-UNNAMED</string>
 		</dict>
 	</dict>
 </plist>
