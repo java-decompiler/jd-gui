@@ -18,7 +18,7 @@ dialog(
         borderLayout()
         vbox(constraints:BorderLayout.NORTH) {
             hbox {
-                label(text:'Select a type to select (* = any string, ? = any character, TZ = TimeZone):')
+                label(text:'Select a type to open (* = any string, ? = any character, TZ = TimeZone):')
                 hglue()
             }
             vstrut(10)
