@@ -18,7 +18,7 @@
     <fileVersion>${VERSION}.0</fileVersion>
     <txtFileVersion>${VERSION}</txtFileVersion>
     <fileDescription>JD-GUI</fileDescription>
-    <copyright>JD-GUI (C) 2008-2015 Emmanuel Dupuy</copyright>
+    <copyright>JD-GUI (C) 2008-2019 Emmanuel Dupuy</copyright>
     <productVersion>${VERSION}.0</productVersion>
     <txtProductVersion>${VERSION}</txtProductVersion>
     <productName>JD-GUI</productName>

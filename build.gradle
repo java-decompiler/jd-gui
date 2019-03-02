@@ -5,7 +5,7 @@ buildscript {
 
     dependencies {
         classpath 'com.netflix.nebula:gradle-ospackage-plugin:2.2.6'
-        classpath 'org.spockframework:spock-core:1.0-groovy-2.3'
+        classpath 'org.spockframework:spock-core:1.2-groovy-2.5'
     }
 }
 
@@ -15,7 +15,7 @@ apply plugin: 'nebula.os-package'
 
 // Common configuration //
 allprojects {
-    version='1.4.0'
+    version='1.4.1'
 
     apply plugin: 'eclipse'
     apply plugin: 'idea'
@@ -56,9 +56,17 @@ subprojects.each { subproject ->
 jar {
     dependsOn subprojects.tasks['jar']
 
+    // Add SPI directory
+    def tmpSpiDir = file('build/tmp/spi')
+    tmpSpiDir.deleteDir()
+    def tmpSpiServicesDir = file(tmpSpiDir.path + '/META-INF/services')
+    tmpSpiServicesDir.mkdirs()
+    from tmpSpiDir
+
+    // Add dependencies
     def deps = []
     subprojects.each { subproject ->
-        from subproject.sourceSets.main.output.classesDir
+        from subproject.sourceSets.main.output.classesDirs
         from subproject.sourceSets.main.output.resourcesDir
         deps += subproject.configurations.runtime - subproject.configurations.provided
     }
@@ -66,34 +74,26 @@ jar {
         deps -= subproject.jar.archivePath
     }
     deps = deps.unique().collect { it.isDirectory() ? it : zipTree(it) }
+    from deps
 
     manifest {
         attributes 'Main-Class': 'org.jd.gui.App',
-                   'SplashScreen-Image': 'org/jd/gui/images/jd_icon_128.png',
-                   'JD-GUI-Version': project.version,
-                   'JD-Core-Version': '0.7.1'
+                'SplashScreen-Image': 'org/jd/gui/images/jd_icon_128.png',
+                'JD-GUI-Version': project.version,
+                'JD-Core-Version': '0.7.1'
     }
-    from deps
-    exclude 'META-INF/services/org.jd.gui.spi.*'
+    exclude 'META-INF/groovy/**', 'META-INF/licenses/**', 'META-INF/maven/**', 'META-INF/INDEX.LIST'
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
     doFirst {
-        // Create temporary directory
-        def tmpSpiDir = file('build/tmp/spi')
-        tmpSpiDir.deleteDir()
-        tmpSpiDir.mkdirs()
         // Copy and merge SPI config files
         subprojects.each { subproject ->
-            def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + File.separator + 'META-INF' + File.separator + 'services')
+            def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + '/META-INF/services')
             if (servicesDir.exists()) {
                 servicesDir.eachFile { source ->
-                    def target = file(tmpSpiDir.path + File.separator + source.name)
+                    def target = file(tmpSpiServicesDir.path + '/' + source.name)
                     target << source.text
                 }
             }
-        }
-        // Add to JAR file
-        into('META-INF/services') {
-            from tmpSpiDir
         }
     }
 }
@@ -109,20 +109,22 @@ task launch4jConfig(type: Copy) {
     )
 }
 
-task launch4j(type: Exec, dependsOn: [':jar', ':launch4jConfig']) {
+task launch4j(type: JavaExec, dependsOn: [':jar', ':launch4jConfig']) {
     def launch4jCfg = file('build/launch4j/launch4j.xml')
-    def launch4jExe = System.properties['LAUNCH4J_HOME'] + '/launch4j.exe'
+    def launch4jJar = file(System.properties['LAUNCH4J_HOME'] + '/launch4j.jar')
 
     onlyIf {
         System.properties['os.name'].startsWith('Windows')
     }
 
-    if (new File(launch4jExe).exists()) {
-        commandLine 'cmd', '/c', launch4jExe, launch4jCfg
-    } else {
-        commandLine 'cmd', '/c', 'echo', 'OFF'
-        doLast {
-            errorOutput.println "ERROR: 'LAUNCH4J_HOME' not defined or invalid. Launch4j (http://launch4j.sourceforge.net) is required to generare 'jd-gui.exe'."
+    classpath = files(launch4jJar)
+    main = 'net.sf.launch4j.Main'
+    args launch4jCfg.path
+
+    if (!launch4jJar.exists()) {
+        ignoreExitValue = true
+        doFirst {
+            errorOutput.println "ERROR: 'LAUNCH4J_HOME' not defined or invalid. Launch4j (http://launch4j.sourceforge.net) is required to generare 'jd-gui.exe'. Download it and add -DLAUNCH4J_HOME=path in command line."
         }
     }
 }

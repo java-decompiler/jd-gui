@@ -60,10 +60,10 @@ class ContainerPanelFactoryProvider implements PanelFactory {
         @CompileStatic
         Indexes index(API api) {
             // Classic map
-            def map = new HashMap<String, Map<String, Collection>>()
+            def map = new HashMap<String, Map<String, ArrayList>>()
             // Map populating value automatically
-            def mapWithDefault = new HashMap<String, Map<String, Collection>>().withDefault { key ->
-                def subMap = new HashMap<String, Collection>()
+            def mapWithDefault = new HashMap<String, Map<String, ArrayList>>().withDefault { key ->
+                def subMap = new HashMap<String, ArrayList>()
 
                 map.put(key, subMap)
 
