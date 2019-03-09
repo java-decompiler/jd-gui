@@ -29,7 +29,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
     }
 
     // Create cache
-    protected Cache<URI, JavaType> cache = new Cache();
+    protected Cache<URI, JavaType> cache = new Cache<>();
 
     /**
      * @return local + optional external selectors

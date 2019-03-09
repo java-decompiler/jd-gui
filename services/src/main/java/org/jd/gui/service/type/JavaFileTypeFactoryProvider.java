@@ -28,7 +28,7 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
     }
 
     // Create cache
-    protected Cache<URI, Listener> cache = new Cache();
+    protected Cache<URI, Listener> cache = new Cache<>();
 
     /**
      * @return local + optional external selectors
