@@ -23,10 +23,12 @@ allprojects {
     tasks.withType(JavaCompile) {
         sourceCompatibility = '1.7'
         targetCompatibility = '1.7'
+        options.compilerArgs << '-Xlint:unchecked'
     }
     tasks.withType(GroovyCompile) {
         sourceCompatibility = '1.7'
         targetCompatibility = '1.7'
+        options.compilerArgs << '-Xlint:unchecked'
     }
 
     repositories {
@@ -130,26 +132,24 @@ task launch4j(type: JavaExec, dependsOn: [':jar', ':launch4jConfig']) {
 }
 
 // Distributions for OSX and Windows //
-task copyAndReplaceVariablesInInfoPlist(type: Copy) {
-    from 'src/osx/resources/Info.plist'
-    into 'build/tmp/distributions/osx'
-    expand(
-            VERSION: project.version
-    )
-}
-
 distributions {
     osx.contents {
         into('JD-GUI.app/Contents') {
-            from 'build/tmp/distributions/osx'
+            from('src/osx/resources') {
+                include 'Info.plist'
+                expand VERSION: project.version
+            }
+        }
+        into('JD-GUI.app/Contents/MacOS') {
+            from('src/osx/resources') {
+                include 'universalJavaApplicationStub.sh'
+                fileMode 0755
+            }
         }
         into('JD-GUI.app/Contents/Resources/Java') {
             from jar.archivePath
         }
         from 'LICENSE', 'NOTICE', 'README.md'
-        doFirst {
-            ant.chmod(file:'src/osx/dist/JD-GUI.app/Contents/MacOS/universalJavaApplicationStub.sh', perm:'+x')
-        }
     }
     windows.contents {
         from 'build/launch4j/jd-gui.exe'
@@ -180,10 +180,6 @@ ospackage {
     postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui; xdg-desktop-menu install ./*.desktop'
     preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; rm -fr ./ext; xdg-desktop-menu uninstall ./*.desktop'
 }
-
-installOsxDist.dependsOn jar, copyAndReplaceVariablesInInfoPlist
-osxDistTar.dependsOn jar, copyAndReplaceVariablesInInfoPlist
-osxDistZip.dependsOn jar, copyAndReplaceVariablesInInfoPlist
 
 installWindowsDist.dependsOn launch4j
 windowsDistTar.dependsOn launch4j
