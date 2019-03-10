@@ -2,32 +2,33 @@ buildscript {
     repositories {
         jcenter()
     }
-
     dependencies {
-        classpath 'com.netflix.nebula:gradle-ospackage-plugin:2.2.6'
+        classpath 'com.netflix.nebula:gradle-ospackage-plugin:5.3.0'
         classpath 'org.spockframework:spock-core:1.2-groovy-2.5'
+        classpath 'edu.sc.seis.gradle:launch4j:2.4.4'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'distribution'
-apply plugin: 'nebula.os-package'
+apply plugin: 'edu.sc.seis.launch4j'
+apply plugin: 'nebula.ospackage'
+
 
 // Common configuration //
-allprojects {
-    version='1.4.1'
+version='1.4.2'
+targetCompatibility = '1.7'
 
+allprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
 
     tasks.withType(JavaCompile) {
-        sourceCompatibility = '1.7'
-        targetCompatibility = '1.7'
+        sourceCompatibility = targetCompatibility = '1.7'
         options.compilerArgs << '-Xlint:unchecked'
     }
     tasks.withType(GroovyCompile) {
-        sourceCompatibility = '1.7'
-        targetCompatibility = '1.7'
+        sourceCompatibility = targetCompatibility = '1.7'
         options.compilerArgs << '-Xlint:unchecked'
     }
 
@@ -100,35 +101,38 @@ jar {
     }
 }
 
-// Windows wrapper configuration to generate "jd-gui.exe" //
-task launch4jConfig(type: Copy) {
-    from 'src/launch4j/resources/config/launch4j.xml'
-    into 'build/launch4j'
-    expand(
-        JAR_FILE: project.jar.archivePath,
-        VERSION: project.version,
-        ICON: file('src/launch4j/resources/images/jd-gui.ico')
-    )
+// Java executable wrapper for Windows //
+launch4j {
+    version = textVersion = project.version
+    fileDescription = productName = 'JD-GUI'
+    errTitle 'JD-GUI Windows Wrapper'
+    copyright 'JD-GUI (C) 2008-2019 Emmanuel Dupuy'
+    icon projectDir.path + '/src/launch4j/resources/images/jd-gui.ico'
 }
 
-task launch4j(type: JavaExec, dependsOn: [':jar', ':launch4jConfig']) {
-    def launch4jCfg = file('build/launch4j/launch4j.xml')
-    def launch4jJar = file(System.properties['LAUNCH4J_HOME'] + '/launch4j.jar')
+// Packages for Linux //
+ospackage {
+    license = file('LICENSE')
+    maintainer 'Emmanuel Dupuy <emmanue1@users.noreply.github.com>'
+    os LINUX
+    packageDescription 'JD-GUI, a standalone graphical utility that displays Java sources from CLASS files'
+    packageGroup 'java'
+    packageName project.name
+    release '0'
+    summary 'A Java Decompiler'
+    url 'https://github.com/java-decompiler/jd-gui'
 
-    onlyIf {
-        System.properties['os.name'].startsWith('Windows')
+    into '/opt/' + project.name
+    from ('build/libs/') {
+        fileMode 0755
     }
-
-    classpath = files(launch4jJar)
-    main = 'net.sf.launch4j.Main'
-    args launch4jCfg.path
-
-    if (!launch4jJar.exists()) {
-        ignoreExitValue = true
-        doFirst {
-            errorOutput.println "ERROR: 'LAUNCH4J_HOME' not defined or invalid. Launch4j (http://launch4j.sourceforge.net) is required to generare 'jd-gui.exe'. Download it and add -DLAUNCH4J_HOME=path in command line."
-        }
+    from ('src/linux/resources/') {
+        fileMode 0755
     }
+    from 'LICENSE', 'NOTICE', 'README.md'
+
+    postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui; xdg-desktop-menu install ./*.desktop'
+    preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; rm -fr ./ext; xdg-desktop-menu uninstall ./*.desktop'
 }
 
 // Distributions for OSX and Windows //
@@ -157,33 +161,12 @@ distributions {
     }
 }
 
-ospackage {
-    license = file('LICENSE')
-    maintainer = 'Emmanuel Dupuy <emmanue1@users.noreply.github.com>'
-    os = LINUX
-    packageDescription = 'JD-GUI, a standalone graphical utility that displays Java sources from CLASS files'
-    packageGroup = 'java'
-    packageName = project.name
-    release = '0'
-    summary = 'A Java Decompiler'
-    url = 'https://github.com/java-decompiler/jd-gui'
-
-    into '/opt/' + project.name
-    from ('build/libs/') {
-        fileMode = 0755
-    }
-    from ('src/linux/resources/') {
-        fileMode = 0755
-    }
-    from 'LICENSE', 'NOTICE', 'README.md'
-
-    postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui; xdg-desktop-menu install ./*.desktop'
-    preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; rm -fr ./ext; xdg-desktop-menu uninstall ./*.desktop'
-}
-
-installWindowsDist.dependsOn launch4j
-windowsDistTar.dependsOn launch4j
-windowsDistZip.dependsOn launch4j
+installWindowsDist.dependsOn createExe
+windowsDistTar.dependsOn createExe
+windowsDistZip.dependsOn createExe
 
 buildDeb.dependsOn jar
 buildRpm.dependsOn jar
+
+build.finalizedBy buildDeb
+build.finalizedBy buildRpm

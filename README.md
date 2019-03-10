@@ -17,26 +17,17 @@ for instant access to methods and fields.
 ```
 > ./gradlew build 
 ```
-generate _"build/libs/jd-gui-x.y.z.jar"_ and _"build/distributions/jd-gui-osx-x.y.z.tar"_
-```
-> iexplore https://sourceforge.net/projects/launch4j/files/launch4j-3/3.12/launch4j-3.12-win32.zip/download
-> unzip launch4j-3.12-win32.zip
-> ./gradlew -DLAUNCH4J_HOME=.../path/to/launch4j-3.12-win32 build
-```
-generate _"build/distributions/jd-gui-windows-x.y.z.zip"_
-```
-> ./gradlew buildDeb
-```
-generate _"build/distributions/jd-gui-x.y.z.deb"_ for Ubuntu and Debian
-```
-> ./gradlew buildRpm
-```
-generate _"build/distributions/jd-gui-x.y.z.rpm"_ for RedHat, CentOS and Fedora
+generate :
+- _"build/libs/jd-gui-x.y.z.jar"_
+- _"build/distributions/jd-gui-windows-x.y.z.zip"_
+- _"build/distributions/jd-gui-osx-x.y.z.tar"_
+- _"build/distributions/jd-gui-x.y.z.deb"_
+- _"build/distributions/jd-gui-x.y.z.rpm"_
 
 ## How to launch JD-GUI ?
 - Double-click on _"jd-gui-x.y.z.jar"_
-- Double-click on _"JD-GUI"_ application from Mac OSX
 - Double-click on _"jd-gui.exe"_ application from Windows
+- Double-click on _"JD-GUI"_ application from Mac OSX
 - Execute _"java -jar jd-gui-x.y.z.jar"_ or _"java -classpath jd-gui-x.y.z.jar org.jd.gui.App"_
 
 ## How to use JD-GUI ?
