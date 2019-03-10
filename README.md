@@ -15,6 +15,8 @@ for instant access to methods and fields.
 
 ## How to build JD-GUI ?
 ```
+> git clone https://github.com/java-decompiler/jd-gui.git
+> cd jd-gui
 > ./gradlew build 
 ```
 generate :
