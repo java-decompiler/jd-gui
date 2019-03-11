@@ -293,7 +293,7 @@ dialog(
                         hglue()
                     }
                     hbox {
-                        label(text: 'Copyright © 2008-2015 Emmanuel Dupuy')
+                        label(text: 'Copyright © 2008-2019 Emmanuel Dupuy')
                         hglue()
                     }
                 }

@@ -242,7 +242,7 @@ abstract class CustomLineNumbersPage extends HyperlinkPage {
                     visibleRect.@y = textAreaInsets.@top
                 }
 
-                int topLine = (int) (visibleRect.@y - textAreaInsets.@top) / cellHeight
+                int topLine = (int) ((visibleRect.@y - textAreaInsets.@top) / cellHeight)
                 int actualTopY = topLine * cellHeight + textAreaInsets.top
                 int y = actualTopY + ascent
 

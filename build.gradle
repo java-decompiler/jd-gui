@@ -2,31 +2,34 @@ buildscript {
     repositories {
         jcenter()
     }
-
     dependencies {
-        classpath 'com.netflix.nebula:gradle-ospackage-plugin:2.2.6'
-        classpath 'org.spockframework:spock-core:1.0-groovy-2.3'
+        classpath 'com.netflix.nebula:gradle-ospackage-plugin:5.3.0'
+        classpath 'org.spockframework:spock-core:1.2-groovy-2.5'
+        classpath 'edu.sc.seis.gradle:launch4j:2.4.4'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'distribution'
-apply plugin: 'nebula.os-package'
+apply plugin: 'edu.sc.seis.launch4j'
+apply plugin: 'nebula.ospackage'
+
 
 // Common configuration //
-allprojects {
-    version='1.4.0'
+version='1.4.2'
+targetCompatibility = '1.7'
 
+allprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
 
     tasks.withType(JavaCompile) {
-        sourceCompatibility = '1.7'
-        targetCompatibility = '1.7'
+        sourceCompatibility = targetCompatibility = '1.7'
+        options.compilerArgs << '-Xlint:unchecked'
     }
     tasks.withType(GroovyCompile) {
-        sourceCompatibility = '1.7'
-        targetCompatibility = '1.7'
+        sourceCompatibility = targetCompatibility = '1.7'
+        options.compilerArgs << '-Xlint:unchecked'
     }
 
     repositories {
@@ -56,9 +59,17 @@ subprojects.each { subproject ->
 jar {
     dependsOn subprojects.tasks['jar']
 
+    // Add SPI directory
+    def tmpSpiDir = file('build/tmp/spi')
+    tmpSpiDir.deleteDir()
+    def tmpSpiServicesDir = file(tmpSpiDir.path + '/META-INF/services')
+    tmpSpiServicesDir.mkdirs()
+    from tmpSpiDir
+
+    // Add dependencies
     def deps = []
     subprojects.each { subproject ->
-        from subproject.sourceSets.main.output.classesDir
+        from subproject.sourceSets.main.output.classesDirs
         from subproject.sourceSets.main.output.resourcesDir
         deps += subproject.configurations.runtime - subproject.configurations.provided
     }
@@ -66,112 +77,57 @@ jar {
         deps -= subproject.jar.archivePath
     }
     deps = deps.unique().collect { it.isDirectory() ? it : zipTree(it) }
+    from deps
 
     manifest {
         attributes 'Main-Class': 'org.jd.gui.App',
-                   'SplashScreen-Image': 'org/jd/gui/images/jd_icon_128.png',
-                   'JD-GUI-Version': project.version,
-                   'JD-Core-Version': '0.7.1'
+                'SplashScreen-Image': 'org/jd/gui/images/jd_icon_128.png',
+                'JD-GUI-Version': project.version,
+                'JD-Core-Version': '0.7.1'
     }
-    from deps
-    exclude 'META-INF/services/org.jd.gui.spi.*'
+    exclude 'META-INF/groovy/**', 'META-INF/licenses/**', 'META-INF/maven/**', 'META-INF/INDEX.LIST'
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
     doFirst {
-        // Create temporary directory
-        def tmpSpiDir = file('build/tmp/spi')
-        tmpSpiDir.deleteDir()
-        tmpSpiDir.mkdirs()
         // Copy and merge SPI config files
         subprojects.each { subproject ->
-            def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + File.separator + 'META-INF' + File.separator + 'services')
+            def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + '/META-INF/services')
             if (servicesDir.exists()) {
                 servicesDir.eachFile { source ->
-                    def target = file(tmpSpiDir.path + File.separator + source.name)
+                    def target = file(tmpSpiServicesDir.path + '/' + source.name)
                     target << source.text
                 }
             }
         }
-        // Add to JAR file
-        into('META-INF/services') {
-            from tmpSpiDir
-        }
     }
 }
 
-// Windows wrapper configuration to generate "jd-gui.exe" //
-task launch4jConfig(type: Copy) {
-    from 'src/launch4j/resources/config/launch4j.xml'
-    into 'build/launch4j'
-    expand(
-        JAR_FILE: project.jar.archivePath,
-        VERSION: project.version,
-        ICON: file('src/launch4j/resources/images/jd-gui.ico')
-    )
+// Java executable wrapper for Windows //
+launch4j {
+    version = textVersion = project.version
+    fileDescription = productName = 'JD-GUI'
+    errTitle 'JD-GUI Windows Wrapper'
+    copyright 'JD-GUI (C) 2008-2019 Emmanuel Dupuy'
+    icon projectDir.path + '/src/launch4j/resources/images/jd-gui.ico'
 }
 
-task launch4j(type: Exec, dependsOn: [':jar', ':launch4jConfig']) {
-    def launch4jCfg = file('build/launch4j/launch4j.xml')
-    def launch4jExe = System.properties['LAUNCH4J_HOME'] + '/launch4j.exe'
-
-    onlyIf {
-        System.properties['os.name'].startsWith('Windows')
-    }
-
-    if (new File(launch4jExe).exists()) {
-        commandLine 'cmd', '/c', launch4jExe, launch4jCfg
-    } else {
-        commandLine 'cmd', '/c', 'echo', 'OFF'
-        doLast {
-            errorOutput.println "ERROR: 'LAUNCH4J_HOME' not defined or invalid. Launch4j (http://launch4j.sourceforge.net) is required to generare 'jd-gui.exe'."
-        }
-    }
-}
-
-// Distributions for OSX and Windows //
-task copyAndReplaceVariablesInInfoPlist(type: Copy) {
-    from 'src/osx/resources/Info.plist'
-    into 'build/tmp/distributions/osx'
-    expand(
-            VERSION: project.version
-    )
-}
-
-distributions {
-    osx.contents {
-        into('JD-GUI.app/Contents') {
-            from 'build/tmp/distributions/osx'
-        }
-        into('JD-GUI.app/Contents/Resources/Java') {
-            from jar.archivePath
-        }
-        from 'LICENSE', 'NOTICE', 'README.md'
-        doFirst {
-            ant.chmod(file:'src/osx/dist/JD-GUI.app/Contents/MacOS/universalJavaApplicationStub.sh', perm:'+x')
-        }
-    }
-    windows.contents {
-        from 'build/launch4j/jd-gui.exe'
-        from 'LICENSE', 'NOTICE', 'README.md'
-    }
-}
-
+// Packages for Linux //
 ospackage {
     license = file('LICENSE')
-    maintainer = 'Emmanuel Dupuy <emmanue1@users.noreply.github.com>'
-    os = LINUX
-    packageDescription = 'JD-GUI, a standalone graphical utility that displays Java sources from CLASS files'
-    packageGroup = 'java'
-    packageName = project.name
-    release = '0'
-    summary = 'A Java Decompiler'
-    url = 'https://github.com/java-decompiler/jd-gui'
+    maintainer 'Emmanuel Dupuy <emmanue1@users.noreply.github.com>'
+    os LINUX
+    packageDescription 'JD-GUI, a standalone graphical utility that displays Java sources from CLASS files'
+    packageGroup 'java'
+    packageName project.name
+    release '0'
+    summary 'A Java Decompiler'
+    url 'https://github.com/java-decompiler/jd-gui'
 
     into '/opt/' + project.name
     from ('build/libs/') {
-        fileMode = 0755
+        fileMode 0755
     }
     from ('src/linux/resources/') {
-        fileMode = 0755
+        fileMode 0755
     }
     from 'LICENSE', 'NOTICE', 'README.md'
 
@@ -179,13 +135,38 @@ ospackage {
     preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; rm -fr ./ext; xdg-desktop-menu uninstall ./*.desktop'
 }
 
-installOsxDist.dependsOn jar, copyAndReplaceVariablesInInfoPlist
-osxDistTar.dependsOn jar, copyAndReplaceVariablesInInfoPlist
-osxDistZip.dependsOn jar, copyAndReplaceVariablesInInfoPlist
+// Distributions for OSX and Windows //
+distributions {
+    osx.contents {
+        into('JD-GUI.app/Contents') {
+            from('src/osx/resources') {
+                include 'Info.plist'
+                expand VERSION: project.version
+            }
+        }
+        into('JD-GUI.app/Contents/MacOS') {
+            from('src/osx/resources') {
+                include 'universalJavaApplicationStub.sh'
+                fileMode 0755
+            }
+        }
+        into('JD-GUI.app/Contents/Resources/Java') {
+            from jar.archivePath
+        }
+        from 'LICENSE', 'NOTICE', 'README.md'
+    }
+    windows.contents {
+        from 'build/launch4j/jd-gui.exe'
+        from 'LICENSE', 'NOTICE', 'README.md'
+    }
+}
 
-installWindowsDist.dependsOn launch4j
-windowsDistTar.dependsOn launch4j
-windowsDistZip.dependsOn launch4j
+installWindowsDist.dependsOn createExe
+windowsDistTar.dependsOn createExe
+windowsDistZip.dependsOn createExe
 
 buildDeb.dependsOn jar
 buildRpm.dependsOn jar
+
+build.finalizedBy buildDeb
+build.finalizedBy buildRpm
