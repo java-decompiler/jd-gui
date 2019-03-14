@@ -8,3 +8,5 @@ dependencies {
     compile project(':api')
     runtime project(':services')
 }
+
+version = parent.version

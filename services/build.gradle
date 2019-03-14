@@ -11,6 +11,8 @@ dependencies {
     testCompile 'org.codehaus.groovy:groovy-test:2.5.6'
 }
 
+version = parent.version
+
 // ANTLR //
 ext.antlr4 = [
         antlrSource: 'src/main/antlr',
