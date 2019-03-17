@@ -8,5 +8,5 @@
 package org.jd.gui.api.feature;
 
 public interface PageClosable {
-    public boolean closePage();
+    boolean closePage();
 }

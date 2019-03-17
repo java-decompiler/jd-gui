@@ -13,9 +13,9 @@ import org.jd.gui.api.model.Container;
 import java.nio.file.Path;
 
 public interface ContainerFactory {
-	public String getType();
+	String getType();
 	
-	public boolean accept(API api, Path rootPath);
+	boolean accept(API api, Path rootPath);
 	
-	public Container make(API api, Container.Entry parentEntry, Path rootPath);
+	Container make(API api, Container.Entry parentEntry, Path rootPath);
 }

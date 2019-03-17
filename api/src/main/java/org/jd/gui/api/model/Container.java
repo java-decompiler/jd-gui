@@ -12,28 +12,28 @@ import java.net.URI;
 import java.util.Collection;
 
 public interface Container {
-    public String getType();
+    String getType();
 
-    public Entry getRoot();
+    Entry getRoot();
 
     /**
      * File or directory
      */
-    public interface Entry {
-        public Container getContainer();
+    interface Entry {
+        Container getContainer();
 
-        public Entry getParent();
+        Entry getParent();
 
-        public URI getUri();
+        URI getUri();
 
-        public String getPath();
+        String getPath();
 
-        public boolean isDirectory();
+        boolean isDirectory();
 
-        public long length();
+        long length();
 
-        public InputStream getInputStream();
+        InputStream getInputStream();
 
-        public Collection<Entry> getChildren();
+        Collection<Entry> getChildren();
     }
 }

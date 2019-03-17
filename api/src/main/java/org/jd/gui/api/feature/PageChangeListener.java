@@ -10,5 +10,5 @@ package org.jd.gui.api.feature;
 import javax.swing.*;
 
 public interface PageChangeListener {
-    public <T extends JComponent & UriGettable> void pageChanged(T page);
+    <T extends JComponent & UriGettable> void pageChanged(T page);
 }

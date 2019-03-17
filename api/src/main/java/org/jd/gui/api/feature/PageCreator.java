@@ -12,5 +12,5 @@ import org.jd.gui.api.API;
 import javax.swing.*;
 
 public interface PageCreator {
-    public <T extends JComponent & UriGettable> T createPage(API api);
+    <T extends JComponent & UriGettable> T createPage(API api);
 }

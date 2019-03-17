@@ -10,5 +10,5 @@ package org.jd.gui.api.feature;
 import java.net.URI;
 
 public interface UriGettable {
-    public URI getUri();
+    URI getUri();
 }

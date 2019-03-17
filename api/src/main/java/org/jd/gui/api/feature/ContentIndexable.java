@@ -11,5 +11,5 @@ import org.jd.gui.api.API;
 import org.jd.gui.api.model.Indexes;
 
 public interface ContentIndexable {
-    public Indexes index(API api);
+    Indexes index(API api);
 }

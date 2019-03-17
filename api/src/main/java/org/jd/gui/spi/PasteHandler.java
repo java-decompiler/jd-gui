@@ -10,7 +10,7 @@ package org.jd.gui.spi;
 import org.jd.gui.api.API;
 
 public interface PasteHandler {
-    public boolean accept(Object obj);
+    boolean accept(Object obj);
 
-    public void paste(API api, Object obj);
+    void paste(API api, Object obj);
 }

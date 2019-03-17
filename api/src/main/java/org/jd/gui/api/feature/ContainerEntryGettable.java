@@ -10,5 +10,5 @@ package org.jd.gui.api.feature;
 import org.jd.gui.api.model.Container;
 
 public interface ContainerEntryGettable {
-    public Container.Entry getEntry();
+    Container.Entry getEntry();
 }

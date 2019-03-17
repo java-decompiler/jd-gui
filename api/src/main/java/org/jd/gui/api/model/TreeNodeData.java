@@ -10,11 +10,11 @@ package org.jd.gui.api.model;
 import javax.swing.*;
 
 public interface TreeNodeData {
-    public String getLabel();
+    String getLabel();
 
-    public String getTip();
+    String getTip();
 
-    public Icon getIcon();
+    Icon getIcon();
 
-    public Icon getOpenIcon();
+    Icon getOpenIcon();
 }

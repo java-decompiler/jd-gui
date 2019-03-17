@@ -8,5 +8,5 @@
 package org.jd.gui.api.feature;
 
 public interface PageChangeable {
-    public void addPageChangeListener(PageChangeListener listener);
+    void addPageChangeListener(PageChangeListener listener);
 }

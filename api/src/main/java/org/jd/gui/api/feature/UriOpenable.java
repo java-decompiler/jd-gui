@@ -62,5 +62,5 @@ import java.net.URI;
  * </ul>
  */
 public interface UriOpenable {
-    public boolean openUri(URI uri);
+    boolean openUri(URI uri);
 }

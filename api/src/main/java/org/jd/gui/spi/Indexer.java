@@ -14,9 +14,9 @@ import org.jd.gui.api.model.Indexes;
 import java.util.regex.Pattern;
 
 public interface Indexer {
-    public String[] getSelectors();
+    String[] getSelectors();
 
-    public Pattern getPathPattern();
+    Pattern getPathPattern();
 
-    public void index(API api, Container.Entry entry, Indexes indexes);
+    void index(API api, Container.Entry entry, Indexes indexes);
 }

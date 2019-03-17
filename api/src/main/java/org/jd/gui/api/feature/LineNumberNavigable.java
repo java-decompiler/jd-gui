@@ -8,9 +8,9 @@
 package org.jd.gui.api.feature;
 
 public interface LineNumberNavigable {
-    public int getMaximumLineNumber();
+    int getMaximumLineNumber();
 
-    public void goToLineNumber(int lineNumber);
+    void goToLineNumber(int lineNumber);
 
-    public boolean checkLineNumber(int lineNumber);
+    boolean checkLineNumber(int lineNumber);
 }

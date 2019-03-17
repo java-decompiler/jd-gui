@@ -17,9 +17,9 @@ import org.jd.gui.api.model.Container;
 import java.util.regex.Pattern;
 
 public interface TreeNodeFactory {
-	public String[] getSelectors();
+	String[] getSelectors();
 
-    public Pattern getPathPattern();
+    Pattern getPathPattern();
 
-	public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry);
+	<T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry);
 }

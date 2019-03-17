@@ -12,7 +12,7 @@ import org.jd.gui.api.API;
 import java.io.OutputStream;
 
 public interface ContentSavable {
-    public String getFileName();
+    String getFileName();
 
-    public void save(API api, OutputStream os);
+    void save(API api, OutputStream os);
 }

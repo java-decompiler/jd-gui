@@ -11,23 +11,23 @@ import java.awt.*;
 import java.util.Map;
 
 public interface PreferencesPanel {
-    public String getPreferencesGroupTitle();
+    String getPreferencesGroupTitle();
 
-    public String getPreferencesPanelTitle();
+    String getPreferencesPanelTitle();
 
-    public void init(Color errorBackgroundColor);
+    void init(Color errorBackgroundColor);
 
-    public boolean isActivated();
+    boolean isActivated();
 
-    public void loadPreferences(Map<String, String> preferences);
+    void loadPreferences(Map<String, String> preferences);
 
-    public void savePreferences(Map<String, String> preferences);
+    void savePreferences(Map<String, String> preferences);
 
-    public boolean arePreferencesValid();
+    boolean arePreferencesValid();
 
-    public void addPreferencesChangeListener(PreferencesPanelChangeListener listener);
+    void addPreferencesChangeListener(PreferencesPanelChangeListener listener);
 
-    public interface PreferencesPanelChangeListener {
-        public void preferencesPanelChanged(PreferencesPanel source);
+    interface PreferencesPanelChangeListener {
+        void preferencesPanelChanged(PreferencesPanel source);
     }
 }

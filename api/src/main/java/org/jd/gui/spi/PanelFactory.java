@@ -14,7 +14,7 @@ import org.jd.gui.api.model.Container;
 import javax.swing.JComponent;
 
 public interface PanelFactory {
-	public String[] getTypes();
+	String[] getTypes();
 	
-	public <T extends JComponent & UriGettable> T make(API api, Container container);
+	<T extends JComponent & UriGettable> T make(API api, Container container);
 }

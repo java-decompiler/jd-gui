@@ -14,8 +14,7 @@ import javax.swing.*;
 import java.util.Collection;
 
 public interface ContextualActionsFactory {
-
-    public static final String GROUP_NAME = "GroupNameKey";
+    String GROUP_NAME = "GroupNameKey";
 
     /**
      * Build a collection of actions for 'entry' and 'fragment', grouped by GROUP_NAME and sorted by NAME. Null values
@@ -24,5 +23,5 @@ public interface ContextualActionsFactory {
      * @param fragment @see jd.gui.api.feature.UriOpenable
      * @return a collection of actions
      */
-    public Collection<Action> make(API api, Container.Entry entry, String fragment);
+    Collection<Action> make(API api, Container.Entry entry, String fragment);
 }

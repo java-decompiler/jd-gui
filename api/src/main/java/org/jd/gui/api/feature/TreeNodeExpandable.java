@@ -10,5 +10,5 @@ package org.jd.gui.api.feature;
 import org.jd.gui.api.API;
 
 public interface TreeNodeExpandable {
-    public void populateTreeNode(API api);
+    void populateTreeNode(API api);
 }

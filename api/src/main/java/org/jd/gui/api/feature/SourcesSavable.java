@@ -11,17 +11,17 @@ import org.jd.gui.api.API;
 import java.nio.file.Path;
 
 public interface SourcesSavable {
-    public String getSourceFileName();
+    String getSourceFileName();
 
-    public int getFileCount();
+    int getFileCount();
 
-    public void save(API api, Controller controller, Listener listener, Path path);
+    void save(API api, Controller controller, Listener listener, Path path);
 
-    public interface Controller {
-        public boolean isCancelled();
+    interface Controller {
+        boolean isCancelled();
     }
 
-    public interface Listener {
-        public void pathSaved(Path path);
+    interface Listener {
+        void pathSaved(Path path);
     }
 }

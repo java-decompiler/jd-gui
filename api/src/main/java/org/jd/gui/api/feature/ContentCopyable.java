@@ -8,5 +8,5 @@
 package org.jd.gui.api.feature;
 
 public interface ContentCopyable {
-    public void copy();
+    void copy();
 }

@@ -8,5 +8,5 @@
 package org.jd.gui.api.feature;
 
 public interface ContentSelectable {
-    public void selectAll();
+    void selectAll();
 }

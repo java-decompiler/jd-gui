@@ -10,5 +10,5 @@ package org.jd.gui.api.feature;
 import java.util.Map;
 
 public interface PreferencesChangeListener {
-    public void preferencesChanged(Map<String, String> preferences);
+    void preferencesChanged(Map<String, String> preferences);
 }
