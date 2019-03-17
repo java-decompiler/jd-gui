@@ -163,7 +163,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             if (indexDollar != -1) {
                 int indexSeparator = name.lastIndexOf('/');
                 if (indexDollar > indexSeparator) {
-                    for (final InnerClassNode innerClassNode : (List<InnerClassNode>)classNode.innerClasses) {
+                    for (final InnerClassNode innerClassNode : classNode.innerClasses) {
                         if (name.equals(innerClassNode.name)) {
                             // Inner class path found
                             if (innerClassNode.outerName != null) {
@@ -212,7 +212,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
                         ClassNode classNode = new ClassNode();
                         classReader.accept(classNode, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
-                        for (final InnerClassNode innerClassNode : (List<InnerClassNode>)classNode.innerClasses) {
+                        for (final InnerClassNode innerClassNode : classNode.innerClasses) {
                             if (name.equals(innerClassNode.name)) {
                                 // Inner class path found => Recursive call
                                 return getDisplayTypeName(innerClassNode.outerName, packageLength) + '.' + innerClassNode.innerName;
@@ -234,7 +234,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             if (innerTypes == null) {
                 innerTypes = new ArrayList<>(classNode.innerClasses.size());
 
-                for (final InnerClassNode innerClassNode : (List<InnerClassNode>)classNode.innerClasses) {
+                for (final InnerClassNode innerClassNode : classNode.innerClasses) {
                     if (((innerClassNode.access & (Opcodes.ACC_SYNTHETIC|Opcodes.ACC_BRIDGE)) == 0) && this.name.equals(innerClassNode.outerName)) {
                         Container.Entry innerEntry = getEntry(innerClassNode.name);
 
@@ -268,7 +268,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             if (fields == null) {
                 fields = new ArrayList<>(classNode.fields.size());
 
-                for (final FieldNode fieldNode : (List<FieldNode>)classNode.fields) {
+                for (final FieldNode fieldNode : classNode.fields) {
                     if ((fieldNode.access & (Opcodes.ACC_SYNTHETIC|Opcodes.ACC_ENUM)) == 0) {
                         fields.add(new Type.Field() {
                             public int getFlags() { return fieldNode.access; }
@@ -294,7 +294,7 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             if (methods == null) {
                 methods = new ArrayList<>(classNode.methods.size());
 
-                for (final MethodNode methodNode : (List<MethodNode>)classNode.methods) {
+                for (final MethodNode methodNode : classNode.methods) {
                     if ((methodNode.access & (Opcodes.ACC_SYNTHETIC|Opcodes.ACC_ENUM|Opcodes.ACC_BRIDGE)) == 0) {
                         methods.add(new Type.Method() {
                             public int getFlags() { return methodNode.access; }
