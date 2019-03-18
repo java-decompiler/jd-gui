@@ -17,18 +17,18 @@ apply plugin: 'nebula.ospackage'
 
 // Common configuration //
 version='1.4.2'
-targetCompatibility = '1.7'
+targetCompatibility = '1.8'
 
 allprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
 
     tasks.withType(JavaCompile) {
-        sourceCompatibility = targetCompatibility = '1.7'
+        sourceCompatibility = targetCompatibility = '1.8'
         options.compilerArgs << '-Xlint:unchecked'
     }
     tasks.withType(GroovyCompile) {
-        sourceCompatibility = targetCompatibility = '1.7'
+        sourceCompatibility = targetCompatibility = '1.8'
         options.compilerArgs << '-Xlint:unchecked'
     }
 
