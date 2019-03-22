@@ -25,6 +25,7 @@ import org.jd.gui.api.feature.UriOpenable
 import org.jd.gui.model.configuration.Configuration
 import org.jd.gui.model.history.History
 import org.jd.gui.spi.FileLoader
+import org.jd.gui.view.component.FileChooser
 
 import javax.swing.Icon
 import javax.swing.JComponent
@@ -201,7 +202,7 @@ class MainView implements UriOpenable, PreferencesChangeListener {
     }
 	
 	JFileChooser createOpenFileChooser() {
-		JFileChooser chooser = new JFileChooser() {
+		FileChooser chooser = new FileChooser() {
             void addFileFilters(Map<String, FileLoader> loaders) {
                 removeChoosableFileFilter(getFileFilter())
 
@@ -225,7 +226,7 @@ class MainView implements UriOpenable, PreferencesChangeListener {
 	}
 
     JFileChooser createSaveFileChooser() {
-        JFileChooser chooser = new JFileChooser() {
+        FileChooser chooser = new FileChooser() {
             void show(Closure okClosure) {
                 if (showSaveDialog(swing.mainFrame) == JFileChooser.APPROVE_OPTION) {
                     if (selectedFile.exists()) {
