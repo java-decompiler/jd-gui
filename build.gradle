@@ -77,12 +77,12 @@ jar {
     exclude 'META-INF/licenses/**', 'META-INF/maven/**', 'META-INF/INDEX.LIST'
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
     doFirst {
-		// Add SPI directory
-		def tmpSpiDir = file('build/tmp/spi')
-		tmpSpiDir.deleteDir()
-		def tmpSpiServicesDir = file(tmpSpiDir.path + '/META-INF/services')
-		tmpSpiServicesDir.mkdirs()
-		from tmpSpiDir
+        // Add SPI directory
+        def tmpSpiDir = file('build/tmp/spi')
+        tmpSpiDir.deleteDir()
+        def tmpSpiServicesDir = file(tmpSpiDir.path + '/META-INF/services')
+        tmpSpiServicesDir.mkdirs()
+        from tmpSpiDir
 
         // Copy and merge SPI config files
         subprojects.each { subproject ->
