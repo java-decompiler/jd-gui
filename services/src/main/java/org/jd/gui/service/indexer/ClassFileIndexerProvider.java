@@ -7,12 +7,13 @@
 
 package org.jd.gui.service.indexer;
 
-import groovyjarjarasm.asm.*;
-import groovyjarjarasm.asm.signature.SignatureReader;
-import groovyjarjarasm.asm.signature.SignatureVisitor;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
+import org.jd.gui.util.exception.ExceptionUtil;
+import org.objectweb.asm.*;
+import org.objectweb.asm.signature.SignatureReader;
+import org.objectweb.asm.signature.SignatureVisitor;
 
 import java.io.InputStream;
 import java.util.*;
@@ -38,26 +39,9 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         fieldDeclarationSet, typeReferenceSet, superTypeNameSet, descriptorSet);
     protected SignatureIndexer signatureIndexer = new SignatureIndexer(typeReferenceSet);
 
-    /**
-     * @return local + optional external selectors
-     */
-    public String[] getSelectors() {
-        List<String> externalSelectors = getExternalSelectors();
+    @Override public String[] getSelectors() { return appendSelectors("*:file:*.class"); }
 
-        if (externalSelectors == null) {
-            return new String[] { "*:file:*.class" };
-        } else {
-            int size = externalSelectors.size();
-            String[] selectors = new String[size+1];
-            externalSelectors.toArray(selectors);
-            selectors[size] = "*:file:*.class";
-            return selectors;
-        }
-    }
-
-    /**
-     * Index format : @see jd.gui.spi.Indexer
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public void index(API api, Container.Entry entry, Indexes indexes) {
         // Cleaning sets...
@@ -156,8 +140,8 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
                     index.get(superTypeName).add(typeName);
                 }
             }
-
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
     }
 
@@ -180,7 +164,7 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
                 HashSet<String> typeDeclarationSet, HashSet<String> constructorDeclarationSet,
                 HashSet<String> methodDeclarationSet, HashSet<String> fieldDeclarationSet,
                 HashSet<String> typeReferenceSet, HashSet<String> superTypeNameSet, HashSet<String> descriptorSet) {
-            super(Opcodes.ASM5);
+            super(Opcodes.ASM7);
 
             this.typeDeclarationSet = typeDeclarationSet;
             this.constructorDeclarationSet = constructorDeclarationSet;
@@ -245,7 +229,7 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         protected HashSet<String> typeReferenceSet;
 
         SignatureIndexer(HashSet<String> typeReferenceSet) {
-            super(Opcodes.ASM5);
+            super(Opcodes.ASM7);
             this.typeReferenceSet = typeReferenceSet;
         }
 
@@ -258,7 +242,7 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         protected HashSet<String> descriptorSet;
 
         public AnnotationIndexer(HashSet<String> descriptorSet) {
-            super(Opcodes.ASM5);
+            super(Opcodes.ASM7);
             this.descriptorSet = descriptorSet;
         }
 
@@ -277,7 +261,7 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         protected AnnotationIndexer annotationIndexer;
 
         public FieldIndexer(HashSet<String> descriptorSet, AnnotationIndexer annotationInexer) {
-            super(Opcodes.ASM5);
+            super(Opcodes.ASM7);
             this.descriptorSet = descriptorSet;
             this.annotationIndexer = annotationInexer;
         }
@@ -298,7 +282,7 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         protected AnnotationIndexer annotationIndexer;
 
         public MethodIndexer(HashSet<String> descriptorSet, AnnotationIndexer annotationIndexer) {
-            super(Opcodes.ASM5);
+            super(Opcodes.ASM7);
             this.descriptorSet = descriptorSet;
             this.annotationIndexer = annotationIndexer;
         }

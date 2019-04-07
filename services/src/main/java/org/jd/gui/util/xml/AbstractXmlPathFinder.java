@@ -7,6 +7,8 @@
 
 package org.jd.gui.util.xml;
 
+import org.jd.gui.util.exception.ExceptionUtil;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -14,9 +16,8 @@ import java.io.StringReader;
 import java.util.*;
 
 public abstract class AbstractXmlPathFinder {
-
     protected HashMap<String, HashSet<String>> tagNameToPaths = new HashMap<>();
-    protected StringBuffer sb = new StringBuffer(200);
+    protected StringBuilder sb = new StringBuilder(200);
 
     public AbstractXmlPathFinder(Collection<String> paths) {
         for (String path : paths) {
@@ -80,7 +81,8 @@ public abstract class AbstractXmlPathFinder {
                     break;
                 }
             }
-        } catch (XMLStreamException ignore) {
+        } catch (XMLStreamException e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
     }
 

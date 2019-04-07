@@ -9,8 +9,7 @@ package org.jd.gui.util.decompiler;
 
 import jd.core.preferences.Preferences;
 
-public class GuiPreferences extends Preferences
-{
+public class GuiPreferences extends Preferences {
 	protected boolean showPrefixThis;
 	protected boolean unicodeEscape;
 	protected boolean showLineNumbers;

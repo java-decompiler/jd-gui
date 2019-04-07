@@ -15,13 +15,13 @@ import org.jd.gui.api.model.Container;
 import org.jd.gui.util.decompiler.ContainerLoader;
 import org.jd.gui.util.decompiler.GuiPreferences;
 import org.jd.gui.util.decompiler.PlainTextPrinter;
+import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.io.NewlineOutputStream;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 
 public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
@@ -39,23 +39,7 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
     protected PlainTextPrinter printer = new PlainTextPrinter();
     protected ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-    /**
-     * @return local + optional external selectors
-     */
-    @Override
-    public String[] getSelectors() {
-        List<String> externalSelectors = getExternalSelectors();
-
-        if (externalSelectors == null) {
-            return new String[] { "*:file:*.class" };
-        } else {
-            int size = externalSelectors.size();
-            String[] selectors = new String[size+1];
-            externalSelectors.toArray(selectors);
-            selectors[size] = "*:file:*.class";
-            return selectors;
-        }
-    }
+    @Override public String[] getSelectors() { return appendSelectors("*:file:*.class"); }
 
     @Override
     public String getSourcePath(Container.Entry entry) {
@@ -144,12 +128,16 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
 
             try (OutputStream os = new NewlineOutputStream(Files.newOutputStream(path))) {
                 baos.writeTo(os);
-            } catch (IOException ignore) {
+            } catch (IOException e) {
+                assert ExceptionUtil.printStackTrace(e);
             }
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            assert ExceptionUtil.printStackTrace(e);
+
             try (BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset())) {
                 writer.write("// INTERNAL ERROR //");
-            } catch (IOException ignoreAgain) {
+            } catch (IOException ee) {
+                assert ExceptionUtil.printStackTrace(ee);
             }
         }
     }

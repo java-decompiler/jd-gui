@@ -3,8 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.netflix.nebula:gradle-ospackage-plugin:5.3.0'
-        classpath 'org.spockframework:spock-core:1.2-groovy-2.5'
+        classpath 'com.netflix.nebula:gradle-ospackage-plugin:5.3.0'    // RPM & DEB support
         classpath 'edu.sc.seis.gradle:launch4j:2.4.4'
     }
 }
@@ -26,10 +25,7 @@ allprojects {
     tasks.withType(JavaCompile) {
         sourceCompatibility = targetCompatibility = '1.8'
         options.compilerArgs << '-Xlint:unchecked'
-    }
-    tasks.withType(GroovyCompile) {
-        sourceCompatibility = targetCompatibility = '1.8'
-        options.compilerArgs << '-Xlint:unchecked'
+        options.encoding = 'UTF-8'
     }
 
     repositories {
@@ -59,13 +55,6 @@ subprojects.each { subproject ->
 jar {
     dependsOn subprojects.tasks['jar']
 
-    // Add SPI directory
-    def tmpSpiDir = file('build/tmp/spi')
-    tmpSpiDir.deleteDir()
-    def tmpSpiServicesDir = file(tmpSpiDir.path + '/META-INF/services')
-    tmpSpiServicesDir.mkdirs()
-    from tmpSpiDir
-
     // Add dependencies
     def deps = []
     subprojects.each { subproject ->
@@ -85,9 +74,16 @@ jar {
                 'JD-GUI-Version': project.version,
                 'JD-Core-Version': '0.7.1'
     }
-    exclude 'META-INF/groovy/**', 'META-INF/licenses/**', 'META-INF/maven/**', 'META-INF/INDEX.LIST'
+    exclude 'META-INF/licenses/**', 'META-INF/maven/**', 'META-INF/INDEX.LIST'
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
     doFirst {
+		// Add SPI directory
+		def tmpSpiDir = file('build/tmp/spi')
+		tmpSpiDir.deleteDir()
+		def tmpSpiServicesDir = file(tmpSpiDir.path + '/META-INF/services')
+		tmpSpiServicesDir.mkdirs()
+		from tmpSpiDir
+
         // Copy and merge SPI config files
         subprojects.each { subproject ->
             def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + '/META-INF/services')

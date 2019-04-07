@@ -7,6 +7,7 @@
 
 package org.jd.gui.spi;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 
@@ -14,6 +15,8 @@ public interface PreferencesPanel {
     String getPreferencesGroupTitle();
 
     String getPreferencesPanelTitle();
+
+    JComponent getPanel();
 
     void init(Color errorBackgroundColor);
 

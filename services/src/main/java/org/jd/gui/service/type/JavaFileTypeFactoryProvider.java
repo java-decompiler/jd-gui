@@ -10,6 +10,7 @@ package org.jd.gui.service.type;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Type;
+import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.parser.antlr.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -32,23 +33,9 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
     // Create cache
     protected Cache<URI, Listener> cache = new Cache<>();
 
-    /**
-     * @return local + optional external selectors
-     */
-    public String[] getSelectors() {
-        List<String> externalSelectors = getExternalSelectors();
+    @Override public String[] getSelectors() { return appendSelectors("*:file:*.java"); }
 
-        if (externalSelectors == null) {
-            return new String[] { "*:file:*.java" };
-        } else {
-            int size = externalSelectors.size();
-            String[] selectors = new String[size+1];
-            externalSelectors.toArray(selectors);
-            selectors[size] = "*:file:*.java";
-            return selectors;
-        }
-    }
-
+    @Override
     public Collection<Type> make(API api, Container.Entry entry) {
         Listener listener = getListener(entry);
 
@@ -59,6 +46,7 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         }
     }
 
+    @Override
     public Type make(API api, Container.Entry entry, String fragment) {
         Listener listener = getListener(entry);
 
@@ -91,7 +79,8 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
             try (InputStream inputStream = entry.getInputStream()) {
                 ANTLRJavaParser.parse(new ANTLRInputStream(inputStream), listener = new Listener(entry));
-            } catch (IOException ignore) {
+            } catch (IOException e) {
+                assert ExceptionUtil.printStackTrace(e);
                 listener = null;
             }
 
@@ -162,7 +151,7 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         public Icon getIcon() { return getFieldIcon(access); }
 
         public String getDisplayName() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(name).append(" : ");
             writeSignature(sb, descriptor, descriptor.length(), 0, false);
             return sb.toString();
@@ -194,7 +183,7 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             if (constructorName == null)
                 constructorName = type.getDisplayTypeName();
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             writeMethodSignature(sb, access, access, isInnerClass, constructorName, name, descriptor);
             return sb.toString();
         }
@@ -373,11 +362,11 @@ public class JavaFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         }
 
         protected String createParamDescriptors(JavaParser.FormalParameterListContext formalParameterList) {
-            StringBuffer paramDescriptors = null;
+            StringBuilder paramDescriptors = null;
 
             if (formalParameterList != null) {
                 List<JavaParser.FormalParameterContext> formalParameters = formalParameterList.formalParameter();
-                paramDescriptors = new StringBuffer("(");
+                paramDescriptors = new StringBuilder("(");
 
                 for (JavaParser.FormalParameterContext formalParameter : formalParameters) {
                     int dimensionOnParameter = countDimension(formalParameter.variableDeclaratorId().children);

@@ -10,6 +10,7 @@ package org.jd.gui.service.indexer;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
+import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.parser.antlr.ANTLRJavaParser;
 import org.jd.gui.util.parser.antlr.AbstractJavaListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -32,26 +33,9 @@ public class JavaFileIndexerProvider extends AbstractIndexerProvider {
         ANTLRJavaParser.parse(new ANTLRInputStream("class EarlyLoading{}"), new Listener(null));
     }
 
-    /**
-     * @return local + optional external selectors
-     */
-    public String[] getSelectors() {
-        List<String> externalSelectors = getExternalSelectors();
+    @Override public String[] getSelectors() { return appendSelectors("*:file:*.java"); }
 
-        if (externalSelectors == null) {
-            return new String[] { "*:file:*.java" };
-        } else {
-            int size = externalSelectors.size();
-            String[] selectors = new String[size+1];
-            externalSelectors.toArray(selectors);
-            selectors[size] = "*:file:*.java";
-            return selectors;
-        }
-    }
-
-    /**
-     * Index format : @see jd.gui.spi.Indexer
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public void index(API api, Container.Entry entry, Indexes indexes) {
         try (InputStream inputStream = entry.getInputStream()) {
@@ -79,7 +63,8 @@ public class JavaFileIndexerProvider extends AbstractIndexerProvider {
                     index.get(superTypeName).add(typeName);
                 }
             }
-        } catch (IOException ignore) {
+        } catch (IOException e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
     }
 
@@ -96,7 +81,7 @@ public class JavaFileIndexerProvider extends AbstractIndexerProvider {
         protected HashSet<String> stringSet = new HashSet<>();
         protected HashMap<String, HashSet<String>> superTypeNamesMap = new HashMap<>();
 
-        protected StringBuffer sbTypeDeclaration = new StringBuffer();
+        protected StringBuilder sbTypeDeclaration = new StringBuilder();
 
         public Listener(Container.Entry entry) {
             super(entry);

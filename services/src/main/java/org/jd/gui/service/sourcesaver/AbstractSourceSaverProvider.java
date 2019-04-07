@@ -8,6 +8,7 @@
 package org.jd.gui.service.sourcesaver;
 
 import org.jd.gui.spi.SourceSaver;
+import org.jd.gui.util.exception.ExceptionUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,6 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 public abstract class AbstractSourceSaverProvider implements SourceSaver {
-
     protected List<String> externalSelectors;
     protected Pattern externalPathPattern;
 
@@ -32,7 +32,8 @@ public abstract class AbstractSourceSaverProvider implements SourceSaver {
             if (is != null) {
                 properties.load(is);
             }
-        } catch (IOException ignore) {
+        } catch (IOException e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
 
         init(properties);
@@ -40,17 +41,41 @@ public abstract class AbstractSourceSaverProvider implements SourceSaver {
 
     protected void init(Properties properties) {
         String selectors = properties.getProperty("selectors");
-        externalSelectors = (selectors == null) ? null : Arrays.asList(selectors.split(","));
+
+        if (selectors != null) {
+            externalSelectors = Arrays.asList(selectors.split(","));
+        }
 
         String pathRegExp = properties.getProperty("pathRegExp");
-        externalPathPattern = (pathRegExp == null) ? null : Pattern.compile(pathRegExp);
+
+        if (pathRegExp != null) {
+            externalPathPattern = Pattern.compile(pathRegExp);
+        }
     }
 
-    protected List<String> getExternalSelectors() { return externalSelectors; }
-    protected Pattern getExternalPathPattern() { return externalPathPattern; }
-
-    public String[] getSelectors() {
-        return (externalSelectors==null) ? null : externalSelectors.toArray(new String[externalSelectors.size()]);
+    protected String[] appendSelectors(String selector) {
+        if (externalSelectors == null) {
+            return new String[] { selector };
+        } else {
+            int size = externalSelectors.size();
+            String[] array = new String[size+1];
+            externalSelectors.toArray(array);
+            array[size] = selector;
+            return array;
+        }
     }
+
+    protected String[] appendSelectors(String... selectors) {
+        if (externalSelectors == null) {
+            return selectors;
+        } else {
+            int size = externalSelectors.size();
+            String[] array = new String[size+selectors.length];
+            externalSelectors.toArray(array);
+            System.arraycopy(selectors, 0, array, size, selectors.length);
+            return array;
+        }
+    }
+
     public Pattern getPathPattern() { return externalPathPattern; }
 }

@@ -1,14 +1,11 @@
 apply plugin: 'java'
-apply plugin: 'groovy'
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy:2.5.6'
-    compile 'org.codehaus.groovy:groovy-swing:2.5.6'
-    compile 'org.codehaus.groovy:groovy-xml:2.5.6'
     compile 'com.fifesoft:rsyntaxtextarea:2.5.6'
+    compile 'org.ow2.asm:asm:7.1'
     compile 'jd:jd-core:0.7.1'
     compile project(':api')
-    testCompile 'org.codehaus.groovy:groovy-test:2.5.6'
+    testCompile 'junit:junit:4.12'
 }
 
 version = parent.version
