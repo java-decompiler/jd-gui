@@ -59,8 +59,7 @@ public class App {
 
             // Create main controller and show main frame
             controller = new MainController(configuration);
-            controller.show();
-            controller.openFiles(newList(args));
+            controller.show(newList(args));
 		}
 	}
 

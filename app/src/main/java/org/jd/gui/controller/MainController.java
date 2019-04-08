@@ -111,13 +111,13 @@ public class MainController implements API {
 	
 	// --- Show GUI --- //
     @SuppressWarnings("unchecked")
-	public void show() {
+	public void show(List<File> files) {
         SwingUtil.invokeLater(() -> {
             // Show main frame
-            mainView.show(
-                    configuration.getMainWindowLocation(),
-                    configuration.getMainWindowSize(),
-                    configuration.isMainWindowMaximize());
+            mainView.show(configuration.getMainWindowLocation(), configuration.getMainWindowSize(), configuration.isMainWindowMaximize());
+            if (!files.isEmpty()) {
+                openFiles(files);
+            }
         });
 
         // Background initializations
