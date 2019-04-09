@@ -146,10 +146,12 @@ public class GenericContainer implements Container {
         }
 
         protected Collection<Container.Entry> loadChildrenFromFileEntry() throws IOException {
-            File tmpFile = File.createTempFile("jd-gui.", ".tmp." + fsPath.getFileName().toString());
+            File tmpFile = File.createTempFile("jd-gui.", "." + fsPath.getFileName().toString());
             Path tmpPath = Paths.get(tmpFile.toURI());
 
+            tmpFile.delete();
             Files.copy(fsPath, tmpPath);
+            tmpFile.deleteOnExit();
 
             FileSystem subFileSystem = FileSystems.newFileSystem(tmpPath, null);
 
@@ -157,8 +159,6 @@ public class GenericContainer implements Container {
                 Iterator<Path> rootDirectories = subFileSystem.getRootDirectories().iterator();
 
                 if (rootDirectories.hasNext()) {
-                    tmpFile.deleteOnExit();
-
                     Path rootPath = rootDirectories.next();
                     ContainerFactory containerFactory = api.getContainerFactory(rootPath);
 
@@ -166,6 +166,7 @@ public class GenericContainer implements Container {
                         Container container = containerFactory.make(api, this, rootPath);
 
                         if (container != null) {
+                            tmpFile.delete();
                             return container.getRoot().getChildren();
                         }
                     }
