@@ -103,7 +103,7 @@ public class SearchInConstantPoolsView<T extends DefaultMutableTreeNode & Contai
                     }
                 }
                 @Override public void keyPressed(KeyEvent e) {
-                    if (e.getKeyChar() == KeyEvent.VK_DOWN) {
+                    if (e.getKeyCode() == KeyEvent.VK_DOWN) {
                         DefaultMutableTreeNode root = (DefaultMutableTreeNode)searchInConstantPoolsTree.getModel().getRoot();
                         if (root.getChildCount() > 0) {
                             searchInConstantPoolsTree.requestFocus();
@@ -194,7 +194,7 @@ public class SearchInConstantPoolsView<T extends DefaultMutableTreeNode & Contai
             searchInConstantPoolsTree.setCellRenderer(new TreeNodeRenderer());
             searchInConstantPoolsTree.addKeyListener(new KeyAdapter() {
                 @Override public void keyPressed(KeyEvent e) {
-                    if (e.getKeyChar() == KeyEvent.VK_UP) {
+                    if (e.getKeyCode() == KeyEvent.VK_UP) {
                         if (searchInConstantPoolsTree.getLeadSelectionRow() == 0) {
                             searchInConstantPoolsEnterTextField.requestFocus();
                             e.consume();

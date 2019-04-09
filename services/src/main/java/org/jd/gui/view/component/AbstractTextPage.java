@@ -91,41 +91,39 @@ public class AbstractTextPage extends JPanel implements LineNumberNavigable, Con
             scrollPane.removeMouseWheelListener(listener);
         }
 
-        scrollPane.addMouseWheelListener(new MouseWheelListener() {
-            public void mouseWheelMoved(MouseWheelEvent event) {
-                if ((event.getModifiers() & (Event.META_MASK|Event.CTRL_MASK)) != 0) {
-                    int x = event.getX() + scrollPane.getX() - textArea.getX();
-                    int y = event.getY() + scrollPane.getY() - textArea.getY();
-                    int offset = textArea.viewToModel(new Point(x, y));
+        scrollPane.addMouseWheelListener(e -> {
+            if ((e.getModifiers() & (Event.META_MASK|Event.CTRL_MASK)) != 0) {
+                int x = e.getX() + scrollPane.getX() - textArea.getX();
+                int y = e.getY() + scrollPane.getY() - textArea.getY();
+                int offset = textArea.viewToModel(new Point(x, y));
 
-                    // Update font size
-                    if (event.getWheelRotation() > 0) {
-                        INCREASE_FONT_SIZE_ACTION.actionPerformedImpl(null, textArea);
-                    } else {
-                        DECREASE_FONT_SIZE_ACTION.actionPerformedImpl(null, textArea);
-                    }
-
-                    // Save preferences
-                    if (preferences != null) {
-                        preferences.put(FONT_SIZE_KEY, String.valueOf(textArea.getFont().getSize()));
-                    }
-
-                    try {
-                        Rectangle newRectangle = textArea.modelToView(offset);
-                        int newY = newRectangle.y + (newRectangle.height >> 1);
-
-                        // Scroll
-                        Point viewPosition = scrollPane.getViewport().getViewPosition();
-                        viewPosition.y = Math.max(viewPosition.y +newY - y, 0);
-                        scrollPane.getViewport().setViewPosition(viewPosition);
-                    } catch (BadLocationException e) {
-                        assert ExceptionUtil.printStackTrace(e);
-                    }
+                // Update font size
+                if (e.getWheelRotation() > 0) {
+                    INCREASE_FONT_SIZE_ACTION.actionPerformedImpl(null, textArea);
                 } else {
-                    // Call default listeners
-                    for (MouseWheelListener listener : mouseWheelListeners) {
-                        listener.mouseWheelMoved(event);
-                    }
+                    DECREASE_FONT_SIZE_ACTION.actionPerformedImpl(null, textArea);
+                }
+
+                // Save preferences
+                if (preferences != null) {
+                    preferences.put(FONT_SIZE_KEY, String.valueOf(textArea.getFont().getSize()));
+                }
+
+                try {
+                    Rectangle newRectangle = textArea.modelToView(offset);
+                    int newY = newRectangle.y + (newRectangle.height >> 1);
+
+                    // Scroll
+                    Point viewPosition = scrollPane.getViewport().getViewPosition();
+                    viewPosition.y = Math.max(viewPosition.y +newY - y, 0);
+                    scrollPane.getViewport().setViewPosition(viewPosition);
+                } catch (BadLocationException ee) {
+                    assert ExceptionUtil.printStackTrace(ee);
+                }
+            } else {
+                // Call default listeners
+                for (MouseWheelListener listener : mouseWheelListeners) {
+                    listener.mouseWheelMoved(e);
                 }
             }
         });
