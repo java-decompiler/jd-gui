@@ -47,8 +47,6 @@ public class AboutView {
             subpanel.setLayout(new BorderLayout());
             JLabel logo = new JLabel(new ImageIcon(SwingUtil.getImage("/org/jd/gui/images/jd_icon_64.png")));
             logo.setBorder(new EmptyBorder(15, 15, 15, 15));
-            logo.setBackground(Color.GRAY);
-            logo.setOpaque(true);
             subpanel.add(logo, BorderLayout.WEST);
             Box subvbox = Box.createVerticalBox();
             subvbox.setBorder(new EmptyBorder(15,0,15,15));
@@ -66,8 +64,6 @@ public class AboutView {
             subsubpanel.setLayout(new GridLayout(2,2));
             subsubpanel.setOpaque(false);
             subsubpanel.setBorder(new EmptyBorder(5,10,5,5));
-            subsubpanel.setBackground(Color.YELLOW);
-            subsubpanel.setOpaque(true);
 
             String jdGuiVersion = "SNAPSHOT";
             String jdCoreVersion = "SNAPSHOT";
@@ -105,11 +101,7 @@ public class AboutView {
             hbox = Box.createHorizontalBox();
             hbox.add(new JLabel("Copyright © 2008-2019 Emmanuel Dupuy"));
             hbox.add(Box.createHorizontalGlue());
-            hbox.setBackground(Color.RED);
-            hbox.setOpaque(true);
             subvbox.add(hbox);
-            subvbox.setBackground(Color.GREEN);
-            subvbox.setOpaque(true);
 
             vbox.add(Box.createVerticalStrut(10));
 
