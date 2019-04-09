@@ -14,6 +14,8 @@ import java.net.URI;
 import java.util.*;
 
 public class FilteredContainerWrapper implements Container {
+    protected static final URI DEFAULT_ROOT_URI = URI.create("file:.");
+
     protected Container container;
     protected EntryWrapper root;
 
@@ -48,11 +50,12 @@ public class FilteredContainerWrapper implements Container {
         return entryWrapper;
     }
 
-    protected ContainerWrapper getContainerWrapper(Container.Entry entry) {
-        URI uri = entry.getContainer().getRoot().getUri();
+    protected ContainerWrapper getContainerWrapper(Container container) {
+        Entry root = container.getRoot();
+        URI uri = (root == null) ? DEFAULT_ROOT_URI : root.getUri();
         ContainerWrapper containerWrapper = uriToContainerWrapper.get(uri);
         if (containerWrapper == null) {
-            uriToContainerWrapper.put(uri, containerWrapper=new ContainerWrapper(entry.getContainer()));
+            uriToContainerWrapper.put(uri, containerWrapper=new ContainerWrapper(container));
         }
         return containerWrapper;
     }
@@ -65,7 +68,7 @@ public class FilteredContainerWrapper implements Container {
             this.entry = entry;
         }
 
-        @Override public Container getContainer() { return getContainerWrapper(entry.getContainer().getRoot()); }
+        @Override public Container getContainer() { return getContainerWrapper(entry.getContainer()); }
         @Override public Entry getParent() { return getEntryWrapper(entry.getParent()); }
         @Override public URI getUri() { return entry.getUri(); }
         @Override public String getPath() { return entry.getPath(); }

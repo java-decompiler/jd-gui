@@ -24,18 +24,28 @@ import java.util.Collections;
 import java.util.Iterator;
 
 public class GenericContainer implements Container {
+    protected static final long TIMESTAMP = System.currentTimeMillis();
+
+    protected static long tmpFileCounter = 0;
+
     protected API api;
     protected int rootNameCount;
     protected Container.Entry root;
 
     public GenericContainer(API api, Container.Entry parentEntry, Path rootPath) {
-        this.api = api;
-        this.rootNameCount = rootPath.getNameCount();
-        this.root = new Entry(parentEntry, rootPath, parentEntry.getUri()) {
-            public Entry newChildEntry(Path fsPath) {
-                return new Entry(parent, fsPath, null);
-            }
-        };
+        try {
+            URI uri = parentEntry.getUri();
+
+            this.api = api;
+            this.rootNameCount = rootPath.getNameCount();
+            this.root = new Entry(parentEntry, rootPath, new URI(uri.getScheme(), uri.getHost(), uri.getPath() + "!/", null)) {
+                public Entry newChildEntry(Path fsPath) {
+                    return new Entry(parent, fsPath, null);
+                }
+            };
+        } catch (URISyntaxException e) {
+            assert ExceptionUtil.printStackTrace(e);
+        }
     }
 
     public String getType() { return "generic"; }
@@ -66,7 +76,8 @@ public class GenericContainer implements Container {
         public URI getUri() {
             if (uri == null) {
                 try {
-                    uri = new URI(root.getUri().getScheme(), root.getUri().getHost(), root.getUri().getPath() + "!/" + getPath(), null);
+                    URI rootUri = root.getUri();
+                    uri = new URI(rootUri.getScheme(), rootUri.getHost(), rootUri.getPath() + getPath(), null);
                 } catch (URISyntaxException e) {
                     assert ExceptionUtil.printStackTrace(e);
                 }
@@ -146,7 +157,8 @@ public class GenericContainer implements Container {
         }
 
         protected Collection<Container.Entry> loadChildrenFromFileEntry() throws IOException {
-            File tmpFile = File.createTempFile("jd-gui.", "." + fsPath.getFileName().toString());
+            StringBuilder suffix = new StringBuilder(".").append(TIMESTAMP).append('.').append(tmpFileCounter++).append('.').append(fsPath.getFileName().toString());
+            File tmpFile = File.createTempFile("jd-gui.tmp.", suffix.toString());
             Path tmpPath = Paths.get(tmpFile.toURI());
 
             tmpFile.delete();
@@ -166,7 +178,6 @@ public class GenericContainer implements Container {
                         Container container = containerFactory.make(api, this, rootPath);
 
                         if (container != null) {
-                            tmpFile.delete();
                             return container.getRoot().getChildren();
                         }
                     }

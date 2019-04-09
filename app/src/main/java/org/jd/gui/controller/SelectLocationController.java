@@ -69,12 +69,9 @@ public class SelectLocationController {
             filteredContainerWrappers.add(new FilteredContainerWrapper(container, getOuterEntries(mapEntry.getValue())));
         }
 
-        selectLocationView.show(
-                location, filteredContainerWrappers, entries.size(),
-                new Consumer<URI>() {
-                    @Override public void accept(URI uri) { onLocationSelected(filteredContainerWrappers, uri, selectedLocationCallback); }
-                },
-                closeCallback);
+        Consumer<URI> selectedEntryCallback = uri -> onLocationSelected(filteredContainerWrappers, uri, selectedLocationCallback);
+
+        selectLocationView.show(location, filteredContainerWrappers, entries.size(), selectedEntryCallback, closeCallback);
     }
 
     protected Collection<Container.Entry> getOuterEntries(Collection<Container.Entry> entries) {
