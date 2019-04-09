@@ -182,7 +182,10 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
             this.name = name;
             typeDeclarationSet.add(name);
-            superTypeNameSet.add(superName);
+
+            if (superName != null) {
+                superTypeNameSet.add(superName);
+            }
 
             if (interfaces != null) {
                 for (int i=interfaces.length-1; i>=0; i--) {
