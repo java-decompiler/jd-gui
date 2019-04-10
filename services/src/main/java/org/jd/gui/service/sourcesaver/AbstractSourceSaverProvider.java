@@ -24,7 +24,7 @@ public abstract class AbstractSourceSaverProvider implements SourceSaver {
     /**
      * Initialize "selectors" and "pathPattern" with optional external properties file
      */
-    AbstractSourceSaverProvider() {
+    public AbstractSourceSaverProvider() {
         Properties properties = new Properties();
         Class clazz = this.getClass();
 

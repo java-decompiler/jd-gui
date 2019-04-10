@@ -20,7 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-class FileSourceSaverProvider extends AbstractSourceSaverProvider {
+public class FileSourceSaverProvider extends AbstractSourceSaverProvider {
 
     @Override public String[] getSelectors() { return appendSelectors("*:file:*"); }
 

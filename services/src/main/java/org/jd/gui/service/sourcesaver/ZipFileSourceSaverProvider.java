@@ -17,7 +17,7 @@ import java.net.URI;
 import java.nio.file.*;
 import java.util.HashMap;
 
-class ZipFileSourceSaverProvider extends DirectorySourceSaverProvider {
+public class ZipFileSourceSaverProvider extends DirectorySourceSaverProvider {
 
     @Override public String[] getSelectors() { return appendSelectors("*:file:*.zip", "*:file:*.jar", "*:file:*.war", "*:file:*.ear"); }
 
