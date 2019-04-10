@@ -529,17 +529,21 @@ public class MainController implements API {
     public boolean openURI(URI uri) {
         if (uri != null) {
             boolean success = mainView.openUri(uri);
-            UriLoader uriLoader = getUriLoader(uri);
 
-            if (uriLoader != null) {
-                success |= uriLoader.load(this, uri);
+            if (success == false) {
+                UriLoader uriLoader = getUriLoader(uri);
+                if (uriLoader != null) {
+                    success = uriLoader.load(this, uri);
+                }
             }
 
             if (success) {
                 addURI(uri);
             }
+
             return success;
         }
+
         return false;
     }
 

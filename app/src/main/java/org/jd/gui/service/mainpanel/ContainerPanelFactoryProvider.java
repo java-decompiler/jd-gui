@@ -47,7 +47,7 @@ public class ContainerPanelFactoryProvider implements PanelFactory {
         protected Container.Entry entry;
 
         public ContainerPanel(API api, Container container) {
-            super(api, container.getRoot().getUri());
+            super(api, container.getRoot().getParent().getUri());
 
             this.entry = container.getRoot().getParent();
 
