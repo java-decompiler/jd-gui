@@ -55,9 +55,9 @@ subprojects.each { subproject ->
 jar {
     dependsOn subprojects.tasks['jar']
 
-	// Add SPI directory
-	def tmpSpiDir = file('build/tmp/spi')
-	from tmpSpiDir
+    // Add SPI directory
+    def tmpSpiDir = file('build/tmp/spi')
+    from tmpSpiDir
     // Add dependencies
     def deps = []
     subprojects.each { subproject ->
