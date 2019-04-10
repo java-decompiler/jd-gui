@@ -55,6 +55,9 @@ subprojects.each { subproject ->
 jar {
     dependsOn subprojects.tasks['jar']
 
+	// Add SPI directory
+	def tmpSpiDir = file('build/tmp/spi')
+	from tmpSpiDir
     // Add dependencies
     def deps = []
     subprojects.each { subproject ->
@@ -77,20 +80,17 @@ jar {
     exclude 'META-INF/licenses/**', 'META-INF/maven/**', 'META-INF/INDEX.LIST'
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
     doFirst {
-        // Add SPI directory
-        def tmpSpiDir = file('build/tmp/spi')
+        // Create SPI directory
         tmpSpiDir.deleteDir()
         def tmpSpiServicesDir = file(tmpSpiDir.path + '/META-INF/services')
         tmpSpiServicesDir.mkdirs()
-        from tmpSpiDir
-
         // Copy and merge SPI config files
         subprojects.each { subproject ->
             def servicesDir = file(subproject.sourceSets.main.output.resourcesDir.path + '/META-INF/services')
             if (servicesDir.exists()) {
-                servicesDir.eachFile { source ->
-                    def target = file(tmpSpiServicesDir.path + '/' + source.name)
-                    target << source.text
+                servicesDir.eachFile { serviceFile ->
+                    def target = file(tmpSpiServicesDir.path + '/' + serviceFile.name)
+                    target << serviceFile.text
                 }
             }
         }
