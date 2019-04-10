@@ -69,8 +69,8 @@ public class SaveAllSourcesController implements SourcesSavable.Controller, Sour
                 if (cancel) {
                     Files.deleteIfExists(path);
                 }
-            } catch (IOException e) {
-                assert ExceptionUtil.printStackTrace(e);
+            } catch (Throwable t) {
+                assert ExceptionUtil.printStackTrace(t);
             }
 
             saveAllSourcesView.hide();
