@@ -17,7 +17,6 @@ import org.jd.gui.view.bean.OpenTypeListCellBean;
 import org.jd.gui.view.renderer.OpenTypeListCellRenderer;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -45,7 +44,7 @@ public class OpenTypeView {
             openTypeDialog = new JDialog(mainFrame, "Open Type", false);
 
             JPanel panel = new JPanel();
-            panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+            panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             panel.setLayout(new BorderLayout());
             openTypeDialog.add(panel);
 

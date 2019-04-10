@@ -20,7 +20,6 @@ import org.jd.gui.view.component.Tree;
 import org.jd.gui.view.renderer.TreeNodeRenderer;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeExpansionEvent;
@@ -72,7 +71,7 @@ public class SearchInConstantPoolsView<T extends DefaultMutableTreeNode & Contai
             searchInConstantPoolsDialog = new JDialog(mainFrame, "Search", false);
 
             JPanel panel = new JPanel();
-            panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+            panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             panel.setLayout(new BorderLayout());
             searchInConstantPoolsDialog.add(panel);
 

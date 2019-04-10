@@ -12,7 +12,6 @@ import org.jd.gui.spi.PreferencesPanel;
 import org.jd.gui.util.swing.SwingUtil;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -36,12 +35,14 @@ public class PreferencesView implements PreferencesPanel.PreferencesPanelChangeL
             preferencesDialog = new JDialog(mainFrame, "Preferences", false);
 
             JPanel panel = new JPanel();
-            panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+            panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             panel.setLayout(new BorderLayout());
             preferencesDialog.add(panel);
 
             // Box for preferences panels
             Box preferencesPanels = Box.createVerticalBox();
+            preferencesPanels.setBackground(panel.getBackground());
+            preferencesPanels.setOpaque(true);
             Color errorBackgroundColor = Color.decode(configuration.getPreferences().get("JdGuiPreferences.errorBackgroundColor"));
 
             // Group "PreferencesPanel" by group name
@@ -93,7 +94,7 @@ public class PreferencesView implements PreferencesPanel.PreferencesPanelChangeL
 
             JScrollPane preferencesScrollPane = new JScrollPane(preferencesPanels);
             preferencesScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            preferencesScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+            preferencesScrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
             panel.add(preferencesScrollPane, BorderLayout.CENTER);
 
             Box vbox = Box.createVerticalBox();

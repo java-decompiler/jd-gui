@@ -10,13 +10,11 @@ package org.jd.gui.view;
 import org.jd.gui.util.swing.SwingUtil;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.function.IntConsumer;
 
 public class SaveAllSourcesView {
     protected JDialog saveAllSourcesDialog;
@@ -35,7 +33,7 @@ public class SaveAllSourcesView {
             });
 
             Box vbox = Box.createVerticalBox();
-            vbox.setBorder(new EmptyBorder(15, 15, 15, 15));
+            vbox.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             saveAllSourcesDialog.add(vbox);
 
             // First label "Saving 'file' ..."
@@ -72,7 +70,6 @@ public class SaveAllSourcesView {
 
             // Prepare to display
             saveAllSourcesDialog.pack();
-            saveAllSourcesDialog.setLocationRelativeTo(mainFrame);
         });
     }
 
@@ -85,6 +82,7 @@ public class SaveAllSourcesView {
             saveAllSourcesProgressBar.setIndeterminate(true);
             saveAllSourcesDialog.pack();
             // Show
+            saveAllSourcesDialog.setLocationRelativeTo(saveAllSourcesDialog.getParent());
             saveAllSourcesDialog.setVisible(true);
         });
     }

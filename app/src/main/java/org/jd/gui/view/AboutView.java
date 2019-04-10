@@ -11,8 +11,6 @@ import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.swing.SwingUtil;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -34,7 +32,7 @@ public class AboutView {
             aboutDialog.setResizable(false);
 
             JPanel panel = new JPanel();
-            panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+            panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             panel.setLayout(new BorderLayout());
             aboutDialog.add(panel);
 
@@ -42,14 +40,14 @@ public class AboutView {
             panel.add(vbox, BorderLayout.NORTH);
             JPanel subpanel = new JPanel();
             vbox.add(subpanel);
-            subpanel.setBorder(new LineBorder(Color.BLACK));
+            subpanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             subpanel.setBackground(Color.WHITE);
             subpanel.setLayout(new BorderLayout());
             JLabel logo = new JLabel(new ImageIcon(SwingUtil.getImage("/org/jd/gui/images/jd_icon_64.png")));
-            logo.setBorder(new EmptyBorder(15, 15, 15, 15));
+            logo.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             subpanel.add(logo, BorderLayout.WEST);
             Box subvbox = Box.createVerticalBox();
-            subvbox.setBorder(new EmptyBorder(15,0,15,15));
+            subvbox.setBorder(BorderFactory.createEmptyBorder(15,0,15,15));
             subpanel.add(subvbox, BorderLayout.EAST);
             Box hbox = Box.createHorizontalBox();
             subvbox.add(hbox);
@@ -63,7 +61,7 @@ public class AboutView {
             hbox.add(subsubpanel);
             subsubpanel.setLayout(new GridLayout(2,2));
             subsubpanel.setOpaque(false);
-            subsubpanel.setBorder(new EmptyBorder(5,10,5,5));
+            subsubpanel.setBorder(BorderFactory.createEmptyBorder(5,10,5,5));
 
             String jdGuiVersion = "SNAPSHOT";
             String jdCoreVersion = "SNAPSHOT";
@@ -124,13 +122,13 @@ public class AboutView {
 
             // Prepare to display
             aboutDialog.pack();
-            aboutDialog.setLocationRelativeTo(mainFrame);
         });
     }
 
     public void show() {
         SwingUtil.invokeLater(() -> {
             // Show
+            aboutDialog.setLocationRelativeTo(aboutDialog.getParent());
             aboutDialog.setVisible(true);
             aboutOkButton.requestFocus();
         });

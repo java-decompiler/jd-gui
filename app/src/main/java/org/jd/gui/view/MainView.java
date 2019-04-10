@@ -19,7 +19,6 @@ import org.jd.gui.view.component.panel.MainTabbedPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.BadLocationException;
@@ -163,7 +162,7 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
                 findPreviousButton.setBorder(border);
                 findCloseButton.setBorder(border);
             } else {
-                findPanel.setBorder(new EmptyBorder(2, 10, 2, 2));
+                findPanel.setBorder(BorderFactory.createEmptyBorder(2, 10, 2, 2));
             }
 
             // Actions //

@@ -12,7 +12,6 @@ import org.jd.gui.model.configuration.Configuration;
 import org.jd.gui.util.swing.SwingUtil;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
@@ -37,7 +36,7 @@ public class GoToView {
             goToDialog.setResizable(false);
 
             Box vbox = Box.createVerticalBox();
-            vbox.setBorder(new EmptyBorder(15, 15, 15, 15));
+            vbox.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             goToDialog.add(vbox);
 
             // First label "Enter line number (1..xxx):"

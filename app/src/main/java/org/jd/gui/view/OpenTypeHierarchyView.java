@@ -18,7 +18,6 @@ import org.jd.gui.view.component.Tree;
 import org.jd.gui.view.renderer.TreeNodeRenderer;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -51,7 +50,7 @@ public class OpenTypeHierarchyView {
             openTypeHierarchyDialog = new JDialog(mainFrame, "Hierarchy Type", false);
 
             JPanel panel = new JPanel();
-            panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+            panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             panel.setLayout(new BorderLayout());
             openTypeHierarchyDialog.add(panel);
 

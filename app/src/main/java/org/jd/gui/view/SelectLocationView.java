@@ -19,8 +19,6 @@ import org.jd.gui.view.component.Tree;
 import org.jd.gui.view.renderer.TreeNodeRenderer;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -56,16 +54,16 @@ public class SelectLocationView<T extends DefaultMutableTreeNode & ContainerEntr
             Color bg = UIManager.getColor("ToolTip.background");
 
             JPanel selectLocationPanel = new JPanel(new BorderLayout());
-            selectLocationPanel.setBorder(new LineBorder(bg.darker()));
+            selectLocationPanel.setBorder(BorderFactory.createLineBorder(bg.darker()));
             selectLocationPanel.setBackground(bg);
             selectLocationDialog.add(selectLocationPanel);
 
             selectLocationLabel = new JLabel();
-            selectLocationLabel.setBorder(new EmptyBorder(5, 5, 0, 5));
+            selectLocationLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
             selectLocationPanel.add(selectLocationLabel, BorderLayout.NORTH);
 
             selectLocationTree = new Tree();
-            selectLocationTree.setBorder(new EmptyBorder(5, 5, 5, 5));
+            selectLocationTree.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             selectLocationTree.setOpaque(false);
             selectLocationTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
             selectLocationTree.setCellRenderer(new TreeNodeRenderer());
