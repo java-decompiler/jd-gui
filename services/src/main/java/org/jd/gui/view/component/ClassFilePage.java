@@ -56,8 +56,8 @@ public class ClassFilePage extends TypePage {
         };
         try {
             DECOMPILER.decompile(preferences, loader, printer, internalTypeName);
-        } catch (Exception e) {
-            assert ExceptionUtil.printStackTrace(e);
+        } catch (Throwable t) {
+            assert ExceptionUtil.printStackTrace(t);
         }
     }
 
@@ -96,8 +96,8 @@ public class ClassFilePage extends TypePage {
             setText(printer.toString());
             // Show hyperlinks
             indexesChanged(api.getCollectionOfIndexes());
-        } catch (Exception e) {
-            assert ExceptionUtil.printStackTrace(e);
+        } catch (Throwable t) {
+            assert ExceptionUtil.printStackTrace(t);
             setText("// INTERNAL ERROR //");
         }
 

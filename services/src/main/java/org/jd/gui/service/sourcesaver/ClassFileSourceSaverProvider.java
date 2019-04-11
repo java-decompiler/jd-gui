@@ -131,8 +131,8 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
             } catch (IOException e) {
                 assert ExceptionUtil.printStackTrace(e);
             }
-        } catch (Exception e) {
-            assert ExceptionUtil.printStackTrace(e);
+        } catch (Throwable t) {
+            assert ExceptionUtil.printStackTrace(t);
 
             try (BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset())) {
                 writer.write("// INTERNAL ERROR //");
