@@ -64,11 +64,8 @@ public class MainController implements API {
     protected ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     protected ArrayList<IndexesChangeListener> containerChangeListeners = new ArrayList<>();
 
-    long debug;
-
     @SuppressWarnings("unchecked")
     public MainController(Configuration configuration) {
-        debug = System.currentTimeMillis();
         this.configuration = configuration;
 
         SwingUtil.invokeLater(() -> {
