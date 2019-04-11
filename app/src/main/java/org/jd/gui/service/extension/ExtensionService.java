@@ -37,13 +37,13 @@ public class ExtensionService {
                 searchJarAndMetaInf(urls, extDirectory);
 
                 if (!urls.isEmpty()) {
-                    URL[] array = (URL[])urls.toArray();
+                    URL[] array = urls.toArray(new URL[urls.size()]);
                     Arrays.sort(array, URL_COMPARATOR);
                     extensionClassLoader = new URLClassLoader(array, ExtensionService.class.getClassLoader());
                 }
             }
         } catch (Exception e) {
-            ExceptionUtil.printStackTrace(e);
+            assert ExceptionUtil.printStackTrace(e);
         }
 
         extensionClassLoader = ExtensionService.class.getClassLoader();

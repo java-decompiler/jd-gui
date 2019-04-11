@@ -37,7 +37,7 @@ public class UriUtil {
                 try {
                     return new URI(uri.getScheme(), uri.getHost(), path, query, fragment);
                 } catch (URISyntaxException e) {
-                    ExceptionUtil.printStackTrace(e);
+                    assert ExceptionUtil.printStackTrace(e);
                 }
             }
         }
