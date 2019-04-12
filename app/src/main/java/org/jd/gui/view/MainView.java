@@ -84,7 +84,7 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
         // Build GUI
         invokeLater(() -> {
             mainFrame = new JFrame("Java Decompiler");
-            mainFrame.setIconImages(Arrays.asList(getImage("/org/jd/gui/images/jd_icon_16.png"), getImage("/org/jd/gui/images/jd_icon_32.png"), getImage("/org/jd/gui/images/jd_icon_64.png"), getImage("/org/jd/gui/images/jd_icon_128.png")));
+            mainFrame.setIconImages(Arrays.asList(getImage("/org/jd/gui/images/jd_icon_32.png"), getImage("/org/jd/gui/images/jd_icon_64.png"), getImage("/org/jd/gui/images/jd_icon_128.png")));
             mainFrame.setMinimumSize(new Dimension(Constants.MINIMAL_WIDTH, Constants.MINIMAL_HEIGHT));
             mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
