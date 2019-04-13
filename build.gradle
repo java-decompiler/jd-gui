@@ -43,9 +43,10 @@ allprojects {
 }
 
 // 'cleanIdea' task extension //
-cleanIdea {
-    file(project.name + '.iws').delete()
-    ant.delete(dir: 'out')
+cleanIdea.doFirst {
+  delete project.name + '.iws'
+  delete 'out'
+  followSymlinks = true
 }
 
 // All in one JAR //
