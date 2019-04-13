@@ -24,6 +24,7 @@ allprojects {
 
     tasks.withType(JavaCompile) {
         sourceCompatibility = targetCompatibility = '1.8'
+        options.compilerArgs << '-Xlint:deprecation'
         options.compilerArgs << '-Xlint:unchecked'
         options.encoding = 'UTF-8'
     }
