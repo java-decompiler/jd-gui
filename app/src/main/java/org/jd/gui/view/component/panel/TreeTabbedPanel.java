@@ -260,10 +260,10 @@ public class TreeTabbedPanel<T extends DefaultMutableTreeNode & ContainerEntryGe
 
         String u = uri.toString();
         T child = null;
-        Enumeration<T> enumeration = node.children();
+        Enumeration enumeration = node.children();
 
         while (enumeration.hasMoreElements()) {
-            T element = enumeration.nextElement();
+            T element = (T)enumeration.nextElement();
             String childU = element.getUri().toString();
 
             if (u.length() > childU.length()) {
