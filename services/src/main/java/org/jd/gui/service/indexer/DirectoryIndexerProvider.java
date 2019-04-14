@@ -23,8 +23,7 @@ public class DirectoryIndexerProvider extends AbstractIndexerProvider {
 
         try {
             depth = Integer.valueOf(api.getPreferences().get("DirectoryIndexerPreferences.maximumDepth"));
-        } catch (NumberFormatException e) {
-            assert ExceptionUtil.printStackTrace(e);
+        } catch (NumberFormatException ignore) {
         }
 
         index(api, entry, indexes, depth);

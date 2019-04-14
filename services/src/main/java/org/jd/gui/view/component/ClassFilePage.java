@@ -7,55 +7,37 @@
 
 package org.jd.gui.view.component;
 
-import jd.core.Decompiler;
-import jd.core.loader.Loader;
-import jd.core.loader.LoaderException;
-import jd.core.process.DecompilerImpl;
 import org.fife.ui.rsyntaxtextarea.DocumentRange;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.jd.core.v1.ClassFileToJavaSourceDecompiler;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
-import org.jd.gui.util.decompiler.ClassFileSourcePrinter;
+import org.jd.gui.util.decompiler.ClassPathLoader;
+import org.jd.gui.util.decompiler.NopPrinter;
+import org.jd.gui.util.decompiler.StringBuilderPrinter;
 import org.jd.gui.util.decompiler.ContainerLoader;
-import org.jd.gui.util.decompiler.GuiPreferences;
 import org.jd.gui.util.exception.ExceptionUtil;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
-import java.io.DataInputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ClassFilePage extends TypePage {
     protected static final String ESCAPE_UNICODE_CHARACTERS   = "ClassFileViewerPreferences.escapeUnicodeCharacters";
-    protected static final String OMIT_THIS_PREFIX            = "ClassFileViewerPreferences.omitThisPrefix";
     protected static final String REALIGN_LINE_NUMBERS        = "ClassFileViewerPreferences.realignLineNumbers";
-    protected static final String DISPLAY_DEFAULT_CONSTRUCTOR = "ClassFileViewerPreferences.displayDefaultConstructor";
 
-    protected static final Decompiler DECOMPILER = new DecompilerImpl();
+    protected static final ClassFileToJavaSourceDecompiler DECOMPILER = new ClassFileToJavaSourceDecompiler();
 
     protected int maximumLineNumber = -1;
 
     static {
         // Early class loading
-        String internalTypeName = ClassFilePage.class.getName().replace('.', '/');
-        GuiPreferences preferences = new GuiPreferences();
-        Loader loader = new Loader() {
-            public DataInputStream load(String internalTypePath) throws LoaderException {
-                return new DataInputStream(ClassFilePage.class.getClassLoader().getResourceAsStream(internalTypeName + ".class"));
-            }
-            public boolean canLoad(String internalTypePath) { return false; }
-        };
-        ClassFileSourcePrinter printer = new ClassFileSourcePrinter() {
-            public boolean getRealignmentLineNumber() { return false; }
-            public boolean isShowPrefixThis() { return false; }
-            public boolean isUnicodeEscape() { return false; }
-            public void append(char c) {}
-            public void append(String s) {}
-        };
         try {
-            DECOMPILER.decompile(preferences, loader, printer, internalTypeName);
+            String internalTypeName = ClassFilePage.class.getName().replace('.', '/');
+            DECOMPILER.decompile(Collections.emptyMap(), new ClassPathLoader(), new NopPrinter(), internalTypeName);
         } catch (Throwable t) {
             assert ExceptionUtil.printStackTrace(t);
         }
@@ -78,22 +60,33 @@ public class ClassFilePage extends TypePage {
             declarations.clear();
             typeDeclarations.clear();
             strings.clear();
-            // Init preferences
-            GuiPreferences p = new GuiPreferences();
-            p.setUnicodeEscape(getPreferenceValue(preferences, ESCAPE_UNICODE_CHARACTERS, false));
-            p.setShowPrefixThis(! getPreferenceValue(preferences, OMIT_THIS_PREFIX, false));
-            p.setShowDefaultConstructor(getPreferenceValue(preferences, DISPLAY_DEFAULT_CONSTRUCTOR, false));
-            p.setRealignmentLineNumber(getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, false));
 
-            setShowMisalignment(p.getRealignmentLineNumber());
+            // Init preferences
+            boolean realignmentLineNumbers = getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, true);
+            boolean unicodeEscape = getPreferenceValue(preferences, ESCAPE_UNICODE_CHARACTERS, false);
+
+            Map<String, Object> configuration = new HashMap<>();
+            configuration.put("realignLineNumbers", realignmentLineNumbers);
+
+            setShowMisalignment(realignmentLineNumbers);
+
             // Init loader
             ContainerLoader loader = new ContainerLoader(entry);
-            // Init printer
-            Printer printer = new Printer(p);
-            // Decompile class file
-            DECOMPILER.decompile(p, loader, printer, entry.getPath());
 
-            setText(printer.toString());
+            // Init printer
+            ClassFilePrinter printer = new ClassFilePrinter();
+            printer.setRealignmentLineNumber(realignmentLineNumbers);
+            printer.setUnicodeEscape(unicodeEscape);
+
+            // Format internal name
+            String entryPath = entry.getPath();
+            assert entryPath.endsWith(".class");
+            String entryInternalName = entryPath.substring(0, entryPath.length() - 6); // 6 = ".class".length()
+
+            // Decompile class file
+            DECOMPILER.decompile(configuration, loader, printer, entryInternalName);
+            setText(printer.getStringBuffer().toString());
+
             // Show hyperlinks
             indexesChanged(api.getCollectionOfIndexes());
         } catch (Throwable t) {
@@ -106,12 +99,7 @@ public class ClassFilePage extends TypePage {
 
     protected static boolean getPreferenceValue(Map<String, String> preferences, String key, boolean defaultValue) {
         String v = preferences.get(key);
-
-        if (v == null) {
-            return defaultValue;
-        } else {
-            return Boolean.valueOf(v);
-        }
+        return (v == null) ? defaultValue : Boolean.valueOf(v);
     }
 
     public String getSyntaxStyle() { return SyntaxConstants.SYNTAX_STYLE_JAVA; }
@@ -153,29 +141,13 @@ public class ClassFilePage extends TypePage {
         super.preferencesChanged(preferences);
     }
 
-    public class Printer extends ClassFileSourcePrinter {
-        protected StringBuilder stringBuffer = new StringBuilder(10*1024);
-        protected boolean realignmentLineNumber;
-        protected boolean showPrefixThis;
-        protected boolean unicodeEscape;
+    public class ClassFilePrinter extends StringBuilderPrinter {
         protected HashMap<String, ReferenceData> referencesCache = new HashMap<>();
-
-        public Printer(GuiPreferences preferences) {
-            this.realignmentLineNumber = preferences.getRealignmentLineNumber();
-            this.showPrefixThis = preferences.isShowPrefixThis();
-            this.unicodeEscape = preferences.isUnicodeEscape();
-        }
-
-        public boolean getRealignmentLineNumber() { return realignmentLineNumber; }
-        public boolean isShowPrefixThis() { return showPrefixThis; }
-        public boolean isUnicodeEscape() { return unicodeEscape; }
-
-        public void append(char c) { stringBuffer.append(c); }
-        public void append(String s) { stringBuffer.append(s); }
 
         // Manage line number and misalignment
         int textAreaLineNumber = 1;
 
+        @Override
         public void start(int maxLineNumber, int majorVersion, int minorVersion) {
             super.start(maxLineNumber, majorVersion, minorVersion);
 
@@ -185,12 +157,51 @@ public class ClassFilePage extends TypePage {
                 setMaxLineNumber(maxLineNumber);
             }
         }
-        public void startOfLine(int sourceLineNumber) {
-            super.startOfLine(sourceLineNumber);
-            setLineNumber(textAreaLineNumber, sourceLineNumber);
+
+        // --- Add strings --- //
+        @Override public void printStringConstant(String constant, String ownerInternalName) {
+            strings.add(new TypePage.StringData(stringBuffer.length(), constant.length(), constant, ownerInternalName));
+            super.printStringConstant(constant, ownerInternalName);
         }
-        public void endOfLine() {
-            super.endOfLine();
+
+        @Override public void printDeclaration(int flags, String internalTypeName, String name, String descriptor) {
+            switch (flags) {
+                case TYPE_FLAG:
+                    TypePage.DeclarationData data = new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalTypeName, null, null);
+                    declarations.put(internalTypeName, data);
+                    typeDeclarations.put(stringBuffer.length(), data);
+                    break;
+                case CONSTRUCTOR_FLAG:
+                    declarations.put(internalTypeName + "-<init>-" + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalTypeName, "<init>", descriptor));
+                    break;
+                default:
+                    declarations.put(internalTypeName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalTypeName, name, descriptor));
+                    break;
+            }
+            super.printDeclaration(flags, internalTypeName, name, descriptor);
+        }
+
+        @Override public void printReference(int flags, String internalTypeName, String name, String descriptor, String ownerInternalName) {
+            switch (flags) {
+                case TYPE_FLAG:
+                    addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalTypeName, null, null, ownerInternalName)));
+                    break;
+                case CONSTRUCTOR_FLAG:
+                    addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalTypeName, "<init>", descriptor, ownerInternalName)));
+                    break;
+                default:
+                    addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalTypeName, name, descriptor, ownerInternalName)));
+                    break;
+            }
+            super.printReference(flags, internalTypeName, name, descriptor, ownerInternalName);
+        }
+
+        @Override public void startLine(int lineNumber) {
+            super.startLine(lineNumber);
+            setLineNumber(textAreaLineNumber, lineNumber);
+        }
+        @Override public void endLine() {
+            super.endLine();
             textAreaLineNumber++;
         }
         public void extraLine(int count) {
@@ -200,46 +211,7 @@ public class ClassFilePage extends TypePage {
             }
         }
 
-        // --- Add strings --- //
-        public void printString(String s, String scopeInternalName)  {
-            strings.add(new TypePage.StringData(stringBuffer.length(), s.length(), s, scopeInternalName));
-            super.printString(s, scopeInternalName);
-        }
-
         // --- Add references --- //
-        public void printTypeImport(String internalName, String name) {
-            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, null, null, null)));
-            super.printTypeImport(internalName, name);
-        }
-
-        public void printType(String internalName, String name, String scopeInternalName) {
-            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, null, null, scopeInternalName)));
-            super.printType(internalName, name, scopeInternalName);
-        }
-
-        public void printField(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)));
-            super.printField(internalName, name, descriptor, scopeInternalName);
-        }
-        public void printStaticField(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)));
-            super.printStaticField(internalName, name, descriptor, scopeInternalName);
-        }
-
-        public void printConstructor(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, "<init>", descriptor, scopeInternalName)));
-            super.printConstructor(internalName, name, descriptor, scopeInternalName);
-        }
-
-        public void printMethod(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)));
-            super.printMethod(internalName, name, descriptor, scopeInternalName);
-        }
-        public void printStaticMethod(String internalName, String name, String descriptor, String scopeInternalName) {
-            addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalName, name, descriptor, scopeInternalName)));
-            super.printStaticMethod(internalName, name, descriptor, scopeInternalName);
-        }
-
         public TypePage.ReferenceData newReferenceData(String internalName, String name, String descriptor, String scopeInternalName) {
             String key = internalName + '-' + name + '-'+ descriptor + '-' + scopeInternalName;
             ReferenceData reference = referencesCache.get(key);
@@ -252,42 +224,5 @@ public class ClassFilePage extends TypePage {
 
             return reference;
         }
-
-        // --- Add declarations --- //
-        public void printTypeDeclaration(String internalName, String name) {
-            TypePage.DeclarationData data = new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, null, null);
-            declarations.put(internalName, data);
-            typeDeclarations.put(stringBuffer.length(), data);
-            super.printTypeDeclaration(internalName, name);
-        }
-
-        public void printFieldDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor));
-            super.printFieldDeclaration(internalName, name, descriptor);
-        }
-        public void printStaticFieldDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor));
-            super.printStaticFieldDeclaration(internalName, name, descriptor);
-        }
-
-        public void printConstructorDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + "-<init>-" + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, "<init>", descriptor));
-            super.printConstructorDeclaration(internalName, name, descriptor);
-        }
-        public void printStaticConstructorDeclaration(String internalName, String name) {
-            declarations.put(internalName + "-<clinit>-()V", new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, "<clinit>", "()V"));
-            super.printStaticConstructorDeclaration(internalName, name);
-        }
-
-        public void printMethodDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor));
-            super.printMethodDeclaration(internalName, name, descriptor);
-        }
-        public void printStaticMethodDeclaration(String internalName, String name, String descriptor) {
-            declarations.put(internalName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalName, name, descriptor));
-            super.printStaticMethodDeclaration(internalName, name, descriptor);
-        }
-
-        public String toString() { return stringBuffer.toString(); }
     }
 }

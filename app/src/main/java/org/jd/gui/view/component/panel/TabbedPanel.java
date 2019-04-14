@@ -90,8 +90,8 @@ public class TabbedPanel<T extends JComponent & UriGettable> extends JPanel impl
         tabCloseButton.addMouseListener(new MouseListener() {
             @Override public void mousePressed(MouseEvent e) {}
             @Override public void mouseReleased(MouseEvent e) {}
-            @Override public void mouseEntered(MouseEvent e) { ((JLabel)e.getSource()).setIcon(TabbedPanel.CLOSE_ACTIVE_ICON); }
-            @Override public void mouseExited(MouseEvent e) { ((JLabel)e.getSource()).setIcon(TabbedPanel.CLOSE_ICON); }
+            @Override public void mouseEntered(MouseEvent e) { ((JLabel)e.getSource()).setIcon(CLOSE_ACTIVE_ICON); }
+            @Override public void mouseExited(MouseEvent e) { ((JLabel)e.getSource()).setIcon(CLOSE_ICON); }
             @Override public void mouseClicked(MouseEvent e) { removeComponent(page); }
         });
 
@@ -129,12 +129,12 @@ public class TabbedPanel<T extends JComponent & UriGettable> extends JPanel impl
 
     @SuppressWarnings("unchecked")
     protected T showPage(URI uri) {
-        String u1 = uri.toString();
+        String u1 = uri.getPath();
         int i = tabbedPane.getTabCount();
 
         while (i-- > 0) {
             T page = (T)tabbedPane.getComponentAt(i);
-            String u2 = page.getUri().toString();
+            String u2 = page.getUri().getPath();
             if (u1.startsWith(u2)) {
                 tabbedPane.setSelectedIndex(i);
                 return page;

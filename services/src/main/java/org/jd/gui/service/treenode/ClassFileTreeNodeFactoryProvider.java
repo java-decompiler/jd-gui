@@ -11,7 +11,6 @@ import org.jd.gui.api.API;
 import org.jd.gui.api.feature.ContainerEntryGettable;
 import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
-import org.jd.gui.util.decompiler.GuiPreferences;
 import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.view.component.ClassFilePage;
 import org.jd.gui.view.data.TreeNodeBean;

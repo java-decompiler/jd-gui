@@ -13,9 +13,9 @@ apply plugin: 'distribution'
 apply plugin: 'edu.sc.seis.launch4j'
 apply plugin: 'nebula.ospackage'
 
-
 // Common configuration //
-version='1.4.2'
+rootProject.version='1.4.2'
+rootProject.ext.set('jdCoreVersion', '1.0.0')
 targetCompatibility = '1.8'
 
 allprojects {
@@ -77,7 +77,7 @@ jar {
         attributes 'Main-Class': 'org.jd.gui.App',
                 'SplashScreen-Image': 'org/jd/gui/images/jd_icon_128.png',
                 'JD-GUI-Version': project.version,
-                'JD-Core-Version': '0.7.1'
+                'JD-Core-Version': project.jdCoreVersion
     }
     exclude 'META-INF/licenses/**', 'META-INF/maven/**', 'META-INF/INDEX.LIST'
     duplicatesStrategy DuplicatesStrategy.EXCLUDE

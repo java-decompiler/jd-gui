@@ -120,15 +120,15 @@ public class MainController implements API {
         // Background initializations
         executor.schedule(() -> {
             // Background service initialization
-            ContextualActionsFactoryService.getInstance();
-            ContainerFactoryService.getInstance();
+            UriLoaderService.getInstance();
             FileLoaderService.getInstance();
+            ContainerFactoryService.getInstance();
             IndexerService.getInstance();
-            PasteHandlerService.getInstance();
-            PreferencesPanelService.getInstance();
             TreeNodeFactoryService.getInstance();
             TypeFactoryService.getInstance();
-            UriLoaderService.getInstance();
+            PasteHandlerService.getInstance();
+            PreferencesPanelService.getInstance();
+            ContextualActionsFactoryService.getInstance();
 
             SwingUtil.invokeLater(() -> {
                 // Populate recent files menu

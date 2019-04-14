@@ -15,45 +15,22 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ContainerLoader implements Loader {
+public class ClassPathLoader implements Loader {
     protected byte[] buffer = new byte[1024 * 4];
-    protected Container.Entry entry;
 
-    public ContainerLoader() { this.entry = null; }
-    public ContainerLoader(Container.Entry entry) {
-        this.entry = entry;
-    }
-
-    public void setEntry(Container.Entry e) { this.entry = e; }
-
-    protected Container.Entry getEntry(String internalPath) {
-        String path = internalPath + ".class";
-
-        if (entry.getPath().equals(path)) {
-            return entry;
-        }
-        for (Container.Entry e : entry.getParent().getChildren()) {
-            if (e.getPath().equals(path)) {
-                return e;
-            }
-        }
-        return null;
-    }
-
-    // --- Loader --- //
     @Override
     public boolean canLoad(String internalName) {
-        return getEntry(internalName) != null;
+        return this.getClass().getResource("/" + internalName + ".class") != null;
     }
 
     @Override
     public byte[] load(String internalName) throws LoaderException {
-        Container.Entry entry = getEntry(internalName);
+        InputStream is = this.getClass().getResourceAsStream("/" + internalName + ".class");
 
-        if (entry == null) {
+        if (is == null) {
             return null;
         } else {
-            try (InputStream input=entry.getInputStream(); ByteArrayOutputStream output=new ByteArrayOutputStream()) {
+            try (InputStream input=is; ByteArrayOutputStream output=new ByteArrayOutputStream()) {
                 int len = input.read(buffer);
 
                 while (len > 0) {
