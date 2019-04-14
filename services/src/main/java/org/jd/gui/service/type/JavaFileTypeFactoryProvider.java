@@ -7,15 +7,17 @@
 
 package org.jd.gui.service.type;
 
-import org.jd.gui.api.API;
-import org.jd.gui.api.model.Container;
-import org.jd.gui.api.model.Type;
-import org.jd.gui.util.exception.ExceptionUtil;
-import org.jd.gui.util.parser.antlr.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jd.gui.api.API;
+import org.jd.gui.api.model.Container;
+import org.jd.gui.api.model.Type;
+import org.jd.gui.util.exception.ExceptionUtil;
+import org.jd.gui.util.parser.antlr.ANTLRJavaParser;
+import org.jd.gui.util.parser.antlr.AbstractJavaListener;
+import org.jd.gui.util.parser.antlr.JavaParser;
 
 import javax.swing.*;
 import java.io.IOException;

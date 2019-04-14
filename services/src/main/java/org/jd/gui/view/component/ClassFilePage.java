@@ -13,9 +13,9 @@ import org.jd.core.v1.ClassFileToJavaSourceDecompiler;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.util.decompiler.ClassPathLoader;
+import org.jd.gui.util.decompiler.ContainerLoader;
 import org.jd.gui.util.decompiler.NopPrinter;
 import org.jd.gui.util.decompiler.StringBuilderPrinter;
-import org.jd.gui.util.decompiler.ContainerLoader;
 import org.jd.gui.util.exception.ExceptionUtil;
 
 import javax.swing.text.BadLocationException;

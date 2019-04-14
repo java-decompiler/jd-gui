@@ -15,7 +15,10 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 public class JarContainerEntryUtil {
     public static Collection<Container.Entry> removeInnerTypeEntries(Collection<Container.Entry> entries) {

@@ -15,7 +15,9 @@ import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.io.NewlineOutputStream;
 
 import java.awt.datatransfer.StringSelection;
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 public class TextPage extends AbstractTextPage implements ContentCopyable, ContentSelectable, ContentSavable {
 

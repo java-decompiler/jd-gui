@@ -17,7 +17,10 @@ import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 

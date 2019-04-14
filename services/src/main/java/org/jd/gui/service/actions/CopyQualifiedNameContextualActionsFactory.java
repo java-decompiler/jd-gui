@@ -14,10 +14,9 @@ import org.jd.gui.spi.ContextualActionsFactory;
 import org.jd.gui.spi.TypeFactory;
 
 import javax.swing.*;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 

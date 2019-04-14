@@ -13,7 +13,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.StringReader;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public abstract class AbstractXmlPathFinder {
     protected HashMap<String, HashSet<String>> tagNameToPaths = new HashMap<>();

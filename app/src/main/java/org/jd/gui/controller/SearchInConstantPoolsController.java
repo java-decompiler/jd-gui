@@ -20,7 +20,6 @@ import org.jd.gui.util.function.TriConsumer;
 import org.jd.gui.view.SearchInConstantPoolsView;
 
 import javax.swing.*;
-import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;

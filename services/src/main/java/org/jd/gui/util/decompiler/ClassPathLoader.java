@@ -9,7 +9,6 @@ package org.jd.gui.util.decompiler;
 
 import org.jd.core.v1.api.loader.Loader;
 import org.jd.core.v1.api.loader.LoaderException;
-import org.jd.gui.api.model.Container;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

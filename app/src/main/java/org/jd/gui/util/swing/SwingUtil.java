@@ -8,7 +8,6 @@
 package org.jd.gui.util.swing;
 
 import org.jd.gui.util.exception.ExceptionUtil;
-import org.jd.gui.view.MainView;
 
 import javax.swing.*;
 import java.awt.*;

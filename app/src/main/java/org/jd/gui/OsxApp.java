@@ -7,7 +7,7 @@
 
 package org.jd.gui;
 
-import com.apple.eawt.*;
+import com.apple.eawt.Application;
 
 public class OsxApp extends App {
 

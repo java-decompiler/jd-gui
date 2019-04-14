@@ -7,10 +7,10 @@
 
 package org.jd.gui.util.parser.antlr;
 
-import org.jd.gui.api.model.Container;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
+import org.jd.gui.api.model.Container;
 import org.jd.gui.util.exception.ExceptionUtil;
 
 import java.util.HashMap;

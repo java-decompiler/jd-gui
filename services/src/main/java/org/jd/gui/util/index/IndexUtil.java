@@ -10,7 +10,10 @@ package org.jd.gui.util.index;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class IndexUtil {
     public static boolean containsInternalTypeName(Collection<Indexes> collectionOfIndexes, String internalTypeName) {

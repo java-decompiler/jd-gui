@@ -12,8 +12,6 @@ import org.jd.gui.api.feature.*;
 import org.jd.gui.service.platform.PlatformService;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.net.URI;
 import java.util.ArrayList;
