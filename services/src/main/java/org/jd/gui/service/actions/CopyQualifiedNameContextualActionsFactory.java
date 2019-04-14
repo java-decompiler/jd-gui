@@ -45,13 +45,13 @@ public class CopyQualifiedNameContextualActionsFactory implements ContextualActi
         }
 
         public void actionPerformed(ActionEvent e) {
-            if (fragment != null) {
-                TypeFactory typeFactory = api.getTypeFactory(entry);
-                Type type = (typeFactory == null) ? null : typeFactory.make(api, entry, fragment);
+            TypeFactory typeFactory = api.getTypeFactory(entry);
+
+            if (typeFactory != null) {
+                Type type = typeFactory.make(api, entry, fragment);
 
                 if (type != null) {
                     StringBuilder sb = new StringBuilder(type.getDisplayPackageName());
-                    int dashIndex = fragment.indexOf('-');
 
                     if (sb.length() > 0) {
                         sb.append('.');
@@ -59,28 +59,32 @@ public class CopyQualifiedNameContextualActionsFactory implements ContextualActi
 
                     sb.append(type.getDisplayTypeName());
 
-                    if (dashIndex != -1) {
-                        int lastDashIndex = fragment.lastIndexOf('-');
+                    if (fragment != null) {
+                        int dashIndex = fragment.indexOf('-');
 
-                        if (dashIndex == lastDashIndex) {
-                            // See jd.gui.api.feature.UriOpenable
-                            throw new InvalidFormatException("fragment: " + fragment);
-                        } else {
-                            String name = fragment.substring(dashIndex + 1, lastDashIndex);
-                            String descriptor = fragment.substring(lastDashIndex + 1);
+                        if (dashIndex != -1) {
+                            int lastDashIndex = fragment.lastIndexOf('-');
 
-                            if (descriptor.startsWith("(")) {
-                                for (Type.Method method : type.getMethods()) {
-                                    if (method.getName().equals(name) && method.getDescriptor().equals(descriptor)) {
-                                        sb.append('.').append(method.getDisplayName());
-                                        break;
-                                    }
-                                }
+                            if (dashIndex == lastDashIndex) {
+                                // See jd.gui.api.feature.UriOpenable
+                                throw new InvalidFormatException("fragment: " + fragment);
                             } else {
-                                for (Type.Field field : type.getFields()) {
-                                    if (field.getName().equals(name) && field.getDescriptor().equals(descriptor)) {
-                                        sb.append('.').append(field.getDisplayName());
-                                        break;
+                                String name = fragment.substring(dashIndex + 1, lastDashIndex);
+                                String descriptor = fragment.substring(lastDashIndex + 1);
+
+                                if (descriptor.startsWith("(")) {
+                                    for (Type.Method method : type.getMethods()) {
+                                        if (method.getName().equals(name) && method.getDescriptor().equals(descriptor)) {
+                                            sb.append('.').append(method.getDisplayName());
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    for (Type.Field field : type.getFields()) {
+                                        if (field.getName().equals(name) && field.getDescriptor().equals(descriptor)) {
+                                            sb.append('.').append(field.getDisplayName());
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -92,9 +96,16 @@ public class CopyQualifiedNameContextualActionsFactory implements ContextualActi
                 }
             }
 
-            // Copy path of entry
-            String path = new File(entry.getUri()).getAbsolutePath();
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(path), null);
+            // Create qualified name from URI
+            String path = entry.getUri().getPath();
+            String rootPath = entry.getContainer().getRoot().getUri().getPath();
+            String qualifiedName = path.substring(rootPath.length()).replace('/', '.');
+
+            if (qualifiedName.endsWith(".class")) {
+                qualifiedName = qualifiedName.substring(0, qualifiedName.length()-6);
+            }
+
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(qualifiedName), null);
         }
     }
 }
