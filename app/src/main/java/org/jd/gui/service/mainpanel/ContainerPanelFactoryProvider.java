@@ -67,13 +67,10 @@ public class ContainerPanelFactoryProvider implements PanelFactory {
         @Override
         public Indexes index(API api) {
             HashMap<String, Map<String, Collection>> map = new HashMap<>();
-            MapMapCollectionWithDefault mapWithDefault = new MapMapCollectionWithDefault(map);
+            DelegatedMapMapWithDefault mapWithDefault = new DelegatedMapMapWithDefault(map);
 
             // Index populating value automatically
-            Indexes indexesWithDefault = new Indexes() {
-                @Override public void waitIndexers() {}
-                @Override public Map<String, Collection> getIndex(String name) { return mapWithDefault.get(name); }
-            };
+            Indexes indexesWithDefault = name -> mapWithDefault.get(name);
 
             // Index entry
             Indexer indexer = api.getIndexer(entry);
@@ -83,10 +80,7 @@ public class ContainerPanelFactoryProvider implements PanelFactory {
             }
 
             // To prevent memory leaks, return an index without the 'populate' behaviour
-            return new Indexes() {
-                @Override public void waitIndexers() {}
-                @Override public Map<String, Collection> getIndex(String name) { return map.get(name); }
-            };
+            return name -> map.get(name);
         }
 
         // --- SourcesSavable --- //
@@ -139,10 +133,10 @@ public class ContainerPanelFactoryProvider implements PanelFactory {
         }
     }
 
-    protected static class MapWrapper<K, V> implements Map<K, V> {
+    protected static class DelegatedMap<K, V> implements Map<K, V> {
         protected Map<K, V> map;
 
-        public MapWrapper(Map<K, V> map) { this.map = map; }
+        public DelegatedMap(Map<K, V> map) { this.map = map; }
 
         @Override public int size() { return map.size(); }
         @Override public boolean isEmpty() { return map.isEmpty(); }
@@ -160,8 +154,8 @@ public class ContainerPanelFactoryProvider implements PanelFactory {
         @Override public int hashCode() { return map.hashCode(); }
     }
 
-    protected static class MapCollectionWithDefault extends MapWrapper<String, Collection> {
-        public MapCollectionWithDefault(Map<String, Collection> map) { super(map); }
+    protected static class DelegatedMapWithDefault extends DelegatedMap<String, Collection> {
+        public DelegatedMapWithDefault(Map<String, Collection> map) { super(map); }
 
         @Override public Collection get(Object o) {
             Collection value = map.get(o);
@@ -173,10 +167,10 @@ public class ContainerPanelFactoryProvider implements PanelFactory {
         }
     }
 
-    protected static class MapMapCollectionWithDefault extends MapWrapper<String, Map<String, Collection>> {
+    protected static class DelegatedMapMapWithDefault extends DelegatedMap<String, Map<String, Collection>> {
 	    protected HashMap<String, Map<String, Collection>> wrappers = new HashMap<>();
 
-        public MapMapCollectionWithDefault(Map<String, Map<String, Collection>> map) { super(map); }
+        public DelegatedMapMapWithDefault(Map<String, Map<String, Collection>> map) { super(map); }
 
         @Override public Map<String, Collection> get(Object o) {
             Map<String, Collection> value = wrappers.get(o);
@@ -185,7 +179,7 @@ public class ContainerPanelFactoryProvider implements PanelFactory {
                 String key = o.toString();
                 HashMap<String, Collection> m = new HashMap<>();
                 map.put(key, m);
-                wrappers.put(key, value=new MapCollectionWithDefault(m));
+                wrappers.put(key, value=new DelegatedMapWithDefault(m));
             }
 
             return value;

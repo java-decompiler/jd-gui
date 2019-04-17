@@ -64,7 +64,5 @@ import java.util.Map;
  * </ul>
  */
 public interface Indexes {
-    void waitIndexers();
-
     Map<String, Collection> getIndex(String name);
 }

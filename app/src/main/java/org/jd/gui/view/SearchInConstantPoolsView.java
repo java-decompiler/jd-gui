@@ -12,7 +12,7 @@ import org.jd.gui.api.feature.ContainerEntryGettable;
 import org.jd.gui.api.feature.TreeNodeExpandable;
 import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
-import org.jd.gui.model.container.FilteredContainerWrapper;
+import org.jd.gui.model.container.DelegatingFilterContainer;
 import org.jd.gui.spi.TreeNodeFactory;
 import org.jd.gui.util.function.TriConsumer;
 import org.jd.gui.util.swing.SwingUtil;
@@ -364,7 +364,7 @@ public class SearchInConstantPoolsView<T extends DefaultMutableTreeNode & Contai
     }
 
     @SuppressWarnings("unchecked")
-    public void updateTree(Collection<FilteredContainerWrapper> containers, int matchingTypeCount) {
+    public void updateTree(Collection<DelegatingFilterContainer> containers, int matchingTypeCount) {
         SwingUtil.invokeLater(() -> {
             DefaultTreeModel model = (DefaultTreeModel)searchInConstantPoolsTree.getModel();
             T root = (T)model.getRoot();
@@ -376,11 +376,11 @@ public class SearchInConstantPoolsView<T extends DefaultMutableTreeNode & Contai
             expanded.clear();
 
             if (containers != null) {
-                ArrayList<FilteredContainerWrapper> list = new ArrayList<>(containers);
+                ArrayList<DelegatingFilterContainer> list = new ArrayList<>(containers);
 
                 list.sort(CONTAINER_COMPARATOR);
 
-                for (FilteredContainerWrapper container : list) {
+                for (DelegatingFilterContainer container : list) {
                     // Init uri set
                     accepted.addAll(container.getUris());
                     // Populate tree

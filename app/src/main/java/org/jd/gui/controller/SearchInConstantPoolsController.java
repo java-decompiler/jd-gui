@@ -12,7 +12,7 @@ import org.jd.gui.api.feature.IndexesChangeListener;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
 import org.jd.gui.api.model.Type;
-import org.jd.gui.model.container.FilteredContainerWrapper;
+import org.jd.gui.model.container.DelegatingFilterContainer;
 import org.jd.gui.service.type.TypeFactoryService;
 import org.jd.gui.spi.TypeFactory;
 import org.jd.gui.util.exception.ExceptionUtil;
@@ -23,6 +23,7 @@ import javax.swing.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -38,8 +39,8 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
     protected JFrame mainFrame;
     protected SearchInConstantPoolsView searchInConstantPoolsView;
     protected Map<String, Map<String, Collection>> cache;
-    protected Set<FilteredContainerWrapper> filteredContainerWrappers = new HashSet<>();
-    protected Collection<Indexes> collectionOfIndexes;
+    protected Set<DelegatingFilterContainer> delegatingFilterContainers = new HashSet<>();
+    protected Collection<Future<Indexes>> collectionOfFutureIndexes;
     protected Consumer<URI> openCallback;
     protected long indexesHashCode = 0L;
 
@@ -67,12 +68,12 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
         };
     }
 
-    public void show(Collection<Indexes> collectionOfIndexes, Consumer<URI> openCallback) {
+    public void show(Collection<Future<Indexes>> collectionOfFutureIndexes, Consumer<URI> openCallback) {
         // Init attributes
-        this.collectionOfIndexes = collectionOfIndexes;
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         this.openCallback = openCallback;
         // Refresh view
-        long hashCode = collectionOfIndexes.hashCode();
+        long hashCode = collectionOfFutureIndexes.hashCode();
         if (hashCode != indexesHashCode) {
             // List of indexes has changed
             updateTree(searchInConstantPoolsView.getPattern(), searchInConstantPoolsView.getFlags());
@@ -84,50 +85,53 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
 
     @SuppressWarnings("unchecked")
     protected void updateTree(String pattern, int flags) {
-        filteredContainerWrappers.clear();
+        delegatingFilterContainers.clear();
 
         executor.execute(() -> {
+            // Waiting the end of indexation...
             searchInConstantPoolsView.showWaitCursor();
 
             int matchingTypeCount = 0;
             int patternLength = pattern.length();
 
             if (patternLength > 0) {
-                // Waiting the end of indexation...
-                for (Indexes indexes : collectionOfIndexes) {
-                    indexes.waitIndexers();
-                }
+                try {
+                    for (Future<Indexes> futureIndexes : collectionOfFutureIndexes) {
+                        if (futureIndexes.isDone()) {
+                            Indexes indexes = futureIndexes.get();
+                            HashSet<Container.Entry> matchingEntries = new HashSet<>();
+                            // Find matched entries
+                            filter(indexes, pattern, flags, matchingEntries);
 
-                for (Indexes indexes : collectionOfIndexes) {
-                    HashSet<Container.Entry> matchingEntries = new HashSet<>();
-                    // Find matched entries
-                    filter(indexes, pattern, flags, matchingEntries);
+                            if (!matchingEntries.isEmpty()) {
+                                // Search root container with first matching entry
+                                Container.Entry parentEntry = matchingEntries.iterator().next();
+                                Container container = null;
 
-                    if (!matchingEntries.isEmpty()) {
-                        // Search root container with first matching entry
-                        Container.Entry parentEntry = matchingEntries.iterator().next();
-                        Container container = null;
+                                while (parentEntry.getContainer().getRoot() != null) {
+                                    container = parentEntry.getContainer();
+                                    parentEntry = container.getRoot().getParent();
+                                }
 
-                        while (parentEntry.getContainer().getRoot() != null) {
-                            container = parentEntry.getContainer();
-                            parentEntry = container.getRoot().getParent();
+                                // TODO In a future release, display matching strings, types, inner-types, fields and methods, not only matching files
+                                matchingEntries = getOuterEntries(matchingEntries);
+
+                                matchingTypeCount += matchingEntries.size();
+
+                                // Create a filtered container
+                                delegatingFilterContainers.add(new DelegatingFilterContainer(container, matchingEntries));
+                            }
                         }
-
-                        // TODO In a future release, display matching strings, types, inner-types, fields and methods, not only matching files
-                        matchingEntries = getOuterEntries(matchingEntries);
-
-                        matchingTypeCount += matchingEntries.size();
-
-                        // Create a filtered container
-                        filteredContainerWrappers.add(new FilteredContainerWrapper(container, matchingEntries));
                     }
+                } catch (Exception e) {
+                    assert ExceptionUtil.printStackTrace(e);
                 }
             }
 
             final int count = matchingTypeCount;
 
             searchInConstantPoolsView.hideWaitCursor();
-            searchInConstantPoolsView.updateTree(filteredContainerWrappers, count);
+            searchInConstantPoolsView.updateTree(delegatingFilterContainers, count);
         });
     }
 
@@ -402,7 +406,7 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
         // Open the single entry uri
         Container.Entry entry = null;
 
-        for (FilteredContainerWrapper container : filteredContainerWrappers) {
+        for (DelegatingFilterContainer container : delegatingFilterContainers) {
             entry = container.getEntry(uri);
             if (entry != null)
                 break;
@@ -437,7 +441,7 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
             //     sbPattern.append(type.name)
             //
             //     def query = sbPattern.toString()
-            //     def outerPath = UriUtil.getOuterPath(collectionOfIndexes, entry, type)
+            //     def outerPath = UriUtil.getOuterPath(collectionOfFutureIndexes, entry, type)
             //
             //     openClosure(new URI(entry.uri.scheme, entry.uri.host, outerPath, query, null))
             // } else {
@@ -454,10 +458,10 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
     }
 
     // --- IndexesChangeListener --- //
-    public void indexesChanged(Collection<Indexes> collectionOfIndexes) {
+    public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
         if (searchInConstantPoolsView.isVisible()) {
             // Update the list of containers
-            this.collectionOfIndexes = collectionOfIndexes;
+            this.collectionOfFutureIndexes = collectionOfFutureIndexes;
             // And refresh
             updateTree(searchInConstantPoolsView.getPattern(), searchInConstantPoolsView.getFlags());
         }

@@ -10,7 +10,7 @@ package org.jd.gui.controller;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Type;
-import org.jd.gui.model.container.FilteredContainerWrapper;
+import org.jd.gui.model.container.DelegatingFilterContainer;
 import org.jd.gui.service.type.TypeFactoryService;
 import org.jd.gui.spi.TypeFactory;
 import org.jd.gui.view.SelectLocationView;
@@ -60,18 +60,18 @@ public class SelectLocationController {
             list.add(entry);
         }
 
-        HashSet<FilteredContainerWrapper> filteredContainerWrappers = new HashSet<>();
+        HashSet<DelegatingFilterContainer> delegatingFilterContainers = new HashSet<>();
 
         for (Map.Entry<Container, ArrayList<Container.Entry>> mapEntry : map.entrySet()) {
             Container container = mapEntry.getKey();
             // Create a filtered container
             // TODO In a future release, display matching types and inner-types, not only matching files
-            filteredContainerWrappers.add(new FilteredContainerWrapper(container, getOuterEntries(mapEntry.getValue())));
+            delegatingFilterContainers.add(new DelegatingFilterContainer(container, getOuterEntries(mapEntry.getValue())));
         }
 
-        Consumer<URI> selectedEntryCallback = uri -> onLocationSelected(filteredContainerWrappers, uri, selectedLocationCallback);
+        Consumer<URI> selectedEntryCallback = uri -> onLocationSelected(delegatingFilterContainers, uri, selectedLocationCallback);
 
-        selectLocationView.show(location, filteredContainerWrappers, entries.size(), selectedEntryCallback, closeCallback);
+        selectLocationView.show(location, delegatingFilterContainers, entries.size(), selectedEntryCallback, closeCallback);
     }
 
     protected Collection<Container.Entry> getOuterEntries(Collection<Container.Entry> entries) {
@@ -153,11 +153,11 @@ public class SelectLocationController {
         return result;
     }
 
-    protected void onLocationSelected(Set<FilteredContainerWrapper> filteredContainerWrappers, URI uri, Consumer<Container.Entry> selectedLocationCallback) {
+    protected void onLocationSelected(Set<DelegatingFilterContainer> delegatingFilterContainers, URI uri, Consumer<Container.Entry> selectedLocationCallback) {
         // Open the single entry uri
         Container.Entry entry = null;
 
-        for (FilteredContainerWrapper container : filteredContainerWrappers) {
+        for (DelegatingFilterContainer container : delegatingFilterContainers) {
             entry = container.getEntry(uri);
             if (entry != null) {
                 break;

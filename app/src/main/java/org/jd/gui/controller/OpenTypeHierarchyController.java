@@ -18,6 +18,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
@@ -29,7 +31,7 @@ public class OpenTypeHierarchyController implements IndexesChangeListener {
     protected OpenTypeHierarchyView openTypeHierarchyView;
     protected SelectLocationController selectLocationController;
 
-    protected Collection<Indexes> collectionOfIndexes;
+    protected Collection<Future<Indexes>> collectionOfFutureIndexes;
     protected Consumer<URI> openCallback;
 
     public OpenTypeHierarchyController(API api, ScheduledExecutorService executor, JFrame mainFrame) {
@@ -41,20 +43,17 @@ public class OpenTypeHierarchyController implements IndexesChangeListener {
         selectLocationController = new SelectLocationController(api, mainFrame);
     }
 
-    public void show(Collection<Indexes> collectionOfIndexes, Container.Entry entry, String typeName, Consumer<URI> openCallback) {
+    public void show(Collection<Future<Indexes>> collectionOfFutureIndexes, Container.Entry entry, String typeName, Consumer<URI> openCallback) {
         // Init attributes
-        this.collectionOfIndexes = collectionOfIndexes;
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         this.openCallback = openCallback;
         executor.execute(() -> {
             // Waiting the end of indexation...
             openTypeHierarchyView.showWaitCursor();
-            for (Indexes indexes : collectionOfIndexes) {
-                indexes.waitIndexers();
-            }
             SwingUtilities.invokeLater(() -> {
                 openTypeHierarchyView.hideWaitCursor();
                 // Show
-                openTypeHierarchyView.show(collectionOfIndexes, entry, typeName);
+                openTypeHierarchyView.show(collectionOfFutureIndexes, entry, typeName);
             });
         });
     }
@@ -62,24 +61,24 @@ public class OpenTypeHierarchyController implements IndexesChangeListener {
     protected void onTypeSelected(Point leftBottom, Collection<Container.Entry> entries, String typeName) {
         if (entries.size() == 1) {
             // Open the single entry uri
-            openCallback.accept(UriUtil.createURI(api, collectionOfIndexes, entries.iterator().next(), null, typeName));
+            openCallback.accept(UriUtil.createURI(api, collectionOfFutureIndexes, entries.iterator().next(), null, typeName));
         } else {
             // Multiple entries -> Open a "Select location" popup
             selectLocationController.show(
                 new Point(leftBottom.x+(16+2), leftBottom.y+2),
                 entries,
-                (entry) -> openCallback.accept(UriUtil.createURI(api, collectionOfIndexes, entry, null, typeName)), // entry selected
+                (entry) -> openCallback.accept(UriUtil.createURI(api, collectionOfFutureIndexes, entry, null, typeName)), // entry selected
                 () -> openTypeHierarchyView.focus());                                                               // popup closeClosure
         }
     }
 
     // --- IndexesChangeListener --- //
-    public void indexesChanged(Collection<Indexes> collectionOfIndexes) {
+    public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
         if (openTypeHierarchyView.isVisible()) {
             // Update the list of containers
-            this.collectionOfIndexes = collectionOfIndexes;
+            this.collectionOfFutureIndexes = collectionOfFutureIndexes;
             // And refresh
-            openTypeHierarchyView.updateTree(collectionOfIndexes);
+            openTypeHierarchyView.updateTree(collectionOfFutureIndexes);
         }
     }
 }

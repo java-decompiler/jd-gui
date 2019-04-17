@@ -14,7 +14,7 @@ import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
 import org.jd.gui.util.exception.ExceptionUtil;
-import org.jd.gui.util.index.IndexUtil;
+import org.jd.gui.util.index.IndexesUtil;
 import org.jd.gui.util.io.TextReader;
 import org.jd.gui.util.xml.AbstractXmlPathFinder;
 
@@ -23,11 +23,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public class EjbJarXmlFilePage extends TypeReferencePage implements UriGettable, IndexesChangeListener {
     protected API api;
     protected Container.Entry entry;
-    protected Collection<Indexes> collectionOfIndexes;
+    protected Collection<Future<Indexes>> collectionOfFutureIndexes = Collections.emptyList();
 
     public EjbJarXmlFilePage(API api, Container.Entry entry) {
         this.api = api;
@@ -38,8 +39,6 @@ public class EjbJarXmlFilePage extends TypeReferencePage implements UriGettable,
         new PathFinder().find(text);
         // Display
         setText(text);
-        // Show hyperlinks
-        indexesChanged(api.getCollectionOfIndexes());
     }
 
     public String getSyntaxStyle() { return SyntaxConstants.SYNTAX_STYLE_XML; }
@@ -59,7 +58,7 @@ public class EjbJarXmlFilePage extends TypeReferencePage implements UriGettable,
 
                 // Open link
                 String internalTypeName = data.internalTypeName;
-                List<Container.Entry> entries = IndexUtil.grepInternalTypeName(collectionOfIndexes, internalTypeName);
+                List<Container.Entry> entries = IndexesUtil.findInternalTypeName(collectionOfFutureIndexes, internalTypeName);
                 String rootUri = entry.getContainer().getRoot().getUri().toString();
                 ArrayList<Container.Entry> sameContainerEntries = new ArrayList<>();
 
@@ -91,16 +90,16 @@ public class EjbJarXmlFilePage extends TypeReferencePage implements UriGettable,
     }
 
     // --- IndexesChangeListener --- //
-    public void indexesChanged(Collection<Indexes> collectionOfIndexes) {
+    public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
         // Update the list of containers
-        this.collectionOfIndexes = collectionOfIndexes;
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         // Refresh links
         boolean refresh = false;
 
         for (Map.Entry<Integer, HyperlinkData> entry : hyperlinks.entrySet()) {
             TypeHyperlinkData entryData = (TypeHyperlinkData)entry.getValue();
             String internalTypeName = entryData.internalTypeName;
-            boolean enabled = IndexUtil.containsInternalTypeName(collectionOfIndexes, internalTypeName);
+            boolean enabled = IndexesUtil.containsInternalTypeName(collectionOfFutureIndexes, internalTypeName);
 
             if (entryData.enabled != enabled) {
                 entryData.enabled = enabled;

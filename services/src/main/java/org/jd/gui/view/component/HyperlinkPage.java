@@ -101,6 +101,10 @@ public abstract class HyperlinkPage extends TextPage {
     }
 
     public class HyperlinkSyntaxTextArea extends RSyntaxTextArea {
+        /**
+         * @see HyperlinkPage.HyperlinkSyntaxTextArea#getUnderlineForToken(org.fife.ui.rsyntaxtextarea.Token)
+         */
+        @Override
         public boolean getUnderlineForToken(Token t) {
             Map.Entry<Integer, HyperlinkData> entry = hyperlinks.floorEntry(t.getOffset());
             if (entry != null) {

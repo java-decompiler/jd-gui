@@ -13,19 +13,19 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.*;
 
-public class FilteredContainerWrapper implements Container {
+public class DelegatingFilterContainer implements Container {
     protected static final URI DEFAULT_ROOT_URI = URI.create("file:.");
 
     protected Container container;
-    protected EntryWrapper root;
+    protected DelegatedEntry root;
 
     protected Set<URI> validEntries = new HashSet<>();
-    protected Map<URI, EntryWrapper> uriToEntryWrapper = new HashMap<>();
-    protected Map<URI, ContainerWrapper> uriToContainerWrapper = new HashMap<>();
+    protected Map<URI, DelegatedEntry> uriToDelegatedEntry = new HashMap<>();
+    protected Map<URI, DelegatedContainer> uriToDelegatedContainer = new HashMap<>();
 
-    public FilteredContainerWrapper(Container container, Collection<Entry> entries) {
+    public DelegatingFilterContainer(Container container, Collection<Entry> entries) {
         this.container = container;
-        this.root = getEntryWrapper(container.getRoot());
+        this.root = getDelegatedEntry(container.getRoot());
 
         for (Entry entry : entries) {
             while ((entry != null) && !validEntries.contains(entry.getUri())) {
@@ -38,38 +38,38 @@ public class FilteredContainerWrapper implements Container {
     @Override public String getType() { return container.getType(); }
     @Override public Container.Entry getRoot() { return root; }
 
-    public Container.Entry getEntry(URI uri) { return uriToEntryWrapper.get(uri); }
+    public Container.Entry getEntry(URI uri) { return uriToDelegatedEntry.get(uri); }
     public Set<URI> getUris() { return validEntries; }
 
-    protected EntryWrapper getEntryWrapper(Container.Entry entry) {
+    protected DelegatedEntry getDelegatedEntry(Container.Entry entry) {
         URI uri = entry.getUri();
-        EntryWrapper entryWrapper = uriToEntryWrapper.get(uri);
-        if (entryWrapper == null) {
-            uriToEntryWrapper.put(uri, entryWrapper=new EntryWrapper(entry));
+        DelegatedEntry delegatedEntry = uriToDelegatedEntry.get(uri);
+        if (delegatedEntry == null) {
+            uriToDelegatedEntry.put(uri, delegatedEntry =new DelegatedEntry(entry));
         }
-        return entryWrapper;
+        return delegatedEntry;
     }
 
-    protected ContainerWrapper getContainerWrapper(Container container) {
+    protected DelegatedContainer getDelegatedContainer(Container container) {
         Entry root = container.getRoot();
         URI uri = (root == null) ? DEFAULT_ROOT_URI : root.getUri();
-        ContainerWrapper containerWrapper = uriToContainerWrapper.get(uri);
-        if (containerWrapper == null) {
-            uriToContainerWrapper.put(uri, containerWrapper=new ContainerWrapper(container));
+        DelegatedContainer delegatedContainer = uriToDelegatedContainer.get(uri);
+        if (delegatedContainer == null) {
+            uriToDelegatedContainer.put(uri, delegatedContainer =new DelegatedContainer(container));
         }
-        return containerWrapper;
+        return delegatedContainer;
     }
 
-    protected class EntryWrapper implements Entry, Comparable<EntryWrapper> {
+    protected class DelegatedEntry implements Entry, Comparable<DelegatedEntry> {
         protected Entry entry;
         protected Collection<Entry> children;
 
-        public EntryWrapper(Entry entry) {
+        public DelegatedEntry(Entry entry) {
             this.entry = entry;
         }
 
-        @Override public Container getContainer() { return getContainerWrapper(entry.getContainer()); }
-        @Override public Entry getParent() { return getEntryWrapper(entry.getParent()); }
+        @Override public Container getContainer() { return getDelegatedContainer(entry.getContainer()); }
+        @Override public Entry getParent() { return getDelegatedEntry(entry.getParent()); }
         @Override public URI getUri() { return entry.getUri(); }
         @Override public String getPath() { return entry.getPath(); }
         @Override public boolean isDirectory() { return entry.isDirectory(); }
@@ -82,7 +82,7 @@ public class FilteredContainerWrapper implements Container {
                 children = new ArrayList<>();
                 for (Entry child : entry.getChildren()) {
                     if (validEntries.contains(child.getUri())) {
-                        children.add(getEntryWrapper(child));
+                        children.add(getDelegatedEntry(child));
                     }
                 }
             }
@@ -90,7 +90,7 @@ public class FilteredContainerWrapper implements Container {
         }
 
         @Override
-        public int compareTo(EntryWrapper other) {
+        public int compareTo(DelegatedEntry other) {
             if (entry.isDirectory()) {
                 if (!other.isDirectory()) {
                     return -1;
@@ -104,14 +104,14 @@ public class FilteredContainerWrapper implements Container {
         }
     }
 
-    protected class ContainerWrapper implements Container {
+    protected class DelegatedContainer implements Container {
         protected Container container;
 
-        public ContainerWrapper(Container container) {
+        public DelegatedContainer(Container container) {
             this.container = container;
         }
 
         @Override public String getType() { return container.getType(); }
-        @Override public Entry getRoot() { return getEntryWrapper(container.getRoot()); }
+        @Override public Entry getRoot() { return getDelegatedEntry(container.getRoot()); }
     }
 }

@@ -80,10 +80,6 @@ public class TabbedPanel<T extends JComponent & UriGettable> extends JPanel impl
 	}
 
     public void addPage(String title, Icon icon, String tip, T page) {
-        // Update preferences
-        if (page instanceof PreferencesChangeListener) {
-            ((PreferencesChangeListener)page).preferencesChanged(preferences);
-        }
         // Add a new tab
         JLabel tabCloseButton = new JLabel(CLOSE_ICON);
         tabCloseButton.setToolTipText("Close this panel");

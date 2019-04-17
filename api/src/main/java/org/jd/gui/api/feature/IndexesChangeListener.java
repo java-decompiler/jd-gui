@@ -10,7 +10,8 @@ package org.jd.gui.api.feature;
 import org.jd.gui.api.model.Indexes;
 
 import java.util.Collection;
+import java.util.concurrent.Future;
 
 public interface IndexesChangeListener {
-    void indexesChanged(Collection<Indexes> collectionOfIndexes);
+    void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes);
 }

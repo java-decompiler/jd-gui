@@ -12,7 +12,7 @@ import org.jd.gui.api.feature.ContainerEntryGettable;
 import org.jd.gui.api.feature.TreeNodeExpandable;
 import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
-import org.jd.gui.model.container.FilteredContainerWrapper;
+import org.jd.gui.model.container.DelegatingFilterContainer;
 import org.jd.gui.spi.TreeNodeFactory;
 import org.jd.gui.util.swing.SwingUtil;
 import org.jd.gui.view.component.Tree;
@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class SelectLocationView<T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> {
-    protected static final FilteredContainerWrapperComparator FILTERED_CONTAINER_WRAPPER_COMPARATOR = new FilteredContainerWrapperComparator();
+    protected static final DelegatingFilterContainerComparator DELEGATING_FILTER_CONTAINER_COMPARATOR = new DelegatingFilterContainerComparator();
 
     protected API api;
 
@@ -99,7 +99,7 @@ public class SelectLocationView<T extends DefaultMutableTreeNode & ContainerEntr
     }
 
     @SuppressWarnings("unchecked")
-    public void show(Point location, Collection<FilteredContainerWrapper> containers, int locationCount, Consumer<URI> selectedEntryCallback, Runnable closeCallback) {
+    public void show(Point location, Collection<DelegatingFilterContainer> containers, int locationCount, Consumer<URI> selectedEntryCallback, Runnable closeCallback) {
         this.selectedEntryCallback = selectedEntryCallback;
         this.closeCallback = closeCallback;
 
@@ -110,10 +110,10 @@ public class SelectLocationView<T extends DefaultMutableTreeNode & ContainerEntr
             // Reset tree nodes
             root.removeAllChildren();
 
-            ArrayList<FilteredContainerWrapper> sortedContainers = new ArrayList<>(containers);
-            sortedContainers.sort(FILTERED_CONTAINER_WRAPPER_COMPARATOR);
+            ArrayList<DelegatingFilterContainer> sortedContainers = new ArrayList<>(containers);
+            sortedContainers.sort(DELEGATING_FILTER_CONTAINER_COMPARATOR);
 
-            for (FilteredContainerWrapper container : sortedContainers) {
+            for (DelegatingFilterContainer container : sortedContainers) {
                 Container.Entry parentEntry = container.getRoot().getParent();
                 TreeNodeFactory factory = api.getTreeNodeFactory(parentEntry);
 
@@ -194,9 +194,9 @@ public class SelectLocationView<T extends DefaultMutableTreeNode & ContainerEntr
         }
     }
 
-    protected static class FilteredContainerWrapperComparator implements Comparator<FilteredContainerWrapper> {
+    protected static class DelegatingFilterContainerComparator implements Comparator<DelegatingFilterContainer> {
         @Override
-        public int compare(FilteredContainerWrapper fcw1, FilteredContainerWrapper fcw2) {
+        public int compare(DelegatingFilterContainer fcw1, DelegatingFilterContainer fcw2) {
             return fcw1.getRoot().getUri().compareTo(fcw2.getRoot().getUri());
         }
     }

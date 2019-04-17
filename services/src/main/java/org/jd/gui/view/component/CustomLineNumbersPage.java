@@ -93,22 +93,7 @@ public abstract class CustomLineNumbersPage extends HyperlinkPage {
 
     @Override protected RSyntaxTextArea newSyntaxTextArea() { return new SourceSyntaxTextArea(); }
 
-    public class SourceSyntaxTextArea extends RSyntaxTextArea {
-        /**
-         * @see HyperlinkPage.HyperlinkSyntaxTextArea#getUnderlineForToken(org.fife.ui.rsyntaxtextarea.Token)
-         */
-        @Override
-        public boolean getUnderlineForToken(Token t) {
-            Map.Entry<Integer, HyperlinkData> entry = hyperlinks.floorEntry(t.getOffset());
-            if (entry != null) {
-                HyperlinkData data = entry.getValue();
-                if ((data != null) && (t.getOffset() < data.endPosition) && (t.getOffset() >= data.startPosition) && isHyperlinkEnabled(data)) {
-                    return true;
-                }
-            }
-            return super.getUnderlineForToken(t);
-        }
-
+    public class SourceSyntaxTextArea extends HyperlinkSyntaxTextArea {
         @Override protected RTextAreaUI createRTextAreaUI() { return new SourceSyntaxTextAreaUI(this); }
     }
 

@@ -14,7 +14,7 @@ import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
 import org.jd.gui.util.exception.ExceptionUtil;
-import org.jd.gui.util.index.IndexUtil;
+import org.jd.gui.util.index.IndexesUtil;
 import org.jd.gui.util.io.TextReader;
 
 import java.awt.*;
@@ -24,13 +24,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class XmlFilePage extends TypeReferencePage implements UriGettable, IndexesChangeListener {
     protected API api;
     protected Container.Entry entry;
-    protected Collection<Indexes> collectionOfIndexes;
+    protected Collection<Future<Indexes>> collectionOfFutureIndexes;
 
     public XmlFilePage(API api, Container.Entry entry) {
         this.api = api;
@@ -55,8 +56,6 @@ public class XmlFilePage extends TypeReferencePage implements UriGettable, Index
         }
         // Display
         setText(text);
-        // Show hyperlinks
-        indexesChanged(api.getCollectionOfIndexes());
     }
 
     public String getSyntaxStyle() { return SyntaxConstants.SYNTAX_STYLE_XML; }
@@ -76,7 +75,7 @@ public class XmlFilePage extends TypeReferencePage implements UriGettable, Index
 
                 // Open link
                 String internalTypeName = data.internalTypeName;
-                List<Container.Entry> entries = IndexUtil.grepInternalTypeName(collectionOfIndexes, internalTypeName);
+                List<Container.Entry> entries = IndexesUtil.findInternalTypeName(collectionOfFutureIndexes, internalTypeName);
                 String rootUri = entry.getContainer().getRoot().getUri().toString();
                 ArrayList<Container.Entry> sameContainerEntries = new ArrayList<>();
 
@@ -108,16 +107,16 @@ public class XmlFilePage extends TypeReferencePage implements UriGettable, Index
     }
 
     // --- IndexesChangeListener --- //
-    public void indexesChanged(Collection<Indexes> collectionOfIndexes) {
+    public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
         // Update the list of containers
-        this.collectionOfIndexes = collectionOfIndexes;
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         // Refresh links
         boolean refresh = false;
 
         for (Map.Entry<Integer, HyperlinkData> entry : hyperlinks.entrySet()) {
             TypeHyperlinkData data = (TypeHyperlinkData)entry.getValue();
             String internalTypeName = data.internalTypeName;
-            boolean enabled = IndexUtil.containsInternalTypeName(collectionOfIndexes, internalTypeName);
+            boolean enabled = IndexesUtil.containsInternalTypeName(collectionOfFutureIndexes, internalTypeName);
 
             if (data.enabled != enabled) {
                 data.enabled = enabled;

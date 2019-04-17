@@ -17,7 +17,7 @@ import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
 import org.jd.gui.api.model.Type;
 import org.jd.gui.util.exception.ExceptionUtil;
-import org.jd.gui.util.index.IndexUtil;
+import org.jd.gui.util.index.IndexesUtil;
 import org.jd.gui.util.matcher.DescriptorMatcher;
 
 import java.awt.*;
@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +33,7 @@ import java.util.regex.Pattern;
 public abstract class TypePage extends CustomLineNumbersPage implements UriGettable, UriOpenable, IndexesChangeListener, FocusedTypeGettable {
     protected API api;
     protected Container.Entry entry;
-    protected Collection<Indexes> collectionOfIndexes;
+    protected Collection<Future<Indexes>> collectionOfFutureIndexes = Collections.emptyList();
 
     protected HashMap<String, DeclarationData> declarations = new HashMap<>();
     protected TreeMap<Integer, DeclarationData> typeDeclarations = new TreeMap<>();
@@ -66,7 +67,7 @@ public abstract class TypePage extends CustomLineNumbersPage implements UriGetta
                 // Open link
                 ReferenceData reference = hyperlinkReferenceData.reference;
                 String typeName = reference.typeName;
-                List<Container.Entry> entries = IndexUtil.grepInternalTypeName(collectionOfIndexes, typeName);
+                List<Container.Entry> entries = IndexesUtil.findInternalTypeName(collectionOfFutureIndexes, typeName);
                 String fragment = typeName;
 
                 if (reference.name != null) {
@@ -332,9 +333,9 @@ public abstract class TypePage extends CustomLineNumbersPage implements UriGetta
 
     // --- IndexesChangeListener --- //
     @Override
-    public void indexesChanged(Collection<Indexes> collectionOfIndexes) {
+    public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
         // Update the list of containers
-        this.collectionOfIndexes = collectionOfIndexes;
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         // Refresh links
         boolean refresh = false;
 
@@ -360,12 +361,19 @@ public abstract class TypePage extends CustomLineNumbersPage implements UriGetta
                 }
             } else {
                 enabled = false;
-                for (Indexes indexes : collectionOfIndexes) {
-                    Map<String, Collection> index = indexes.getIndex("typeDeclarations");
-                    if ((index != null) && (index.get(typeName) != null)) {
-                        enabled = true;
-                        break;
+
+                try {
+                    for (Future<Indexes> futureIndexes : collectionOfFutureIndexes) {
+                        if (futureIndexes.isDone()) {
+                            Map<String, Collection> index = futureIndexes.get().getIndex("typeDeclarations");
+                            if ((index != null) && (index.get(typeName) != null)) {
+                                enabled = true;
+                                break;
+                            }
+                        }
                     }
+                } catch (Exception e) {
+                    assert ExceptionUtil.printStackTrace(e);
                 }
             }
 
@@ -384,14 +392,20 @@ public abstract class TypePage extends CustomLineNumbersPage implements UriGetta
     protected String searchTypeHavingMember(String typeName, String name, String descriptor, Container.Entry entry) {
         ArrayList<Container.Entry> entries = new ArrayList<>();
 
-        for (Indexes indexes : collectionOfIndexes) {
-            Map<String, Collection> index = indexes.getIndex("typeDeclarations");
-            if (index != null) {
-                Collection<Container.Entry> collection = index.get(typeName);
-                if (collection != null) {
-                    entries.addAll(collection);
+        try {
+            for (Future<Indexes> futureIndexes : collectionOfFutureIndexes) {
+                if (futureIndexes.isDone()) {
+                    Map<String, Collection> index = futureIndexes.get().getIndex("typeDeclarations");
+                    if (index != null) {
+                        Collection<Container.Entry> collection = index.get(typeName);
+                        if (collection != null) {
+                            entries.addAll(collection);
+                        }
+                    }
                 }
             }
+        } catch (Exception e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
 
         String rootUri = entry.getContainer().getRoot().getUri().toString();

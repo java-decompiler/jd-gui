@@ -12,7 +12,7 @@ import org.jd.gui.api.feature.ContainerEntryGettable;
 import org.jd.gui.api.feature.PageCreator;
 import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
-import org.jd.gui.view.component.OneTypeReferenceByLinePage;
+import org.jd.gui.view.component.OneTypeReferencePerLinePage;
 import org.jd.gui.view.data.TreeNodeBean;
 
 import javax.swing.*;
@@ -49,7 +49,7 @@ public class MetainfServiceFileTreeNodeFactoryProvider extends FileTreeNodeFacto
         @Override
         @SuppressWarnings("unchecked")
         public <T extends JComponent & UriGettable> T createPage(API api) {
-            return (T)new OneTypeReferenceByLinePage(api, entry);
+            return (T)new OneTypeReferencePerLinePage(api, entry);
         }
     }
 }

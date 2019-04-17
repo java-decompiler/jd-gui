@@ -13,18 +13,20 @@ import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
 import org.jd.gui.util.exception.ExceptionUtil;
-import org.jd.gui.util.index.IndexUtil;
+import org.jd.gui.util.index.IndexesUtil;
 
 import java.awt.*;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 public class LogPage extends HyperlinkPage implements UriGettable, IndexesChangeListener {
     protected API api;
     protected URI uri;
-    protected Collection<Indexes> collectionOfIndexes;
+    protected Collection<Future<Indexes>> collectionOfFutureIndexes = Collections.emptyList();
 
     public LogPage(API api, URI uri, String content) {
         this.api = api;
@@ -42,8 +44,6 @@ public class LogPage extends HyperlinkPage implements UriGettable, IndexesChange
         parseLine(content, index, content.length());
         // Display
         setText(content);
-        // Show hyperlinks
-        indexesChanged(api.getCollectionOfIndexes());
     }
 
     protected void parseLine(String content, int index, int eol) {
@@ -76,7 +76,7 @@ public class LogPage extends HyperlinkPage implements UriGettable, IndexesChange
                 int lastDotIndex = typeAndMethodNames.lastIndexOf('.');
                 String methodName = typeAndMethodNames.substring(lastDotIndex + 1);
                 String internalTypeName = typeAndMethodNames.substring(0, lastDotIndex).replace('.', '/');
-                List<Container.Entry> entries = IndexUtil.grepInternalTypeName(collectionOfIndexes, internalTypeName);
+                List<Container.Entry> entries = IndexesUtil.findInternalTypeName(collectionOfFutureIndexes, internalTypeName);
                 int leftParenthesisIndex = hyperlinkData.endPosition + 1;
                 int rightParenthesisIndex = text.indexOf(')', leftParenthesisIndex);
                 String lineNumberOrNativeMethodFlag = text.substring(leftParenthesisIndex, rightParenthesisIndex);
@@ -109,9 +109,9 @@ public class LogPage extends HyperlinkPage implements UriGettable, IndexesChange
     }
 
     // --- IndexesChangeListener --- //
-    public void indexesChanged(Collection<Indexes> collectionOfIndexes) {
+    public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
         // Update the list of containers
-        this.collectionOfIndexes = collectionOfIndexes;
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         // Refresh links
         boolean refresh = false;
         String text = getText();
@@ -121,7 +121,7 @@ public class LogPage extends HyperlinkPage implements UriGettable, IndexesChange
             String typeAndMethodNames = text.substring(entryData.startPosition, entryData.endPosition);
             int lastDotIndex = typeAndMethodNames.lastIndexOf('.');
             String internalTypeName = typeAndMethodNames.substring(0, lastDotIndex).replace('.', '/');
-            boolean enabled = IndexUtil.containsInternalTypeName(collectionOfIndexes, internalTypeName);
+            boolean enabled = IndexesUtil.containsInternalTypeName(collectionOfFutureIndexes, internalTypeName);
 
             if (entryData.enabled != enabled) {
                 entryData.enabled = enabled;

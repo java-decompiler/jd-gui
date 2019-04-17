@@ -120,9 +120,9 @@ public class TreeTabbedPanel<T extends DefaultMutableTreeNode & ContainerEntryGe
         int hashCode = 1;
 
         while (enumeration.hasMoreElements()) {
-            Object element = enumeration.nextElement();
-
             hashCode *= 31;
+
+            Object element = enumeration.nextElement();
 
             if (element != null) {
                 hashCode += element.hashCode();
@@ -172,8 +172,6 @@ public class TreeTabbedPanel<T extends DefaultMutableTreeNode & ContainerEntryGe
         if ((page == null) && (baseNode instanceof PageCreator)) {
             page = ((PageCreator)baseNode).createPage(api);
             page.putClientProperty("node", baseNode);
-            page.putClientProperty("preferences-stamp", Integer.valueOf(api.getPreferences().hashCode()));
-            page.putClientProperty("collectionOfIndexes-stamp", Integer.valueOf(api.getCollectionOfIndexes().hashCode()));
 
             String path = baseUri.getPath();
             String label = path.substring(path.lastIndexOf('/')+1);

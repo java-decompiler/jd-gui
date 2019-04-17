@@ -18,6 +18,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 public interface API {
     boolean openURI(URI uri);
@@ -48,5 +49,5 @@ public interface API {
 
     Map<String, String> getPreferences();
 
-    Collection<Indexes> getCollectionOfIndexes();
+    Collection<Future<Indexes>> getCollectionOfFutureIndexes();
 }

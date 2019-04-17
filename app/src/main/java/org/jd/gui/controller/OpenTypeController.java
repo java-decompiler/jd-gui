@@ -11,6 +11,7 @@ import org.jd.gui.api.API;
 import org.jd.gui.api.feature.IndexesChangeListener;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
+import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.net.UriUtil;
 import org.jd.gui.view.OpenTypeView;
 
@@ -18,6 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -27,7 +29,7 @@ public class OpenTypeController implements IndexesChangeListener {
 
     protected API api;
     protected ScheduledExecutorService executor;
-    protected Collection<Indexes> collectionOfIndexes;
+    protected Collection<Future<Indexes>> collectionOfFutureIndexes;
     protected Consumer<URI> openCallback;
 
     protected JFrame mainFrame;
@@ -53,12 +55,12 @@ public class OpenTypeController implements IndexesChangeListener {
         };
     }
 
-    public void show(Collection<Indexes> collectionOfIndexes, Consumer<URI> openCallback) {
+    public void show(Collection<Future<Indexes>> collectionOfFutureIndexes, Consumer<URI> openCallback) {
         // Init attributes
-        this.collectionOfIndexes = collectionOfIndexes;
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         this.openCallback = openCallback;
         // Refresh view
-        long hashCode = collectionOfIndexes.hashCode();
+        long hashCode = collectionOfFutureIndexes.hashCode();
         if (hashCode != indexesHashCode) {
             // List of indexes has changed -> Refresh result list
             updateList(openTypeView.getPattern());
@@ -80,60 +82,63 @@ public class OpenTypeController implements IndexesChangeListener {
                 // Waiting the end of indexation...
                 openTypeView.showWaitCursor();
 
-                for (Indexes indexes : collectionOfIndexes) {
-                    indexes.waitIndexers();
-                }
-
                 Pattern regExpPattern = createRegExpPattern(pattern);
                 Map<String, Collection<Container.Entry>> result = new HashMap<>();
 
-                for (Indexes indexes : collectionOfIndexes) {
-                    String key = String.valueOf(indexes.hashCode()) + "***" + pattern;
-                    Map<String, Collection> matchingEntries = cache.get(key);
+                try {
+                    for (Future<Indexes> futureIndexes : collectionOfFutureIndexes) {
+                        if (futureIndexes.isDone()) {
+                            Indexes indexes = futureIndexes.get();
+                            String key = String.valueOf(indexes.hashCode()) + "***" + pattern;
+                            Map<String, Collection> matchingEntries = cache.get(key);
 
-                    if (matchingEntries != null) {
-                        // Merge 'result' and 'matchingEntries'
-                        for (Map.Entry<String, Collection> mapEntry : matchingEntries.entrySet()) {
-                            Collection<Container.Entry> collection = result.get(mapEntry.getKey());
-                            if (collection == null) {
-                                result.put(mapEntry.getKey(), collection = new HashSet<>());
-                            }
-                            collection.addAll(mapEntry.getValue());
-                        }
-                    } else {
-                        // Waiting the end of indexation...
-                        Map<String, Collection> index = indexes.getIndex("typeDeclarations");
-
-                        if ((index != null) && !index.isEmpty()) {
-                            matchingEntries = new HashMap<>();
-
-                            // Filter
-                            if (patternLength == 1) {
-                                match(pattern.charAt(0), index, matchingEntries);
+                            if (matchingEntries != null) {
+                                // Merge 'result' and 'matchingEntries'
+                                for (Map.Entry<String, Collection> mapEntry : matchingEntries.entrySet()) {
+                                    Collection<Container.Entry> collection = result.get(mapEntry.getKey());
+                                    if (collection == null) {
+                                        result.put(mapEntry.getKey(), collection = new HashSet<>());
+                                    }
+                                    collection.addAll(mapEntry.getValue());
+                                }
                             } else {
-                                String lastKey = key.substring(0, patternLength - 1);
-                                Map<String, Collection> lastResult = cache.get(lastKey);
+                                // Waiting the end of indexation...
+                                Map<String, Collection> index = indexes.getIndex("typeDeclarations");
 
-                                if (lastResult != null) {
-                                    match(regExpPattern, lastResult, matchingEntries);
-                                } else {
-                                    match(regExpPattern, index, matchingEntries);
+                                if ((index != null) && !index.isEmpty()) {
+                                    matchingEntries = new HashMap<>();
+
+                                    // Filter
+                                    if (patternLength == 1) {
+                                        match(pattern.charAt(0), index, matchingEntries);
+                                    } else {
+                                        String lastKey = key.substring(0, patternLength - 1);
+                                        Map<String, Collection> lastResult = cache.get(lastKey);
+
+                                        if (lastResult != null) {
+                                            match(regExpPattern, lastResult, matchingEntries);
+                                        } else {
+                                            match(regExpPattern, index, matchingEntries);
+                                        }
+                                    }
+
+                                    // Store 'matchingEntries'
+                                    cache.put(key, matchingEntries);
+
+                                    // Merge 'result' and 'matchingEntries'
+                                    for (Map.Entry<String, Collection> mapEntry : matchingEntries.entrySet()) {
+                                        Collection<Container.Entry> collection = result.get(mapEntry.getKey());
+                                        if (collection == null) {
+                                            result.put(mapEntry.getKey(), collection = new HashSet<>());
+                                        }
+                                        collection.addAll(mapEntry.getValue());
+                                    }
                                 }
-                            }
-
-                            // Store 'matchingEntries'
-                            cache.put(key, matchingEntries);
-
-                            // Merge 'result' and 'matchingEntries'
-                            for (Map.Entry<String, Collection> mapEntry : matchingEntries.entrySet()) {
-                                Collection<Container.Entry> collection = result.get(mapEntry.getKey());
-                                if (collection == null) {
-                                    result.put(mapEntry.getKey(), collection = new HashSet<>());
-                                }
-                                collection.addAll(mapEntry.getValue());
                             }
                         }
                     }
+                } catch (Exception e) {
+                    assert ExceptionUtil.printStackTrace(e);
                 }
 
                 SwingUtilities.invokeLater(() -> {
@@ -251,22 +256,22 @@ public class OpenTypeController implements IndexesChangeListener {
     protected void onTypeSelected(Point leftBottom, Collection<Container.Entry> entries, String typeName) {
         if (entries.size() == 1) {
             // Open the single entry uri
-            openCallback.accept(UriUtil.createURI(api, collectionOfIndexes, entries.iterator().next(), null, typeName));
+            openCallback.accept(UriUtil.createURI(api, collectionOfFutureIndexes, entries.iterator().next(), null, typeName));
         } else {
             // Multiple entries -> Open a "Select location" popup
             selectLocationController.show(
                 new Point(leftBottom.x+(16+2), leftBottom.y+2),
                 entries,
-                (entry) -> openCallback.accept(UriUtil.createURI(api, collectionOfIndexes, entry, null, typeName)),   // entry selected callback
-                () -> openTypeView.focus());                                                                          // popup close callback
+                (entry) -> openCallback.accept(UriUtil.createURI(api, collectionOfFutureIndexes, entry, null, typeName)), // entry selected callback
+                () -> openTypeView.focus());                                                                              // popup close callback
         }
     }
 
     // --- IndexesChangeListener --- //
-    public void indexesChanged(Collection<Indexes> collectionOfIndexes) {
+    public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
         if (openTypeView.isVisible()) {
             // Update the list of containers
-            this.collectionOfIndexes = collectionOfIndexes;
+            this.collectionOfFutureIndexes = collectionOfFutureIndexes;
             // And refresh
             updateList(openTypeView.getPattern());
         }

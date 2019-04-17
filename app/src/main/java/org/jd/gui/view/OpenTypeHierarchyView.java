@@ -12,6 +12,7 @@ import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
 import org.jd.gui.api.model.TreeNodeData;
 import org.jd.gui.api.model.Type;
+import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.function.TriConsumer;
 import org.jd.gui.util.swing.SwingUtil;
 import org.jd.gui.view.component.Tree;
@@ -27,6 +28,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public class OpenTypeHierarchyView {
     protected static final ImageIcon ROOT_CLASS_ICON = new ImageIcon(OpenTypeHierarchyView.class.getClassLoader().getResource("org/jd/gui/images/generate_class.png"));
@@ -35,7 +37,7 @@ public class OpenTypeHierarchyView {
     protected static final TreeNodeComparator TREE_NODE_COMPARATOR = new TreeNodeComparator();
 
     protected API api;
-    protected Collection<Indexes> collectionOfIndexes;
+    protected Collection<Future<Indexes>> collectionOfFutureIndexes;
 
     protected JDialog openTypeHierarchyDialog;
     protected Tree openTypeHierarchyTree;
@@ -141,8 +143,8 @@ public class OpenTypeHierarchyView {
         });
     }
 
-    public void show(Collection<Indexes> collectionOfIndexes, Container.Entry entry, String typeName) {
-        this.collectionOfIndexes = collectionOfIndexes;
+    public void show(Collection<Future<Indexes>> collectionOfFutureIndexes, Container.Entry entry, String typeName) {
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         SwingUtil.invokeLater(() -> {
             updateTree(entry, typeName);
             openTypeHierarchyDialog.setVisible(true);
@@ -160,8 +162,8 @@ public class OpenTypeHierarchyView {
         SwingUtil.invokeLater(() -> openTypeHierarchyDialog.setCursor(Cursor.getDefaultCursor()));
     }
 
-    public void updateTree(Collection<Indexes> collectionOfIndexes) {
-        this.collectionOfIndexes = collectionOfIndexes;
+    public void updateTree(Collection<Future<Indexes>> collectionOfFutureIndexes) {
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         TreeNode selectedTreeNode = (TreeNode)openTypeHierarchyTree.getLastSelectedPathComponent();
 
         if (selectedTreeNode != null) {
@@ -367,18 +369,24 @@ public class OpenTypeHierarchyView {
     protected List<String> getSubTypeNames(String typeName) {
         ArrayList<String> result = new ArrayList<>();
 
-        for (Indexes indexes : collectionOfIndexes) {
-            Map<String, Collection> subTypeNames = indexes.getIndex("subTypeNames");
-            if (subTypeNames != null) {
-                Collection<String> collection = subTypeNames.get(typeName);
-                if (collection != null) {
-                    for (String tn : collection) {
-                        if (tn != null) {
-                            result.add(tn);
+        try {
+            for (Future<Indexes> futureIndexes : collectionOfFutureIndexes) {
+                if (futureIndexes.isDone()) {
+                    Map<String, Collection> subTypeNames = futureIndexes.get().getIndex("subTypeNames");
+                    if (subTypeNames != null) {
+                        Collection<String> collection = subTypeNames.get(typeName);
+                        if (collection != null) {
+                            for (String tn : collection) {
+                                if (tn != null) {
+                                    result.add(tn);
+                                }
+                            }
                         }
                     }
                 }
             }
+        } catch (Exception e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
 
         return result;
@@ -388,18 +396,24 @@ public class OpenTypeHierarchyView {
     protected List<Container.Entry> getEntries(String typeName) {
         ArrayList<Container.Entry> result = new ArrayList<>();
 
-        for (Indexes indexes : collectionOfIndexes) {
-            Map<String, Collection> typeDeclarations = indexes.getIndex("typeDeclarations");
-            if (typeDeclarations != null) {
-                Collection<Container.Entry> collection = typeDeclarations.get(typeName);
-                if (collection != null) {
-                    for (Container.Entry e : collection) {
-                        if (e != null) {
-                            result.add(e);
+        try {
+            for (Future<Indexes> futureIndexes : collectionOfFutureIndexes) {
+                if (futureIndexes.isDone()) {
+                    Map<String, Collection> typeDeclarations = futureIndexes.get().getIndex("typeDeclarations");
+                    if (typeDeclarations != null) {
+                        Collection<Container.Entry> collection = typeDeclarations.get(typeName);
+                        if (collection != null) {
+                            for (Container.Entry e : collection) {
+                                if (e != null) {
+                                    result.add(e);
+                                }
+                            }
                         }
                     }
                 }
             }
+        } catch (Exception e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
 
         return result;

@@ -13,7 +13,7 @@ import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
 import org.jd.gui.util.exception.ExceptionUtil;
-import org.jd.gui.util.index.IndexUtil;
+import org.jd.gui.util.index.IndexesUtil;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -21,17 +21,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.Future;
 
-public class OneTypeReferenceByLinePage extends TypeReferencePage implements UriGettable, IndexesChangeListener {
+public class OneTypeReferencePerLinePage extends TypeReferencePage implements UriGettable, IndexesChangeListener {
     protected API api;
     protected Container.Entry entry;
-    protected Collection<Indexes> collectionOfIndexes;
+    protected Collection<Future<Indexes>> collectionOfFutureIndexes = Collections.emptyList();
 
-    public OneTypeReferenceByLinePage(API api, Container.Entry entry) {
+    public OneTypeReferencePerLinePage(API api, Container.Entry entry) {
         this.api = api;
         this.entry = entry;
         // Load content file & Create hyperlinks
@@ -61,8 +60,6 @@ public class OneTypeReferenceByLinePage extends TypeReferencePage implements Uri
 
         // Display
         setText(sb.toString());
-        // Show hyperlinks
-        indexesChanged(api.getCollectionOfIndexes());
     }
 
     protected boolean isHyperlinkEnabled(HyperlinkData hyperlinkData) { return ((TypeHyperlinkData)hyperlinkData).enabled; }
@@ -80,7 +77,7 @@ public class OneTypeReferenceByLinePage extends TypeReferencePage implements Uri
 
                 // Open link
                 String internalTypeName = data.internalTypeName;
-                List<Container.Entry> entries = IndexUtil.grepInternalTypeName(collectionOfIndexes, internalTypeName);
+                List<Container.Entry> entries = IndexesUtil.findInternalTypeName(collectionOfFutureIndexes, internalTypeName);
                 String rootUri = entry.getContainer().getRoot().getUri().toString();
                 ArrayList<Container.Entry> sameContainerEntries = new ArrayList<>();
 
@@ -112,16 +109,16 @@ public class OneTypeReferenceByLinePage extends TypeReferencePage implements Uri
     }
 
     // --- IndexesChangeListener --- //
-    public void indexesChanged(Collection<Indexes> collectionOfIndexes) {
+    public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
         // Update the list of containers
-        this.collectionOfIndexes = collectionOfIndexes;
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
         // Refresh links
         boolean refresh = false;
 
         for (Map.Entry<Integer, HyperlinkData> entry : hyperlinks.entrySet()) {
             TypeHyperlinkData entryData = (TypeHyperlinkData)entry.getValue();
             String internalTypeName = entryData.internalTypeName;
-            boolean enabled = IndexUtil.containsInternalTypeName(collectionOfIndexes, internalTypeName);
+            boolean enabled = IndexesUtil.containsInternalTypeName(collectionOfFutureIndexes, internalTypeName);
 
             if (entryData.enabled != enabled) {
                 entryData.enabled = enabled;

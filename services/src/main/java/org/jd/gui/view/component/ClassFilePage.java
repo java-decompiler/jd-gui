@@ -86,9 +86,6 @@ public class ClassFilePage extends TypePage {
             // Decompile class file
             DECOMPILER.decompile(configuration, loader, printer, entryInternalName);
             setText(printer.getStringBuffer().toString());
-
-            // Show hyperlinks
-            indexesChanged(api.getCollectionOfIndexes());
         } catch (Throwable t) {
             assert ExceptionUtil.printStackTrace(t);
             setText("// INTERNAL ERROR //");
