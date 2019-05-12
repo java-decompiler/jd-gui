@@ -111,7 +111,7 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
             String entryInternalName = entryPath.substring(0, entryPath.length() - 6); // 6 = ".class".length()
 
             // Decompile class file
-            DECOMPILER.decompile(configuration, loader, printer, entryInternalName);
+            DECOMPILER.decompile(loader, printer, entryInternalName, configuration);
 
             StringBuilder stringBuffer = printer.getStringBuffer();
 

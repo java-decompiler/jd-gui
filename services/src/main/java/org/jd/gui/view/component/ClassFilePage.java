@@ -37,7 +37,7 @@ public class ClassFilePage extends TypePage {
         // Early class loading
         try {
             String internalTypeName = ClassFilePage.class.getName().replace('.', '/');
-            DECOMPILER.decompile(Collections.emptyMap(), new ClassPathLoader(), new NopPrinter(), internalTypeName);
+            DECOMPILER.decompile(new ClassPathLoader(), new NopPrinter(), internalTypeName);
         } catch (Throwable t) {
             assert ExceptionUtil.printStackTrace(t);
         }
@@ -84,7 +84,7 @@ public class ClassFilePage extends TypePage {
             String entryInternalName = entryPath.substring(0, entryPath.length() - 6); // 6 = ".class".length()
 
             // Decompile class file
-            DECOMPILER.decompile(configuration, loader, printer, entryInternalName);
+            DECOMPILER.decompile(loader, printer, entryInternalName, configuration);
             setText(printer.getStringBuffer().toString());
         } catch (Throwable t) {
             assert ExceptionUtil.printStackTrace(t);
