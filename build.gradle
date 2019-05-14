@@ -5,6 +5,7 @@ buildscript {
     dependencies {
         classpath 'com.netflix.nebula:gradle-ospackage-plugin:5.3.0'    // RPM & DEB support
         classpath 'edu.sc.seis.gradle:launch4j:2.4.4'
+		classpath 'net.sf.proguard:proguard-gradle:6.1.0'
     }
 }
 
@@ -49,7 +50,7 @@ cleanIdea.doFirst {
   followSymlinks = true
 }
 
-// All in one JAR //
+// All in one JAR file //
 subprojects.each { subproject ->
     evaluationDependsOn(subproject.path)
 }
@@ -80,6 +81,8 @@ jar {
                 'JD-Core-Version': project.jdCoreVersion
     }
     exclude 'META-INF/licenses/**', 'META-INF/maven/**', 'META-INF/INDEX.LIST'
+    exclude '**/ErrorStrip_*.properties', '**/RSyntaxTextArea_*.properties', '**/RTextArea_*.properties'
+    exclude '**/FocusableTip_*.properties', '**/RSyntaxTextArea_License.txt'
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
     doFirst {
         // Create SPI directory
@@ -99,17 +102,31 @@ jar {
     }
 }
 
+// Minify JAR file //
+task proguard(type: proguard.gradle.ProGuardTask, dependsOn: 'jar') {
+    configuration 'src/proguard/resources/proguard.config.txt'
+    injars jar.archivePath
+    outjars 'build/libs/' + project.name + '-' + project.version + '-min.jar'
+    libraryjars System.getProperty('java.home') + '/lib/rt.jar'
+}
+
 // Java executable wrapper for Windows //
 launch4j {
+    createExe.dependsOn 'proguard'
+
     version = textVersion = project.version
     fileDescription = productName = 'JD-GUI'
     errTitle 'JD-GUI Windows Wrapper'
     copyright 'JD-GUI (C) 2008-2019 Emmanuel Dupuy'
     icon projectDir.path + '/src/launch4j/resources/images/jd-gui.ico'
+    jar projectDir.path + '/' + proguard.outJarFiles[0]
 }
 
 // Packages for Linux //
 ospackage {
+    buildDeb.dependsOn 'proguard'
+    buildRpm.dependsOn 'proguard'
+
     license = file('LICENSE')
     maintainer 'Emmanuel Dupuy <emmanue1@users.noreply.github.com>'
     os LINUX
@@ -121,7 +138,7 @@ ospackage {
     url 'https://github.com/java-decompiler/jd-gui'
 
     into '/opt/' + project.name
-    from ('build/libs/') {
+    from (proguard.outJarFiles[0]) {
         fileMode 0755
     }
     from ('src/linux/resources/') {
@@ -129,8 +146,8 @@ ospackage {
     }
     from 'LICENSE', 'NOTICE', 'README.md'
 
-    postInstall 'cd /opt/'+ project.name+'; ln -s ./jd-gui-'+project.version+'.jar ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui; xdg-desktop-menu install ./*.desktop'
-    preUninstall 'cd /opt/'+ project.name+'; rm -f ./jd-gui.jar; rm -fr ./ext; xdg-desktop-menu uninstall ./*.desktop'
+    postInstall 'cd /opt/' + project.name + '; ln -s ./' + file(proguard.outJarFiles[0]).name + ' ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui; xdg-desktop-menu install ./*.desktop'
+    preUninstall 'cd /opt/' + project.name + '; rm -f ./jd-gui.jar; rm -fr ./ext; xdg-desktop-menu uninstall ./*.desktop'
 }
 
 // Distributions for OSX and Windows //
@@ -139,7 +156,8 @@ distributions {
         into('JD-GUI.app/Contents') {
             from('src/osx/resources') {
                 include 'Info.plist'
-                expand VERSION: project.version
+                expand VERSION: project.version,
+                       JAR: file(proguard.outJarFiles[0]).name
             }
         }
         into('JD-GUI.app/Contents/MacOS') {
@@ -149,7 +167,7 @@ distributions {
             }
         }
         into('JD-GUI.app/Contents/Resources/Java') {
-            from jar.archivePath
+            from proguard.outJarFiles[0]
         }
         from 'LICENSE', 'NOTICE', 'README.md'
     }
@@ -157,14 +175,15 @@ distributions {
         from 'build/launch4j/jd-gui.exe'
         from 'LICENSE', 'NOTICE', 'README.md'
     }
+
+    installWindowsDist.dependsOn createExe
+    windowsDistTar.dependsOn createExe
+    windowsDistZip.dependsOn createExe
+
+    installOsxDist.dependsOn 'proguard'
+    osxDistTar.dependsOn 'proguard'
+    osxDistZip.dependsOn 'proguard'
 }
-
-installWindowsDist.dependsOn createExe
-windowsDistTar.dependsOn createExe
-windowsDistZip.dependsOn createExe
-
-buildDeb.dependsOn jar
-buildRpm.dependsOn jar
 
 build.finalizedBy buildDeb
 build.finalizedBy buildRpm
