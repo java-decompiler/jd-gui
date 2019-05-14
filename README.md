@@ -5,7 +5,6 @@ JD-GUI, a standalone graphical utility that displays Java sources from CLASS fil
 ![](http://jd.benow.ca/img/screenshot17.png)
 
 - Java Decompiler projects home page: [http://java-decompiler.github.io](http://java-decompiler.github.io)
-- Java Decompiler Wikipedia page: [http://en.wikipedia.org/wiki/Java_Decompiler](http://en.wikipedia.org/wiki/Java_Decompiler)
 - JD-GUI source code: [https://github.com/java-decompiler/jd-gui](https://github.com/java-decompiler/jd-gui)
 
 ## Description
