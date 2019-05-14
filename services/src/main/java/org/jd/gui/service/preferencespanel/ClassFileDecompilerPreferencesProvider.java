@@ -13,15 +13,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 
-public class ClassFileViewerPreferencesProvider extends JPanel implements PreferencesPanel {
-    protected static final String ESCAPE_UNICODE_CHARACTERS = "ClassFileViewerPreferences.escapeUnicodeCharacters";
-    protected static final String REALIGN_LINE_NUMBERS = "ClassFileViewerPreferences.realignLineNumbers";
+public class ClassFileDecompilerPreferencesProvider extends JPanel implements PreferencesPanel {
+    protected static final String ESCAPE_UNICODE_CHARACTERS = "ClassFileDecompilerPreferences.escapeUnicodeCharacters";
+    protected static final String REALIGN_LINE_NUMBERS = "ClassFileDecompilerPreferences.realignLineNumbers";
 
     protected PreferencesPanel.PreferencesPanelChangeListener listener = null;
     protected JCheckBox escapeUnicodeCharactersCheckBox;
     protected JCheckBox realignLineNumbersCheckBox;
 
-    public ClassFileViewerPreferencesProvider() {
+    public ClassFileDecompilerPreferencesProvider() {
         super(new GridLayout(0,1));
 
         escapeUnicodeCharactersCheckBox = new JCheckBox("Escape unicode characters");
@@ -32,7 +32,7 @@ public class ClassFileViewerPreferencesProvider extends JPanel implements Prefer
     }
 
     // --- PreferencesPanel --- //
-    @Override public String getPreferencesGroupTitle() { return "Viewer"; }
+    @Override public String getPreferencesGroupTitle() { return "Decompiler"; }
     @Override public String getPreferencesPanelTitle() { return "Class file"; }
     @Override public JComponent getPanel() { return this; }
 

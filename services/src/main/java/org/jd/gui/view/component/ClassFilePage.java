@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ClassFilePage extends TypePage {
-    protected static final String ESCAPE_UNICODE_CHARACTERS   = "ClassFileViewerPreferences.escapeUnicodeCharacters";
-    protected static final String REALIGN_LINE_NUMBERS        = "ClassFileViewerPreferences.realignLineNumbers";
+    protected static final String ESCAPE_UNICODE_CHARACTERS   = "ClassFileDecompilerPreferences.escapeUnicodeCharacters";
+    protected static final String REALIGN_LINE_NUMBERS        = "ClassFileDecompilerPreferences.realignLineNumbers";
 
     protected static final ClassFileToJavaSourceDecompiler DECOMPILER = new ClassFileToJavaSourceDecompiler();
 

@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.jar.Manifest;
 
 public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
-    protected static final String ESCAPE_UNICODE_CHARACTERS = "ClassFileSaverPreferences.escapeUnicodeCharacters";
-    protected static final String REALIGN_LINE_NUMBERS = "ClassFileSaverPreferences.realignLineNumbers";
+    protected static final String ESCAPE_UNICODE_CHARACTERS = "ClassFileDecompilerPreferences.escapeUnicodeCharacters";
+    protected static final String REALIGN_LINE_NUMBERS = "ClassFileDecompilerPreferences.realignLineNumbers";
     protected static final String WRITE_LINE_NUMBERS = "ClassFileSaverPreferences.writeLineNumbers";
     protected static final String WRITE_METADATA = "ClassFileSaverPreferences.writeMetadata";
 
