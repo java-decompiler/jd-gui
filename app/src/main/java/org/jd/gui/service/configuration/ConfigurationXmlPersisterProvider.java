@@ -78,96 +78,89 @@ public class ConfigurationXmlPersisterProvider implements ConfigurationPersister
         config.setRecentLoadDirectory(recentSaveDirectory);
         config.setRecentSaveDirectory(recentSaveDirectory);
 
-        XMLInputFactory factory = XMLInputFactory.newInstance();
-        XMLStreamReader reader = null;
+        if (FILE.exists()) {
+            try (FileInputStream fis = new FileInputStream(FILE)) {
+                XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(fis);
 
-        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(FILE))) {
-            // Load values
-            reader = factory.createXMLStreamReader(bis);
+                // Load values
+                String name = "";
+                Stack<String> names = new Stack<>();
+                List<File> recentFiles = new ArrayList<>();
+                boolean maximize = false;
+                Map<String, String> preferences = config.getPreferences();
 
-            String name = "";
-            Stack<String> names = new Stack<>();
-            List<File> recentFiles = new ArrayList<>();
-            boolean maximize = false;
-            Map<String, String> preferences = config.getPreferences();
-
-            while (reader.hasNext()) {
-                switch (reader.next()) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        names.push(name);
-                        name += '/' + reader.getLocalName();
-                        switch (name) {
-                            case "/configuration/gui/mainWindow/location":
-                                x = Integer.parseInt(reader.getAttributeValue(null, "x"));
-                                y = Integer.parseInt(reader.getAttributeValue(null, "y"));
-                                break;
-                            case "/configuration/gui/mainWindow/size":
-                                w = Integer.parseInt(reader.getAttributeValue(null, "w"));
-                                h = Integer.parseInt(reader.getAttributeValue(null, "h"));
-                                break;
-                        }
-                        break;
-                    case XMLStreamConstants.END_ELEMENT:
-                        name = names.pop();
-                        break;
-                    case XMLStreamConstants.CHARACTERS:
-                        switch (name) {
-                            case "/configuration/recentFilePaths/filePath":
-                                File file = new File(reader.getText().trim());
-                                if (file.exists()) {
-                                    recentFiles.add(file);
-                                }
-                                break;
-                            case "/configuration/recentDirectories/loadPath":
-                                file = new File(reader.getText().trim());
-                                if (file.exists()) {
-                                    config.setRecentLoadDirectory(file);
-                                }
-                                break;
-                            case "/configuration/recentDirectories/savePath":
-                                file = new File(reader.getText().trim());
-                                if (file.exists()) {
-                                    config.setRecentSaveDirectory(file);
-                                }
-                                break;
-                            case "/configuration/gui/lookAndFeel":
-                                config.setLookAndFeel(reader.getText().trim());
-                                break;
-                            case "/configuration/gui/mainWindow/maximize":
-                                maximize = Boolean.parseBoolean(reader.getText().trim());
-                                break;
-                            default:
-                                if (name.startsWith("/configuration/preferences/")) {
-                                    String key = name.substring("/configuration/preferences/".length());
-                                    preferences.put(key, reader.getText().trim());
-                                }
-                                break;
-                        }
-                        break;
+                while (reader.hasNext()) {
+                    switch (reader.next()) {
+                        case XMLStreamConstants.START_ELEMENT:
+                            names.push(name);
+                            name += '/' + reader.getLocalName();
+                            switch (name) {
+                                case "/configuration/gui/mainWindow/location":
+                                    x = Integer.parseInt(reader.getAttributeValue(null, "x"));
+                                    y = Integer.parseInt(reader.getAttributeValue(null, "y"));
+                                    break;
+                                case "/configuration/gui/mainWindow/size":
+                                    w = Integer.parseInt(reader.getAttributeValue(null, "w"));
+                                    h = Integer.parseInt(reader.getAttributeValue(null, "h"));
+                                    break;
+                            }
+                            break;
+                        case XMLStreamConstants.END_ELEMENT:
+                            name = names.pop();
+                            break;
+                        case XMLStreamConstants.CHARACTERS:
+                            switch (name) {
+                                case "/configuration/recentFilePaths/filePath":
+                                    File file = new File(reader.getText().trim());
+                                    if (file.exists()) {
+                                        recentFiles.add(file);
+                                    }
+                                    break;
+                                case "/configuration/recentDirectories/loadPath":
+                                    file = new File(reader.getText().trim());
+                                    if (file.exists()) {
+                                        config.setRecentLoadDirectory(file);
+                                    }
+                                    break;
+                                case "/configuration/recentDirectories/savePath":
+                                    file = new File(reader.getText().trim());
+                                    if (file.exists()) {
+                                        config.setRecentSaveDirectory(file);
+                                    }
+                                    break;
+                                case "/configuration/gui/lookAndFeel":
+                                    config.setLookAndFeel(reader.getText().trim());
+                                    break;
+                                case "/configuration/gui/mainWindow/maximize":
+                                    maximize = Boolean.parseBoolean(reader.getText().trim());
+                                    break;
+                                default:
+                                    if (name.startsWith("/configuration/preferences/")) {
+                                        String key = name.substring("/configuration/preferences/".length());
+                                        preferences.put(key, reader.getText().trim());
+                                    }
+                                    break;
+                            }
+                            break;
+                    }
                 }
-            }
 
-            if (recentFiles.size() > Constants.MAX_RECENT_FILES) {
-                // Truncate
-                recentFiles = recentFiles.subList(0, Constants.MAX_RECENT_FILES);
-            }
-            config.setRecentFiles(recentFiles);
-
-            if ((x >= 0) && (y >= 0) && (x + w < screenSize.width) && (y + h < screenSize.height)) {
-                // Update preferences
-                config.setMainWindowLocation(new Point(x, y));
-                config.setMainWindowSize(new Dimension(w, h));
-                config.setMainWindowMaximize(maximize);
-            }
-        } catch (Exception e) {
-            assert ExceptionUtil.printStackTrace(e);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (XMLStreamException e) {
-                    assert ExceptionUtil.printStackTrace(e);
+                if (recentFiles.size() > Constants.MAX_RECENT_FILES) {
+                    // Truncate
+                    recentFiles = recentFiles.subList(0, Constants.MAX_RECENT_FILES);
                 }
+                config.setRecentFiles(recentFiles);
+
+                if ((x >= 0) && (y >= 0) && (x + w < screenSize.width) && (y + h < screenSize.height)) {
+                    // Update preferences
+                    config.setMainWindowLocation(new Point(x, y));
+                    config.setMainWindowSize(new Dimension(w, h));
+                    config.setMainWindowMaximize(maximize);
+                }
+
+                reader.close();
+            } catch (Exception e) {
+                assert ExceptionUtil.printStackTrace(e);
             }
         }
 
@@ -182,12 +175,10 @@ public class ConfigurationXmlPersisterProvider implements ConfigurationPersister
         Point l = configuration.getMainWindowLocation();
         Dimension s = configuration.getMainWindowSize();
 
-        XMLOutputFactory factory = XMLOutputFactory.newInstance();
-        XMLStreamWriter writer = null;
+        try (FileOutputStream fos = new FileOutputStream(FILE)) {
+            XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(fos);
 
-        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(FILE))) {
             // Load values
-            writer = factory.createXMLStreamWriter(bos);
             writer.writeStartDocument();
             writer.writeCharacters("\n");
             writer.writeStartElement("configuration");
@@ -261,16 +252,9 @@ public class ConfigurationXmlPersisterProvider implements ConfigurationPersister
 
             writer.writeEndElement();
             writer.writeEndDocument();
+            writer.close();
         } catch (Exception e) {
             assert ExceptionUtil.printStackTrace(e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (XMLStreamException e) {
-                    assert ExceptionUtil.printStackTrace(e);
-                }
-            }
         }
     }
 }
