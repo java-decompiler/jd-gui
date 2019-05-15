@@ -103,7 +103,8 @@ public class MainController implements API {
                 e -> openURI(history.forward()),
                 e -> onSearch(),
                 e -> onJdWebSite(),
-                e -> onWikipedia(),
+                e -> onJdGuiIssues(),
+                e -> onJdCoreIssues(),
                 e -> onPreferences(),
                 e -> onAbout(),
                 () -> panelClosed(),
@@ -355,12 +356,25 @@ public class MainController implements API {
         }
     }
 
-    protected void onWikipedia() {
+    protected void onJdGuiIssues() {
         if (Desktop.isDesktopSupported()) {
             Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.BROWSE)) {
                 try {
-                    desktop.browse(URI.create("http://en.wikipedia.org/wiki/Java_Decompiler"));
+                    desktop.browse(URI.create("https://github.com/java-decompiler/jd-gui/issues"));
+                } catch (IOException e) {
+                    assert ExceptionUtil.printStackTrace(e);
+                }
+            }
+        }
+    }
+
+    protected void onJdCoreIssues() {
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
+            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(URI.create("https://github.com/java-decompiler/jd-core/issues"));
                 } catch (IOException e) {
                     assert ExceptionUtil.printStackTrace(e);
                 }

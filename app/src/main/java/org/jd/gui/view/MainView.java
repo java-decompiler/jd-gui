@@ -76,7 +76,8 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
             ActionListener forwardActionListener,
             ActionListener searchActionListener,
             ActionListener jdWebSiteActionListener,
-            ActionListener wikipediaActionListener,
+            ActionListener jdGuiIssuesActionListener,
+            ActionListener jdCoreIssuesActionListener,
             ActionListener preferencesActionListener,
             ActionListener aboutActionListener,
             Runnable panelClosedCallback,
@@ -187,7 +188,8 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
             forwardAction = newAction("Forward", newImageIcon("/org/jd/gui/images/forward_nav.png"), false, forwardActionListener);
             Action searchAction = newAction("Search...", newImageIcon("/org/jd/gui/images/search_src.png"), false, searchActionListener);
             Action jdWebSiteAction = newAction("JD Web site", browser, "Open JD Web site", jdWebSiteActionListener);
-            Action wikipediaAction = newAction("Wikipedia", browser, "Open Wikipedia page", wikipediaActionListener);
+            Action jdGuiIssuesActionAction = newAction("JD-GUI issues", browser, "Open JD-GUI issues page", jdGuiIssuesActionListener);
+            Action jdCoreIssuesActionAction = newAction("JD-Core issues", browser, "Open JD-Core issues page", jdCoreIssuesActionListener);
             Action preferencesAction = newAction("Preferences...", newImageIcon("/org/jd/gui/images/preferences.png"), true, "Open the preferences panel", preferencesActionListener);
             Action aboutAction = newAction("About...", true, "About JD-GUI", aboutActionListener);
 
@@ -232,7 +234,8 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
             menuBar.add(menu);
             if (browser) {
                 menu.add(jdWebSiteAction);
-                menu.add(wikipediaAction);
+                menu.add(jdGuiIssuesActionAction);
+                menu.add(jdCoreIssuesActionAction);
                 menu.addSeparator();
             }
             menu.add(preferencesAction).setAccelerator(KeyStroke.getKeyStroke('P', menuShortcutKeyMask|InputEvent.SHIFT_MASK));
