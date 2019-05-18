@@ -120,6 +120,7 @@ launch4j {
     copyright 'JD-GUI (C) 2008-2019 Emmanuel Dupuy'
     icon projectDir.path + '/src/launch4j/resources/images/jd-gui.ico'
     jar projectDir.path + '/' + proguard.outJarFiles[0]
+    bundledJrePath = '%JAVA_HOME%'
 }
 
 // Packages for Linux //
