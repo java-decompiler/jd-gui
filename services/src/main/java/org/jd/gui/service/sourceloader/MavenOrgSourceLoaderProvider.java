@@ -209,10 +209,10 @@ public class MavenOrgSourceLoaderProvider implements SourceLoader {
                     tmpFile.deleteOnExit();
 
                     try (InputStream is = new BufferedInputStream(loadUrl.openStream()); OutputStream os = new BufferedOutputStream(new FileOutputStream(tmpFile))) {
-                        int readed = is.read(buffer);
-                        while (readed > 0) {
-                            os.write(buffer, 0, readed);
-                            readed = is.read(buffer);
+                        int read = is.read(buffer);
+                        while (read > 0) {
+                            os.write(buffer, 0, read);
+                            read = is.read(buffer);
                         }
                     }
 
