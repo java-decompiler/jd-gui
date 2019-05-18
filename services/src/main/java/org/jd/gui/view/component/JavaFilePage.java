@@ -31,7 +31,7 @@ public class JavaFilePage extends TypePage {
     public JavaFilePage(API api, Container.Entry entry) {
         super(api, entry);
         // Load content file
-        String text = TextReader.getText(entry.getInputStream()).replace("\r\n", "\n").replace("\r", "\n");
+        String text = TextReader.getText(entry.getInputStream()).replace("\r\n", "\n").replace('\r', '\n');
         // Parse
         DeclarationListener declarationListener = new DeclarationListener(entry);
         ReferenceListener referenceListener = new ReferenceListener(entry);
@@ -40,7 +40,12 @@ public class JavaFilePage extends TypePage {
         referenceListener.init(declarationListener);
         ANTLRJavaParser.parse(new ANTLRInputStream(text), referenceListener);
         // Display
+        initLineNumbers(getMaxLineNumber(text));
         setText(text);
+    }
+
+    private static int getMaxLineNumber(String text) {
+        return text.length() - text.replace("\n", "").length();
     }
 
     public String getSyntaxStyle() { return SyntaxConstants.SYNTAX_STYLE_JAVA; }

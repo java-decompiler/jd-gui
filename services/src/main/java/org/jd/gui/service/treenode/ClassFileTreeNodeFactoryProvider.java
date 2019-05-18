@@ -12,7 +12,7 @@ import org.jd.gui.api.feature.ContainerEntryGettable;
 import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.util.exception.ExceptionUtil;
-import org.jd.gui.view.component.ClassFilePage;
+import org.jd.gui.view.component.DynamicPage;
 import org.jd.gui.view.data.TreeNodeBean;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ public class ClassFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFa
     static {
         // Early class loading
         try {
-            Class.forName(ClassFilePage.class.getName());
+            Class.forName(DynamicPage.class.getName());
         } catch (Exception e) {
             assert ExceptionUtil.printStackTrace(e);
         }
@@ -49,7 +49,7 @@ public class ClassFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFa
         @Override
         @SuppressWarnings("unchecked")
         public <T extends JComponent & UriGettable> T makePage(API a, Container.Entry e) {
-            return (T)new ClassFilePage(a, e);
+            return (T)new DynamicPage(a, e);
         }
 
         @Override

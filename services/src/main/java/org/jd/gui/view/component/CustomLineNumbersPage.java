@@ -7,7 +7,10 @@
 
 package org.jd.gui.view.component;
 
-import org.fife.ui.rsyntaxtextarea.*;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaUI;
+import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities;
 import org.fife.ui.rsyntaxtextarea.folding.Fold;
 import org.fife.ui.rsyntaxtextarea.folding.FoldManager;
 import org.fife.ui.rtextarea.Gutter;
@@ -55,6 +58,14 @@ public abstract class CustomLineNumbersPage extends HyperlinkPage {
             if (this.maxLineNumber < maxLineNumber) {
                 this.maxLineNumber = maxLineNumber;
             }
+        }
+    }
+
+    public void initLineNumbers(int maxLineNumber) {
+        setMaxLineNumber(maxLineNumber);
+
+        for (int i=1; i<=maxLineNumber; i++) {
+            lineNumberMap[i] = i;
         }
     }
 

@@ -21,6 +21,7 @@ import org.jd.gui.service.mainpanel.PanelFactoryService;
 import org.jd.gui.service.pastehandler.PasteHandlerService;
 import org.jd.gui.service.platform.PlatformService;
 import org.jd.gui.service.preferencespanel.PreferencesPanelService;
+import org.jd.gui.service.sourceloader.SourceLoaderService;
 import org.jd.gui.service.sourcesaver.SourceSaverService;
 import org.jd.gui.service.treenode.TreeNodeFactoryService;
 import org.jd.gui.service.type.TypeFactoryService;
@@ -64,6 +65,7 @@ public class MainController implements API {
     protected SaveAllSourcesController saveAllSourcesController;
     protected SelectLocationController selectLocationController;
     protected AboutController aboutController;
+    protected SourceLoaderService sourceLoaderService;
 
     protected History history = new History();
     protected JComponent currentPage = null;
@@ -147,6 +149,7 @@ public class MainController implements API {
                 preferencesController = new PreferencesController(configuration, mainFrame, PreferencesPanelService.getInstance().getProviders());
                 selectLocationController = new SelectLocationController(MainController.this, mainFrame);
                 aboutController = new AboutController(mainFrame);
+                sourceLoaderService = new SourceLoaderService();
                 // Add listeners
                 mainFrame.addComponentListener(new MainFrameListener(configuration));
                 // Set drop files transfer handler
@@ -676,5 +679,26 @@ public class MainController implements API {
         }
 
         return list;
+    }
+
+    @Override
+    public String getSource(Container.Entry entry) {
+        return sourceLoaderService.getSource(this, entry);
+    }
+
+    @Override
+    public void loadSource(Container.Entry entry, LoadSourceListener listener) {
+        executor.execute(() -> {
+            String source = sourceLoaderService.loadSource(this, entry);
+
+            if ((source != null) && !source.isEmpty()) {
+                listener.sourceLoaded(source);
+            }
+        });
+    }
+
+    @Override
+    public File loadSourceFile(Container.Entry entry) {
+        return sourceLoaderService.getSourceFile(this, entry);
     }
 }

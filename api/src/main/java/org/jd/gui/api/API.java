@@ -50,4 +50,14 @@ public interface API {
     Map<String, String> getPreferences();
 
     Collection<Future<Indexes>> getCollectionOfFutureIndexes();
+
+    interface LoadSourceListener {
+        void sourceLoaded(String source);
+    }
+
+    String getSource(Container.Entry entry);
+
+    void loadSource(Container.Entry entry, LoadSourceListener listener);
+
+    File loadSourceFile(Container.Entry entry);
 }

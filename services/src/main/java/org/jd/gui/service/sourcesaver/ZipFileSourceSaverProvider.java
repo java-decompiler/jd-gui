@@ -14,7 +14,10 @@ import org.jd.gui.util.exception.ExceptionUtil;
 
 import java.io.File;
 import java.net.URI;
-import java.nio.file.*;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 public class ZipFileSourceSaverProvider extends DirectorySourceSaverProvider {
@@ -32,25 +35,31 @@ public class ZipFileSourceSaverProvider extends DirectorySourceSaverProvider {
                 Files.createDirectories(parentPath);
             }
 
-            File tmpFile = File.createTempFile("jd-gui.", ".tmp.zip");
-            tmpFile.delete();
+            File tmpSourceFile = api.loadSourceFile(entry);
 
-            URI tmpFileUri = tmpFile.toURI();
-            URI tmpArchiveUri = new URI("jar:" + tmpFileUri.getScheme(), tmpFileUri.getHost(), tmpFileUri.getPath() + "!/", null);
+            if (tmpSourceFile != null) {
+                Files.copy(tmpSourceFile.toPath(), path);
+            } else {
+                File tmpFile = File.createTempFile("jd-gui.", ".tmp.zip");
 
-            HashMap<String,String> env = new HashMap<>();
-            env.put("create", "true");
+                tmpFile.delete();
+                tmpFile.deleteOnExit();
 
-            FileSystem tmpArchiveFs = FileSystems.newFileSystem(tmpArchiveUri, env);
-            Path tmpArchiveRootPath = tmpArchiveFs.getPath("/");
+                URI tmpFileUri = tmpFile.toURI();
+                URI tmpArchiveUri = new URI("jar:" + tmpFileUri.getScheme(), tmpFileUri.getHost(), tmpFileUri.getPath() + "!/", null);
 
-            saveContent(api, controller, listener, tmpArchiveRootPath, tmpArchiveRootPath, entry);
+                HashMap<String, String> env = new HashMap<>();
+                env.put("create", "true");
 
-            tmpArchiveFs.close();
+                FileSystem tmpArchiveFs = FileSystems.newFileSystem(tmpArchiveUri, env);
+                Path tmpArchiveRootPath = tmpArchiveFs.getPath("/");
 
-            Path tmpPath = Paths.get(tmpFile.getAbsolutePath());
+                saveContent(api, controller, listener, tmpArchiveRootPath, tmpArchiveRootPath, entry);
 
-            Files.move(tmpPath, path);
+                tmpArchiveFs.close();
+
+                Files.move(tmpFile.toPath(), path);
+            }
         } catch (Exception e) {
             assert ExceptionUtil.printStackTrace(e);
         }
