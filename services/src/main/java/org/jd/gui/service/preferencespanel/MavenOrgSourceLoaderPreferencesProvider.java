@@ -98,9 +98,7 @@ public class MavenOrgSourceLoaderPreferencesProvider extends JPanel implements P
 
         String filters = preferences.get(FILTERS);
 
-        if ((filters == null) || filters.isEmpty()) {
-            filtersTextArea.setText(DEFAULT_FILTERS_VALUE);
-        }
+        filtersTextArea.setText((filters == null) || filters.isEmpty() ? DEFAULT_FILTERS_VALUE : filters);
     }
 
     @Override
