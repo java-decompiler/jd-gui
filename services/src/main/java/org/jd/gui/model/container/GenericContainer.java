@@ -162,8 +162,8 @@ public class GenericContainer implements Container {
             Path tmpPath = Paths.get(tmpFile.toURI());
 
             tmpFile.delete();
-            Files.copy(fsPath, tmpPath);
             tmpFile.deleteOnExit();
+            Files.copy(fsPath, tmpPath);
 
             FileSystem subFileSystem = FileSystems.newFileSystem(tmpPath, null);
 

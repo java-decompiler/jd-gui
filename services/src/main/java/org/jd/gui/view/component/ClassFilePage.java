@@ -21,7 +21,6 @@ import org.jd.gui.util.exception.ExceptionUtil;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 

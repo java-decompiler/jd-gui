@@ -15,7 +15,9 @@ import org.jd.gui.util.exception.ExceptionUtil;
 import javax.swing.*;
 import javax.xml.stream.*;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -178,7 +180,7 @@ public class ConfigurationXmlPersisterProvider implements ConfigurationPersister
         try (FileOutputStream fos = new FileOutputStream(FILE)) {
             XMLStreamWriter writer = XMLOutputFactory.newInstance().createXMLStreamWriter(fos);
 
-            // Load values
+            // Save values
             writer.writeStartDocument();
             writer.writeCharacters("\n");
             writer.writeStartElement("configuration");
