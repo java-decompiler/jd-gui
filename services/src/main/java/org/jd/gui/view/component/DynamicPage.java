@@ -32,7 +32,7 @@ public class DynamicPage
     protected Container.Entry entry;
     protected TypePage page;
     protected URI lastOpenedUri;
-    protected Collection<Future<Indexes>> collectionOfFutureIndexes;
+    protected Collection<Future<Indexes>> lastCollectionOfFutureIndexes;
 
     public DynamicPage(API api, Container.Entry entry) {
         super(new BorderLayout());
@@ -75,8 +75,7 @@ public class DynamicPage
 
     // --- IndexesChangeListener --- //
     @Override public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
-        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
-        page.indexesChanged(collectionOfFutureIndexes);
+        page.indexesChanged(lastCollectionOfFutureIndexes = collectionOfFutureIndexes);
     }
 
     // --- LineNumberNavigable --- //
@@ -107,8 +106,8 @@ public class DynamicPage
                 page.openUri(lastOpenedUri);
             }
 
-            if (collectionOfFutureIndexes != null) {
-                page.indexesChanged(collectionOfFutureIndexes);
+            if (lastCollectionOfFutureIndexes != null) {
+                page.indexesChanged(lastCollectionOfFutureIndexes);
             }
         });
     }
