@@ -10,28 +10,17 @@ package org.jd.gui.service.sourceloader;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.service.preferencespanel.MavenOrgSourceLoaderPreferencesProvider;
-import org.jd.gui.spi.PreferencesPanel;
 import org.jd.gui.spi.SourceLoader;
 import org.jd.gui.util.exception.ExceptionUtil;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Source;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.*;
-import java.util.List;
-import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -55,7 +44,7 @@ public class MavenOrgSourceLoaderProvider implements SourceLoader {
             }
 
             if (accepted(filters, entry.getPath())) {
-                return search(entry, cache.get(entry.getContainer().getRoot().getParent()));
+                return searchSource(entry, cache.get(entry.getContainer().getRoot().getParent()));
             }
         }
 
@@ -64,8 +53,6 @@ public class MavenOrgSourceLoaderProvider implements SourceLoader {
 
     @Override
     public String loadSource(API api, Container.Entry entry) {
-        boolean activated = !"false".equals(api.getPreferences().get(MavenOrgSourceLoaderPreferencesProvider.ACTIVATED));
-
         if (isActivated(api)) {
             String filters = api.getPreferences().get(MavenOrgSourceLoaderPreferencesProvider.FILTERS);
 
@@ -74,7 +61,7 @@ public class MavenOrgSourceLoaderProvider implements SourceLoader {
             }
 
             if (accepted(filters, entry.getPath())) {
-                return search(entry, load(entry.getContainer().getRoot().getParent()));
+                return searchSource(entry, downloadSourceJarFile(entry.getContainer().getRoot().getParent()));
             }
         }
 
@@ -83,53 +70,49 @@ public class MavenOrgSourceLoaderProvider implements SourceLoader {
 
     @Override
     public File loadSourceFile(API api, Container.Entry entry) {
-        return isActivated(api) ? load(entry) : null;
+        return isActivated(api) ? downloadSourceJarFile(entry) : null;
     }
 
     private static boolean isActivated(API api) {
         return !"false".equals(api.getPreferences().get(MavenOrgSourceLoaderPreferencesProvider.ACTIVATED));
     }
 
-    protected String search(Container.Entry entry, File file) {
-        if (file != null) {
-            String fileName = file.toString().toLowerCase();
+    protected String searchSource(Container.Entry entry, File sourceJarFile) {
+        if (sourceJarFile != null) {
+            byte[] buffer = new byte[1024 * 2];
 
-            if (fileName.endsWith(".zip") || fileName.endsWith(".jar")) {
-                byte[] buffer = new byte[1024 * 2];
+            try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(sourceJarFile)))) {
+                ZipEntry ze = zis.getNextEntry();
+                String name = entry.getPath();
 
-                try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)))) {
-                    ZipEntry ze = zis.getNextEntry();
-                    String name = entry.getPath();
+                name = name.substring(0, name.length()-6) + ".java"; // 6 = ".class".length()
 
-                    name = name.substring(0, name.length()-6) + ".java"; // 6 = ".class".length()
+                while (ze != null) {
+                    if (ze.getName().equals(name)) {
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        int read = zis.read(buffer);
 
-                    while (ze != null) {
-                        if (ze.getName().equals(name)) {
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            int read = zis.read(buffer);
-
-                            while (read > 0) {
-                                out.write(buffer, 0, read);
-                                read = zis.read(buffer);
-                            }
-
-                            return new String(out.toByteArray(), "UTF-8");
+                        while (read > 0) {
+                            out.write(buffer, 0, read);
+                            read = zis.read(buffer);
                         }
 
-                        ze = zis.getNextEntry();
+                        return new String(out.toByteArray(), "UTF-8");
                     }
 
-                    zis.closeEntry();
-                } catch (IOException e) {
-                    assert ExceptionUtil.printStackTrace(e);
+                    ze = zis.getNextEntry();
                 }
+
+                zis.closeEntry();
+            } catch (IOException e) {
+                assert ExceptionUtil.printStackTrace(e);
             }
         }
 
         return null;
     }
 
-    protected File load(Container.Entry entry) {
+    protected File downloadSourceJarFile(Container.Entry entry) {
         if (cache.containsKey(entry)) {
             return cache.get(entry);
         }
@@ -158,6 +141,7 @@ public class MavenOrgSourceLoaderProvider implements SourceLoader {
                 URL searchUrl = new URL(MAVENORG_SEARCH_URL_PREFIX + sha1 + MAVENORG_SEARCH_URL_SUFFIX);
                 boolean sourceAvailable = false;
                 String id = null;
+                String numFound = null;
 
                 try (InputStream is = searchUrl.openStream()) {
                     XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(is);
@@ -172,6 +156,8 @@ public class MavenOrgSourceLoaderProvider implements SourceLoader {
                                     } else {
                                         name = "str";
                                     }
+                                } else if ("result".equals(reader.getLocalName())) {
+                                    numFound = reader.getAttributeValue(null, "numFound");
                                 } else {
                                     name = "";
                                 }
@@ -192,18 +178,31 @@ public class MavenOrgSourceLoaderProvider implements SourceLoader {
                     reader.close();
                 }
 
-                if (sourceAvailable == false) {
-                    failed.add(entry);
-                } else {
-                    // Load source
+                String groupId=null, artifactId=null, version=null;
+
+                if ("0".equals(numFound)) {
+                    // File not indexed by Apache Solr of maven.org -> Try to found groupId, artifactId, version in 'pom.properties'
+                    Properties pomProperties = getPomProperties(entry);
+
+                    if (pomProperties != null) {
+                        groupId = pomProperties.getProperty("groupId");
+                        artifactId = pomProperties.getProperty("artifactId");
+                        version = pomProperties.getProperty("version");
+                    }
+                } else if ("1".equals(numFound) && sourceAvailable) {
                     int index1 = id.indexOf(':');
                     int index2 = id.lastIndexOf(':');
-                    String groupId = id.substring(0, index1);
-                    String artifactId = id.substring(index1+1, index2);
-                    String version = id.substring(index2+1);
+
+                    groupId = id.substring(0, index1);
+                    artifactId = id.substring(index1+1, index2);
+                    version = id.substring(index2+1);
+                }
+
+                if (artifactId != null) {
+                    // Load source
                     String filePath = groupId.replace('.', '/') + '/' + artifactId + '/' + version + '/' + artifactId + '-' + version;
                     URL loadUrl = new URL(MAVENORG_LOAD_URL_PREFIX + filePath + MAVENORG_LOAD_URL_SUFFIX);
-                    File tmpFile = File.createTempFile("jd-gui.tmp.", '.' + artifactId + '-' + version + "-sources.jar");
+                    File tmpFile = File.createTempFile("jd-gui.tmp.", '.' + groupId + '_' + artifactId + '_' + version + "-sources.jar");
 
                     tmpFile.delete();
                     tmpFile.deleteOnExit();
@@ -221,7 +220,45 @@ public class MavenOrgSourceLoaderProvider implements SourceLoader {
                 }
             } catch (Exception e) {
                 assert ExceptionUtil.printStackTrace(e);
-                failed.add(entry);
+            }
+        }
+
+        failed.add(entry);
+        return null;
+    }
+
+    private static Properties getPomProperties(Container.Entry parent) {
+        // Search 'META-INF/maven/*/*/pom.properties'
+        for (Container.Entry child1 : parent.getChildren()) {
+            if (child1.isDirectory() && child1.getPath().equals("META-INF")) {
+                for (Container.Entry child2 : child1.getChildren()) {
+                    if (child2.isDirectory() && child2.getPath().equals("META-INF/maven")) {
+                        if (child2.isDirectory()) {
+                            Collection<Container.Entry> children = child2.getChildren();
+                            if (children.size() == 1) {
+                                Container.Entry entry = children.iterator().next();
+                                if (entry.isDirectory()) {
+                                    children = entry.getChildren();
+                                    if (children.size() == 1) {
+                                        entry = children.iterator().next();
+                                        for (Container.Entry child3 : entry.getChildren()) {
+                                            if (!child3.isDirectory() && child3.getPath().endsWith("/pom.properties")) {
+                                                // Load properties
+                                                try (InputStream is = child3.getInputStream()) {
+                                                    Properties properties = new Properties();
+                                                    properties.load(is);
+                                                    return properties;
+                                                } catch (Exception e) {
+                                                    assert ExceptionUtil.printStackTrace(e);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
