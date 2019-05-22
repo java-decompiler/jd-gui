@@ -155,12 +155,21 @@ public class ClassFilePage extends TypePage {
         }
 
         // --- Add strings --- //
-        @Override public void printStringConstant(String constant, String ownerInternalName) {
+        @Override
+        public void printStringConstant(String constant, String ownerInternalName) {
+            if (constant == null) constant = "null";
+            if (ownerInternalName == null) ownerInternalName = "null";
+
             strings.add(new TypePage.StringData(stringBuffer.length(), constant.length(), constant, ownerInternalName));
             super.printStringConstant(constant, ownerInternalName);
         }
 
-        @Override public void printDeclaration(int flags, String internalTypeName, String name, String descriptor) {
+        @Override
+        public void printDeclaration(int flags, String internalTypeName, String name, String descriptor) {
+            if (internalTypeName == null) internalTypeName = "null";
+            if (name == null) name = "null";
+            if (descriptor == null) descriptor = "null";
+
             switch (flags) {
                 case TYPE_FLAG:
                     TypePage.DeclarationData data = new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalTypeName, null, null);
@@ -177,7 +186,12 @@ public class ClassFilePage extends TypePage {
             super.printDeclaration(flags, internalTypeName, name, descriptor);
         }
 
-        @Override public void printReference(int flags, String internalTypeName, String name, String descriptor, String ownerInternalName) {
+        @Override
+        public void printReference(int flags, String internalTypeName, String name, String descriptor, String ownerInternalName) {
+            if (internalTypeName == null) internalTypeName = "null";
+            if (name == null) name = "null";
+            if (descriptor == null) descriptor = "null";
+
             switch (flags) {
                 case TYPE_FLAG:
                     addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalTypeName, null, null, ownerInternalName)));
@@ -192,11 +206,13 @@ public class ClassFilePage extends TypePage {
             super.printReference(flags, internalTypeName, name, descriptor, ownerInternalName);
         }
 
-        @Override public void startLine(int lineNumber) {
+        @Override
+        public void startLine(int lineNumber) {
             super.startLine(lineNumber);
             setLineNumber(textAreaLineNumber, lineNumber);
         }
-        @Override public void endLine() {
+        @Override
+        public void endLine() {
             super.endLine();
             textAreaLineNumber++;
         }

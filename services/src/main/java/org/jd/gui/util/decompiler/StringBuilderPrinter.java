@@ -33,7 +33,7 @@ public class StringBuilderPrinter implements Printer {
 	public void append(String s) { stringBuffer.append(s); }
 
 	protected void printEscape(String s) {
-		if (unicodeEscape) {
+		if (unicodeEscape && (s != null)) {
 			int length = s.length();
 
 			for (int i=0; i<length; i++) {
