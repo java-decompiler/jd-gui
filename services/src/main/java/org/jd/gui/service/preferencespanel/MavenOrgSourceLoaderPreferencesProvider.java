@@ -24,7 +24,7 @@ public class MavenOrgSourceLoaderPreferencesProvider extends JPanel implements P
 
     public static final String DEFAULT_FILTERS_VALUE =
             "+org +com.google +com.springsource +com.sun -com +java +javax +sun +sunw " +
-            "+spring +springframework +springmodules +tomcat +maven";
+            "+spring +springframework +springmodules +tomcat +maven +edu";
 
     protected static final Pattern CONTROL_PATTERN = Pattern.compile("([+-][a-zA-Z_0-9$_.]+(\\s+[+-][a-zA-Z_0-9$_.]+)*)?\\s*");
 
