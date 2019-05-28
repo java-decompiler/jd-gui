@@ -26,3 +26,4 @@ org.jd.gui.service.treenode.WebXmlFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.XmlBasedFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.XmlFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.ZipFileTreeNodeFactoryProvider
+org.jd.gui.service.treenode.ImageFileTreeNodeFactoryProvider
