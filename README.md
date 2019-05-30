@@ -20,7 +20,7 @@ for instant access to methods and fields.
 ```
 generate :
 - _"build/libs/jd-gui-x.y.z.jar"_
-- _"build/libs/jd-gui-x.y.z.jar"_
+- _"build/libs/jd-gui-x.y.z-min.jar"_
 - _"build/distributions/jd-gui-windows-x.y.z.zip"_
 - _"build/distributions/jd-gui-osx-x.y.z.tar"_
 - _"build/distributions/jd-gui-x.y.z.deb"_
@@ -62,6 +62,4 @@ Released under the [GNU GPL v3](LICENSE).
 ## Donations
 Did JD-GUI help you to solve a critical situation? Do you use JD-Eclipse daily? What about making a donation?
 
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=C88ZMVZ78RF22) Euro
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CRMXT4Y4QLQGU) US Dollar
+[![paypal](https://raw.githubusercontent.com/java-decompiler/jd-gui/master/src/website/img/btn_donate_euro.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=C88ZMVZ78RF22) [![paypal](https://raw.githubusercontent.com/java-decompiler/jd-gui/master/src/website/img/btn_donate_usd.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CRMXT4Y4QLQGU)
