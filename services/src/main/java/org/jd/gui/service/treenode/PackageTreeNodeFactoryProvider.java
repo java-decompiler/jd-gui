@@ -16,6 +16,7 @@ import org.jd.gui.view.data.TreeNodeBean;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
 import java.util.Collection;
 
 public class PackageTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
@@ -38,7 +39,8 @@ public class PackageTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProv
         }
 
         String label = entry.getPath().substring(lastSlashIndex+1).replace("/", ".");
-        T node = (T)new TreeNode(entry, new TreeNodeBean(label, getIcon(), getOpenIcon()));
+        String location = new File(entry.getUri()).getPath();
+        T node = (T)new TreeNode(entry, new TreeNodeBean(label, "Location: " + location, getIcon(), getOpenIcon()));
 
         if (entries.size() > 0) {
             // Add dummy node

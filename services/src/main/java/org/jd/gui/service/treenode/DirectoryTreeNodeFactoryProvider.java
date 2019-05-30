@@ -18,6 +18,7 @@ import org.jd.gui.view.data.TreeNodeBean;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
 import java.net.URI;
 import java.util.Collection;
 
@@ -42,15 +43,16 @@ public class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryPro
         }
 
         String label = entry.getPath().substring(lastSlashIndex+1);
-        TreeNode node = new TreeNode(entry, new TreeNodeBean(label, getIcon(), getOpenIcon()));
+        String location = new File(entry.getUri()).getPath();
+        TreeNode node = new TreeNode(entry, new TreeNodeBean(label, "Location: " + location, getIcon(), getOpenIcon()));
 
         if (entries.size() > 0) {
             // Add dummy node
             node.add(new DefaultMutableTreeNode());
         }
 
-		return (T)node;
-	}
+        return (T)node;
+    }
 
     public ImageIcon getIcon() { return ICON; }
     public ImageIcon getOpenIcon() { return OPEN_ICON; }

@@ -15,6 +15,7 @@ import org.jd.gui.view.data.TreeNodeBean;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
 
 public class EarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvider {
     protected static final ImageIcon ICON = new ImageIcon(JarFileTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/ear_obj.gif"));
@@ -25,8 +26,9 @@ public class EarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvid
     @SuppressWarnings("unchecked")
     public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.getPath().lastIndexOf("/");
-        String name = entry.getPath().substring(lastSlashIndex+1);
-        T node = (T)new TreeNode(entry, "ear", new TreeNodeBean(name, ICON));
+        String label = entry.getPath().substring(lastSlashIndex+1);
+        String location = new File(entry.getUri()).getPath();
+        T node = (T)new TreeNode(entry, "ear", new TreeNodeBean(label, "Location: " + location, ICON));
         // Add dummy node
         node.add(new DefaultMutableTreeNode());
         return node;

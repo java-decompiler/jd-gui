@@ -41,8 +41,8 @@ public class ClassFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFa
     @SuppressWarnings("unchecked")
     public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.getPath().lastIndexOf('/');
-        String name = entry.getPath().substring(lastSlashIndex+1);
-        return (T)new FileTreeNode(entry, new TreeNodeBean(name, CLASS_FILE_ICON), FACTORY);
+        String label = entry.getPath().substring(lastSlashIndex+1);
+        return (T)new FileTreeNode(entry, new TreeNodeBean(label, CLASS_FILE_ICON), FACTORY);
     }
 
     protected static class Factory implements AbstractTypeFileTreeNodeFactoryProvider.PageAndTipFactory {
@@ -54,10 +54,10 @@ public class ClassFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFa
 
         @Override
         public String makeTip(API api, Container.Entry entry) {
-            File file = new File(entry.getContainer().getRoot().getUri());
+            String location = new File(entry.getUri()).getPath();
             StringBuilder tip = new StringBuilder("<html>Location: ");
 
-            tip.append(file.getPath());
+            tip.append(location);
             tip.append("<br>Java compiler version: ");
 
             try (InputStream is = entry.getInputStream()) {

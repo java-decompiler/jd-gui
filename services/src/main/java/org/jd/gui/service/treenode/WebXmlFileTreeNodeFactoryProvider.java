@@ -17,6 +17,7 @@ import org.jd.gui.view.data.TreeNodeBean;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
 
 public class WebXmlFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
     protected static final ImageIcon ICON = new ImageIcon(ManifestFileTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/xml_obj.gif"));
@@ -26,7 +27,8 @@ public class WebXmlFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvid
     @Override
     @SuppressWarnings("unchecked")
     public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
-        return (T)new TreeNode(entry, new TreeNodeBean("web.xml", "Location: " + entry.getUri().getPath(), ICON));
+        String location = new File(entry.getUri()).getPath();
+        return (T)new TreeNode(entry, new TreeNodeBean("web.xml", "Location: " + location, ICON));
     }
 
     protected static class TreeNode extends FileTreeNodeFactoryProvider.TreeNode implements PageCreator {

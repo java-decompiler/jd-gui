@@ -17,6 +17,7 @@ import org.jd.gui.view.data.TreeNodeBean;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
 import java.util.regex.Pattern;
 
 public class MetainfServiceFileTreeNodeFactoryProvider extends FileTreeNodeFactoryProvider {
@@ -36,8 +37,9 @@ public class MetainfServiceFileTreeNodeFactoryProvider extends FileTreeNodeFacto
     @SuppressWarnings("unchecked")
     public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.getPath().lastIndexOf("/");
-        String name = entry.getPath().substring(lastSlashIndex+1);
-        return (T)new TreeNode(entry, new TreeNodeBean(name, "Location: " + entry.getUri().getPath(), ICON));
+        String label = entry.getPath().substring(lastSlashIndex+1);
+        String location = new File(entry.getUri()).getPath();
+        return (T)new TreeNode(entry, new TreeNodeBean(label, "Location: " + location, ICON));
     }
 
     protected static class TreeNode extends FileTreeNodeFactoryProvider.TreeNode implements PageCreator {

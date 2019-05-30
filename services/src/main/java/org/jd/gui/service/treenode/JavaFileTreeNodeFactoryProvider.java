@@ -28,9 +28,9 @@ public class JavaFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFac
     @SuppressWarnings("unchecked")
     public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.getPath().lastIndexOf('/');
-        String name = entry.getPath().substring(lastSlashIndex+1);
-
-        return (T)new FileTreeNode(entry, new TreeNodeBean(name, JAVA_FILE_ICON), FACTORY);
+        String label = entry.getPath().substring(lastSlashIndex+1);
+        String location = new File(entry.getUri()).getPath();
+        return (T)new FileTreeNode(entry, new TreeNodeBean(label, "Location: " + location, JAVA_FILE_ICON), FACTORY);
     }
 
     protected static class Factory implements AbstractTypeFileTreeNodeFactoryProvider.PageAndTipFactory {

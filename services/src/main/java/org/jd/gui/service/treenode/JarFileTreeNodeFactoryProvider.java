@@ -16,6 +16,7 @@ import org.jd.gui.view.data.TreeNodeBean;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
 import java.util.Collection;
 
 public class JarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvider {
@@ -28,13 +29,14 @@ public class JarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvid
     @SuppressWarnings("unchecked")
     public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.getPath().lastIndexOf("/");
-        String name = entry.getPath().substring(lastSlashIndex+1);
+        String label = entry.getPath().substring(lastSlashIndex+1);
+        String location = new File(entry.getUri()).getPath();
         ImageIcon icon = isAEjbModule(entry) ? EJB_FILE_ICON : JAR_FILE_ICON;
-        T node = (T)new TreeNode(entry, "jar", new TreeNodeBean(name, icon));
+        T node = (T)new TreeNode(entry, "jar", new TreeNodeBean(label, "Location: " + location, icon));
         // Add dummy node
         node.add(new DefaultMutableTreeNode());
         return node;
-	}
+    }
 
     protected static boolean isAEjbModule(Container.Entry entry) {
         Collection<Container.Entry> children = entry.getChildren();

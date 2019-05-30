@@ -15,10 +15,11 @@ import org.jd.gui.view.data.TreeNodeBean;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.File;
 import java.net.URI;
 
 public class FileTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
-	protected static final ImageIcon ICON = new ImageIcon(FileTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/file_plain_obj.png"));
+    protected static final ImageIcon ICON = new ImageIcon(FileTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/file_plain_obj.png"));
 
     @Override public String[] getSelectors() { return appendSelectors("*:file:*"); }
 
@@ -26,9 +27,10 @@ public class FileTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider
     @SuppressWarnings("unchecked")
     public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.getPath().lastIndexOf('/');
-        String name = entry.getPath().substring(lastSlashIndex+1);
-		return (T)new TreeNode(entry, new TreeNodeBean(name, ICON));
-	}
+        String label = entry.getPath().substring(lastSlashIndex+1);
+        String location = new File(entry.getUri()).getPath();
+        return (T)new TreeNode(entry, new TreeNodeBean(label, "Location: " + location, ICON));
+    }
 
     protected static class TreeNode extends DefaultMutableTreeNode implements ContainerEntryGettable, UriGettable {
         protected Container.Entry entry;
