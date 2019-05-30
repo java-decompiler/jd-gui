@@ -17,13 +17,15 @@ import java.util.regex.Pattern;
 public class JavaFileLoaderProvider extends AbstractTypeFileLoaderProvider {
     protected static final String[] EXTENSIONS = { "java" };
 
-    public String[] getExtensions() { return EXTENSIONS; }
-    public String getDescription() { return "Java files (*.java)"; }
+    @Override public String[] getExtensions() { return EXTENSIONS; }
+    @Override public String getDescription() { return "Java files (*.java)"; }
 
+    @Override
     public boolean accept(API api, File file) {
-        return file.exists() && file.canRead() && file.getName().toLowerCase().endsWith(".java");
+        return file.exists() && file.isFile() && file.canRead() && file.getName().toLowerCase().endsWith(".java");
     }
 
+    @Override
     public boolean load(API api, File file) {
         String text = TextReader.getText(file);
         Pattern pattern = Pattern.compile("(?s)(.*\\s)?package\\s+(\\S+)\\s*;.*");

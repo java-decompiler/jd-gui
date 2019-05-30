@@ -21,7 +21,7 @@ import java.util.Collection;
 public class PackageTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
     protected static final ImageIcon ICON = new ImageIcon(PackageTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/package_obj.png"));
 
-    @Override public String[] getSelectors() { return appendSelectors("jar:dir:*"); }
+    @Override public String[] getSelectors() { return appendSelectors("jar:dir:*", "jmodClassesDirectory:dir:*"); }
 
     @Override
     @SuppressWarnings("unchecked")

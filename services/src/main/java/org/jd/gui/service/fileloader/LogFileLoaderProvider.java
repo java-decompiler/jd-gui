@@ -16,13 +16,15 @@ import java.io.File;
 public class LogFileLoaderProvider extends ZipFileLoaderProvider {
     protected static final String[] EXTENSIONS = { "log" };
 
-    public String[] getExtensions() { return EXTENSIONS; }
-    public String getDescription() { return "Log files (*.log)"; }
+    @Override public String[] getExtensions() { return EXTENSIONS; }
+    @Override public String getDescription() { return "Log files (*.log)"; }
 
+    @Override
     public boolean accept(API api, File file) {
-        return file.exists() && file.canRead() && file.getName().toLowerCase().endsWith(".log");
+        return file.exists() && file.isFile() && file.canRead() && file.getName().toLowerCase().endsWith(".log");
     }
 
+    @Override
     public boolean load(API api, File file) {
         api.addPanel(file.getName(), null, "Location: " + file.getAbsolutePath(), new LogPage(api, file.toURI(), TextReader.getText(file)));
         return true;

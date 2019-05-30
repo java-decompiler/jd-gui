@@ -20,9 +20,9 @@ public class UriLoaderService {
 
     public static UriLoaderService getInstance() { return URI_LOADER_SERVICE; }
 
-	protected HashMap<String, UriLoader> mapProviders = new HashMap<>();
+    protected HashMap<String, UriLoader> mapProviders = new HashMap<>();
 
-	protected UriLoaderService() {
+    protected UriLoaderService() {
         Collection<UriLoader> providers = ExtensionService.getInstance().load(UriLoader.class);
 
         for (UriLoader provider : providers) {

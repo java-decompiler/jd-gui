@@ -18,9 +18,10 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class EarContainerFactoryProvider implements ContainerFactory {
-
+    @Override
     public String getType() { return "ear"; }
 
+    @Override
     public boolean accept(API api, Path rootPath) {
         if (rootPath.toUri().toString().toLowerCase().endsWith(".ear!/")) {
             return true;
@@ -35,6 +36,7 @@ public class EarContainerFactoryProvider implements ContainerFactory {
         }
     }
 
+    @Override
     public Container make(API api, Container.Entry parentEntry, Path rootPath) {
         return new EarContainer(api, parentEntry, rootPath);
     }

@@ -18,9 +18,10 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class JarContainerFactoryProvider implements ContainerFactory {
-
+    @Override
     public String getType() { return "jar"; }
 
+    @Override
     public boolean accept(API api, Path rootPath) {
         if (rootPath.toUri().toString().toLowerCase().endsWith(".jar!/")) {
             // Specification: http://docs.oracle.com/javase/6/docs/technotes/guides/jar/jar.html
@@ -36,7 +37,8 @@ public class JarContainerFactoryProvider implements ContainerFactory {
         }
     }
 
+    @Override
     public Container make(API api, Container.Entry parentEntry, Path rootPath) {
-		return new JarContainer(api, parentEntry, rootPath);
-	}
+        return new JarContainer(api, parentEntry, rootPath);
+    }
 }

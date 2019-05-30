@@ -18,9 +18,9 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class ZipFileTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
-	protected static final ImageIcon ICON = new ImageIcon(ZipFileTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/zip_obj.png"));
+    protected static final ImageIcon ICON = new ImageIcon(ZipFileTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/zip_obj.png"));
 
-    @Override public String[] getSelectors() { return appendSelectors("*:file:*.zip"); }
+    @Override public String[] getSelectors() { return appendSelectors("*:file:*.zip", "*:file:*.aar"); }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -31,7 +31,7 @@ public class ZipFileTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProv
         // Add dummy node
         node.add(new DefaultMutableTreeNode());
         return node;
-	}
+    }
 
     protected static class TreeNode extends DirectoryTreeNodeFactoryProvider.TreeNode {
         protected String ct;

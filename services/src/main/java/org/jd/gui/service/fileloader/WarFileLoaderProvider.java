@@ -14,10 +14,11 @@ import java.io.File;
 public class WarFileLoaderProvider extends ZipFileLoaderProvider {
     protected static final String[] EXTENSIONS = { "war" };
 
-    public String[] getExtensions() { return EXTENSIONS; }
-    public String getDescription() { return "War files (*.war)"; }
+    @Override public String[] getExtensions() { return EXTENSIONS; }
+    @Override public String getDescription() { return "Web application archive files (*.war)"; }
 
+    @Override
     public boolean accept(API api, File file) {
-        return file.exists() && file.canRead() && file.getName().toLowerCase().endsWith(".war");
+        return file.exists() && file.isFile() && file.canRead() && file.getName().toLowerCase().endsWith(".war");
     }
 }

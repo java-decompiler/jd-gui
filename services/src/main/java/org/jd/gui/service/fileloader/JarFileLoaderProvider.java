@@ -12,12 +12,13 @@ import org.jd.gui.api.API;
 import java.io.File;
 
 public class JarFileLoaderProvider extends ZipFileLoaderProvider {
-	protected static final String[] EXTENSIONS = { "jar" };
+    protected static final String[] EXTENSIONS = { "jar" };
 
-	public String[] getExtensions() { return EXTENSIONS; }
-	public String getDescription() { return "Jar files (*.jar)"; }
+    @Override public String[] getExtensions() { return EXTENSIONS; }
+    @Override public String getDescription() { return "Java archive files (*.jar)"; }
 
-	public boolean accept(API api, File file) {
-        return file.exists() && file.canRead() && file.getName().toLowerCase().endsWith(".jar");
-	}
+    @Override
+    public boolean accept(API api, File file) {
+        return file.exists() && file.isFile() && file.canRead() && file.getName().toLowerCase().endsWith(".jar");
+    }
 }

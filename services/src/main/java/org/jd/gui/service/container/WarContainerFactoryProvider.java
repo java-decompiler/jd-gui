@@ -18,9 +18,10 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class WarContainerFactoryProvider implements ContainerFactory {
-
+    @Override
     public String getType() { return "war"; }
 
+    @Override
     public boolean accept(API api, Path rootPath) {
         if (rootPath.toUri().toString().toLowerCase().endsWith(".war!/")) {
             return true;
@@ -35,6 +36,7 @@ public class WarContainerFactoryProvider implements ContainerFactory {
         }
     }
 
+    @Override
     public Container make(API api, Container.Entry parentEntry, Path rootPath) {
         return new WarContainer(api, parentEntry, rootPath);
     }

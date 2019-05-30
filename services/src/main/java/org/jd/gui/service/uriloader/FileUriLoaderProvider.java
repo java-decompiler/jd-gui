@@ -15,16 +15,16 @@ import java.io.File;
 import java.net.URI;
 
 public class FileUriLoaderProvider implements UriLoader {
-	protected static final String[] SCHEMES = { "file" };
+    protected static final String[] SCHEMES = { "file" };
 
-	public String[] getSchemes() { return SCHEMES; }
+    public String[] getSchemes() { return SCHEMES; }
 
-	public boolean accept(API api, URI uri) { return "file".equals(uri.getScheme()); }
+    public boolean accept(API api, URI uri) { return "file".equals(uri.getScheme()); }
 
-	public boolean load(API api, URI uri) {
+    public boolean load(API api, URI uri) {
         File file = new File(uri.getPath());
-		FileLoader fileLoader = api.getFileLoader(file);
+        FileLoader fileLoader = api.getFileLoader(file);
 
         return (fileLoader != null) && fileLoader.load(api, file);
-	}
+    }
 }

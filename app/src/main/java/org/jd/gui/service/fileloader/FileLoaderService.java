@@ -21,12 +21,12 @@ public class FileLoaderService {
     public static FileLoaderService getInstance() { return FILE_LOADER_SERVICE; }
 
     protected final Collection<FileLoader> providers = ExtensionService.getInstance().load(FileLoader.class);
-	
-	protected HashMap<String, FileLoader> mapProviders = new HashMap<>();
 
-	protected FileLoaderService() {
-	    for (FileLoader provider : providers) {
-	        for (String extension : provider.getExtensions()) {
+    protected HashMap<String, FileLoader> mapProviders = new HashMap<>();
+
+    protected FileLoaderService() {
+        for (FileLoader provider : providers) {
+            for (String extension : provider.getExtensions()) {
                 mapProviders.put(extension, provider);
             }
         }
@@ -37,12 +37,7 @@ public class FileLoaderService {
         int lastDot = name.lastIndexOf('.');
         String extension = name.substring(lastDot+1);
         FileLoader provider = mapProviders.get(extension);
-
-        if ((provider != null) && provider.accept(api, file)) {
-            return provider;
-        }
-
-        return null;
+        return provider;
     }
 
     public HashMap<String, FileLoader> getMapProviders() {

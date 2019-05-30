@@ -15,12 +15,14 @@ import org.jd.gui.spi.ContainerFactory;
 import java.nio.file.Path;
 
 public class GenericContainerFactoryProvider implements ContainerFactory {
+    @Override
+    public String getType() { return "generic"; }
 
-	public String getType() { return "generic"; }
+    @Override
+    public boolean accept(API api, Path rootPath) { return true; }
 
-	public boolean accept(API api, Path rootPath) { return true; }
-
-	public Container make(API api, Container.Entry parentEntry, Path rootPath) {
-		return new GenericContainer(api, parentEntry, rootPath);
-	}
+    @Override
+    public Container make(API api, Container.Entry parentEntry, Path rootPath) {
+        return new GenericContainer(api, parentEntry, rootPath);
+    }
 }

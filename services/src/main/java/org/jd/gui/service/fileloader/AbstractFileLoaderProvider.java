@@ -57,8 +57,8 @@ public abstract class AbstractFileLoaderProvider implements FileLoader {
 
     protected static class ContainerEntry implements Container.Entry {
         protected static final Container PARENT_CONTAINER = new Container() {
-            public String getType() { return "generic"; }
-            public Container.Entry getRoot() { return null; }
+            @Override public String getType() { return "generic"; }
+            @Override public Container.Entry getRoot() { return null; }
         };
 
         protected Collection<Container.Entry> children = Collections.emptyList();
@@ -76,14 +76,15 @@ public abstract class AbstractFileLoaderProvider implements FileLoader {
             }
         }
 
-        public Container getContainer() { return PARENT_CONTAINER; }
-        public Container.Entry getParent() { return null; }
-        public URI getUri() { return uri; }
-        public String getPath() { return path; }
-        public boolean isDirectory() { return file.isDirectory(); }
-        public long length() { return file.length(); }
-        public Collection<Container.Entry> getChildren() { return children; }
+        @Override public Container getContainer() { return PARENT_CONTAINER; }
+        @Override public Container.Entry getParent() { return null; }
+        @Override public URI getUri() { return uri; }
+        @Override public String getPath() { return path; }
+        @Override public boolean isDirectory() { return file.isDirectory(); }
+        @Override public long length() { return file.length(); }
+        @Override public Collection<Container.Entry> getChildren() { return children; }
 
+        @Override
         public InputStream getInputStream() {
             try {
                 return new BufferedInputStream(new FileInputStream(file));

@@ -11,14 +11,14 @@ import org.jd.gui.api.API;
 
 import java.io.File;
 
-public class EarFileLoaderProvider extends ZipFileLoaderProvider {
-    protected static final String[] EXTENSIONS = { "ear" };
+public class AarFileLoaderProvider extends ZipFileLoaderProvider {
+    protected static final String[] EXTENSIONS = { "aar" };
 
     @Override public String[] getExtensions() { return EXTENSIONS; }
-    @Override public String getDescription() { return "Enterprise application archive files (*.ear)"; }
+    @Override public String getDescription() { return "Android archive files (*.aar)"; }
 
     @Override
     public boolean accept(API api, File file) {
-        return file.exists() && file.isFile() && file.canRead() && file.getName().toLowerCase().endsWith(".ear");
+        return file.exists() && file.isFile() && file.canRead() && file.getName().toLowerCase().endsWith(".aar");
     }
 }

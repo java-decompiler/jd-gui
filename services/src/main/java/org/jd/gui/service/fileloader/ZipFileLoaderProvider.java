@@ -24,13 +24,15 @@ import java.util.Iterator;
 public class ZipFileLoaderProvider extends AbstractFileLoaderProvider {
     protected static final String[] EXTENSIONS = { "zip" };
 
-    public String[] getExtensions() { return EXTENSIONS; }
-    public String getDescription() { return "Zip files (*.zip)"; }
+    @Override public String[] getExtensions() { return EXTENSIONS; }
+    @Override public String getDescription() { return "Zip files (*.zip)"; }
 
+    @Override
     public boolean accept(API api, File file) {
-        return file.exists() && file.canRead() && file.getName().toLowerCase().endsWith(".zip");
+        return file.exists() && file.isFile() && file.canRead() && file.getName().toLowerCase().endsWith(".zip");
     }
 
+    @Override
     public boolean load(API api, File file) {
         try {
             URI fileUri = file.toURI();
@@ -55,5 +57,5 @@ public class ZipFileLoaderProvider extends AbstractFileLoaderProvider {
         }
 
         return false;
-	}
+    }
 }

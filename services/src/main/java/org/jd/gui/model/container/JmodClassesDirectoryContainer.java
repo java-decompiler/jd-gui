@@ -5,17 +5,17 @@
  * copy and modify the code freely for non-commercial purposes.
  */
 
-package org.jd.gui.spi;
+package org.jd.gui.model.container;
 
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 
 import java.nio.file.Path;
 
-public interface ContainerFactory {
-    String getType();
+public class JmodClassesDirectoryContainer extends GenericContainer {
+    public JmodClassesDirectoryContainer(API api, Container.Entry parentEntry, Path rootPath) {
+        super(api, parentEntry, rootPath);
+    }
 
-    boolean accept(API api, Path rootPath);
-
-    Container make(API api, Container.Entry parentEntry, Path rootPath);
+    public String getType() { return "jmodClassesDirectory"; }
 }
