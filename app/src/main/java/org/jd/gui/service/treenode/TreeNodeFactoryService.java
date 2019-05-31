@@ -19,7 +19,7 @@ public class TreeNodeFactoryService {
 
     public static TreeNodeFactoryService getInstance() { return TREE_NODE_FACTORY_SERVICE; }
 
-	protected HashMap<String, TreeNodeFactories> mapProviders = new HashMap<>();
+    protected HashMap<String, TreeNodeFactories> mapProviders = new HashMap<>();
 
     protected TreeNodeFactoryService() {
         Collection<TreeNodeFactory> providers = ExtensionService.getInstance().load(TreeNodeFactory.class);

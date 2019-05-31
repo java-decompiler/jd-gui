@@ -32,7 +32,7 @@ public class JarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvid
         String label = entry.getPath().substring(lastSlashIndex+1);
         String location = new File(entry.getUri()).getPath();
         ImageIcon icon = isAEjbModule(entry) ? EJB_FILE_ICON : JAR_FILE_ICON;
-        T node = (T)new TreeNode(entry, "jar", new TreeNodeBean(label, "Location: " + location, icon));
+        T node = (T)new TreeNode(entry, new TreeNodeBean(label, "Location: " + location, icon));
         // Add dummy node
         node.add(new DefaultMutableTreeNode());
         return node;
@@ -66,8 +66,8 @@ public class JarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvid
     }
 
     protected static class TreeNode extends ZipFileTreeNodeFactoryProvider.TreeNode {
-        public TreeNode(Container.Entry entry, String containerType, Object userObject) {
-            super(entry, containerType, userObject);
+        public TreeNode(Container.Entry entry, Object userObject) {
+            super(entry, userObject);
         }
 
         @Override

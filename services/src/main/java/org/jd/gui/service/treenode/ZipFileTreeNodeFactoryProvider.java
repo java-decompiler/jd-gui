@@ -29,18 +29,15 @@ public class ZipFileTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProv
         int lastSlashIndex = entry.getPath().lastIndexOf("/");
         String label = entry.getPath().substring(lastSlashIndex+1);
         String location = new File(entry.getUri()).getPath();
-        T node = (T)new TreeNode(entry, "generic", new TreeNodeBean(label, "Location: " + location, ICON));
+        T node = (T)new TreeNode(entry, new TreeNodeBean(label, "Location: " + location, ICON));
         // Add dummy node
         node.add(new DefaultMutableTreeNode());
         return node;
     }
 
     protected static class TreeNode extends DirectoryTreeNodeFactoryProvider.TreeNode {
-        protected String ct;
-
-        public TreeNode(Container.Entry entry, String containerType, Object userObject) {
+        public TreeNode(Container.Entry entry, Object userObject) {
             super(entry, userObject);
-            ct = containerType;
         }
 
         // --- TreeNodeExpandable --- //

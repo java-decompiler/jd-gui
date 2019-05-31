@@ -12,10 +12,10 @@ import org.jd.gui.api.model.Container;
 
 import java.nio.file.Path;
 
-public class JmodClassesDirectoryContainer extends GenericContainer {
-    public JmodClassesDirectoryContainer(API api, Container.Entry parentEntry, Path rootPath) {
+public class JmodContainer extends GenericContainer {
+    public JmodContainer(API api, Container.Entry parentEntry, Path rootPath) {
         super(api, parentEntry, rootPath);
     }
 
-    public String getType() { return "jmodClassesDirectory"; }
+    public String getType() { return "jmod"; }
 }

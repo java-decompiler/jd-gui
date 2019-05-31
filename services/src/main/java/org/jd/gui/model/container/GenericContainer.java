@@ -152,20 +152,7 @@ public class GenericContainer implements Container {
 
                 for (Path subPath : stream) {
                     if (subPath.getNameCount() > parentNameCount) {
-                        ContainerFactory containerFactory = api.getContainerFactory(subPath);
-
-                        if ((containerFactory == null) || "generic".equals(containerFactory.getType())) {
-                            children.add(newChildEntry(subPath));
-                        } else {
-                            Entry childEntry = newChildEntry(subPath);
-                            Container container = containerFactory.make(api, childEntry, subPath);
-
-                            if (container != null) {
-                                childEntry.children = container.getRoot().getChildren();
-                            }
-
-                            children.add(childEntry);
-                        }
+                        children.add(newChildEntry(subPath));
                     }
                 }
 

@@ -9,10 +9,10 @@ package org.jd.gui.service.treenode;
 
 import javax.swing.*;
 
-public class WebinfClassesDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
-    protected static final ImageIcon ICON = new ImageIcon(WebinfClassesDirectoryTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/packagefolder_obj.png"));
+public class ClassesDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
+    protected static final ImageIcon ICON = new ImageIcon(ClassesDirectoryTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/packagefolder_obj.png"));
 
-    @Override public String[] getSelectors() { return appendSelectors("war:dir:WEB-INF/classes"); }
+    @Override public String[] getSelectors() { return appendSelectors("war:dir:WEB-INF/classes", "jmod:dir:classes"); }
     @Override public ImageIcon getIcon() { return ICON; }
     @Override public ImageIcon getOpenIcon() { return null; }
 }

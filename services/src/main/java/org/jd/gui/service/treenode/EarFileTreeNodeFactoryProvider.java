@@ -28,7 +28,7 @@ public class EarFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvid
         int lastSlashIndex = entry.getPath().lastIndexOf("/");
         String label = entry.getPath().substring(lastSlashIndex+1);
         String location = new File(entry.getUri()).getPath();
-        T node = (T)new TreeNode(entry, "ear", new TreeNodeBean(label, "Location: " + location, ICON));
+        T node = (T)new TreeNode(entry, new TreeNodeBean(label, "Location: " + location, ICON));
         // Add dummy node
         node.add(new DefaultMutableTreeNode());
         return node;

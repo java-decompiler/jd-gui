@@ -1,3 +1,4 @@
+org.jd.gui.service.treenode.ClassesDirectoryTreeNodeFactoryProvider
 org.jd.gui.service.treenode.ClassFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.CssFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.DirectoryTreeNodeFactoryProvider
@@ -10,6 +11,7 @@ org.jd.gui.service.treenode.JarFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JavaFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JavascriptFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JmodFileTreeNodeFactoryProvider
+org.jd.gui.service.treenode.JmodPackageTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JsonFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JspFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.ManifestFileTreeNodeFactoryProvider
@@ -21,7 +23,6 @@ org.jd.gui.service.treenode.SqlFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.TextFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.WarFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.WarPackageTreeNodeFactoryProvider
-org.jd.gui.service.treenode.WebinfClassesDirectoryTreeNodeFactoryProvider
 org.jd.gui.service.treenode.WebinfLibDirectoryTreeNodeFactoryProvider
 org.jd.gui.service.treenode.WebXmlFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.XmlBasedFileTreeNodeFactoryProvider
