@@ -102,9 +102,9 @@ public class AbstractTextPage extends JPanel implements LineNumberNavigable, Con
 
                 // Update font size
                 if (e.getWheelRotation() > 0) {
-                    INCREASE_FONT_SIZE_ACTION.actionPerformedImpl(null, textArea);
-                } else {
                     DECREASE_FONT_SIZE_ACTION.actionPerformedImpl(null, textArea);
+                } else {
+                    INCREASE_FONT_SIZE_ACTION.actionPerformedImpl(null, textArea);
                 }
 
                 // Save preferences
