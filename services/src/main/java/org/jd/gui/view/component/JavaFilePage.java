@@ -40,12 +40,8 @@ public class JavaFilePage extends TypePage {
         referenceListener.init(declarationListener);
         ANTLRJavaParser.parse(new ANTLRInputStream(text), referenceListener);
         // Display
-        initLineNumbers(getMaxLineNumber(text));
         setText(text);
-    }
-
-    private static int getMaxLineNumber(String text) {
-        return text.length() - text.replace("\n", "").length();
+        initLineNumbers();
     }
 
     public String getSyntaxStyle() { return SyntaxConstants.SYNTAX_STYLE_JAVA; }
@@ -396,7 +392,7 @@ public class JavaFilePage extends TypePage {
                                 }
                             }
                         }
-                    } else {
+                    } else if (ctx.primary() != null) {
                         TerminalNode identifier = ctx.primary().Identifier();
 
                         if (identifier != null) {

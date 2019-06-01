@@ -17,6 +17,7 @@ org.jd.gui.service.treenode.JspFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.ManifestFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.MetainfDirectoryTreeNodeFactoryProvider
 org.jd.gui.service.treenode.MetainfServiceFileTreeNodeFactoryProvider
+org.jd.gui.service.treenode.ModuleInfoFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.PackageTreeNodeFactoryProvider
 org.jd.gui.service.treenode.PropertiesFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.SqlFileTreeNodeFactoryProvider

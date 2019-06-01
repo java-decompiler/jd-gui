@@ -44,8 +44,9 @@ public abstract class AbstractFileLoaderProvider implements FileLoader {
                         TreeNodeFactory treeNodeFactory = api.getTreeNodeFactory(parentEntry);
                         Object data = (treeNodeFactory != null) ? treeNodeFactory.make(api, parentEntry).getUserObject() : null;
                         Icon icon = (data instanceof TreeNodeData) ? ((TreeNodeData)data).getIcon() : null;
+                        String location = file.getPath();
 
-                        api.addPanel(file.getName(), icon, "Location: " + file.getAbsolutePath(), mainPanel);
+                        api.addPanel(file.getName(), icon, "Location: " + location, mainPanel);
                         return mainPanel;
                     }
                 }

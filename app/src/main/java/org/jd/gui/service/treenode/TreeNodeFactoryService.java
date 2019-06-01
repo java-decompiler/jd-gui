@@ -43,7 +43,7 @@ public class TreeNodeFactoryService {
     }
 
     protected TreeNodeFactory get(String containerType, Container.Entry entry) {
-        String path = entry.getPath();;
+        String path = entry.getPath();
         String type = entry.isDirectory() ? "dir" : "file";
         String prefix = containerType + ':' + type + ':';
         TreeNodeFactory factory = null;

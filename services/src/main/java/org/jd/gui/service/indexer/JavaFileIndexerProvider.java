@@ -122,43 +122,47 @@ public class JavaFileIndexerProvider extends AbstractIndexerProvider {
 
         protected void enterTypeDeclaration(ParserRuleContext ctx) {
             // Add type declaration
-            String typeName = ctx.getToken(JavaParser.Identifier, 0).getText();
-            int length = sbTypeDeclaration.length();
+            TerminalNode identifier = ctx.getToken(JavaParser.Identifier, 0);
 
-            if ((length == 0) || (sbTypeDeclaration.charAt(length-1) == '/')) {
-                sbTypeDeclaration.append(typeName);
-            } else {
-                sbTypeDeclaration.append('$').append(typeName);
-            }
+            if (identifier != null) {
+                String typeName = identifier.getText();
+                int length = sbTypeDeclaration.length();
 
-            String internalTypeName = sbTypeDeclaration.toString();
-            typeDeclarationSet.add(internalTypeName);
-            nameToInternalTypeName.put(typeName, internalTypeName);
-
-            HashSet<String> superInternalTypeNameSet = new HashSet<>();
-
-            // Add super type reference
-            JavaParser.TypeContext superType = ctx.getRuleContext(JavaParser.TypeContext.class, 0);
-            if (superType != null) {
-                String superQualifiedTypeName = resolveInternalTypeName(superType.classOrInterfaceType().Identifier());
-
-                if (superQualifiedTypeName.charAt(0) != '*')
-                    superInternalTypeNameSet.add(superQualifiedTypeName);
-            }
-
-            // Add implementation references
-            JavaParser.TypeListContext superInterfaces = ctx.getRuleContext(JavaParser.TypeListContext.class, 0);
-            if (superInterfaces != null) {
-                for (JavaParser.TypeContext superInterface : superInterfaces.type()) {
-                    String superQualifiedInterfaceName = resolveInternalTypeName(superInterface.classOrInterfaceType().Identifier());
-
-                    if (superQualifiedInterfaceName.charAt(0) != '*')
-                        superInternalTypeNameSet.add(superQualifiedInterfaceName);
+                if ((length == 0) || (sbTypeDeclaration.charAt(length - 1) == '/')) {
+                    sbTypeDeclaration.append(typeName);
+                } else {
+                    sbTypeDeclaration.append('$').append(typeName);
                 }
-            }
 
-            if (! superInternalTypeNameSet.isEmpty()) {
-                superTypeNamesMap.put(internalTypeName, superInternalTypeNameSet);
+                String internalTypeName = sbTypeDeclaration.toString();
+                typeDeclarationSet.add(internalTypeName);
+                nameToInternalTypeName.put(typeName, internalTypeName);
+
+                HashSet<String> superInternalTypeNameSet = new HashSet<>();
+
+                // Add super type reference
+                JavaParser.TypeContext superType = ctx.getRuleContext(JavaParser.TypeContext.class, 0);
+                if (superType != null) {
+                    String superQualifiedTypeName = resolveInternalTypeName(superType.classOrInterfaceType().Identifier());
+
+                    if (superQualifiedTypeName.charAt(0) != '*')
+                        superInternalTypeNameSet.add(superQualifiedTypeName);
+                }
+
+                // Add implementation references
+                JavaParser.TypeListContext superInterfaces = ctx.getRuleContext(JavaParser.TypeListContext.class, 0);
+                if (superInterfaces != null) {
+                    for (JavaParser.TypeContext superInterface : superInterfaces.type()) {
+                        String superQualifiedInterfaceName = resolveInternalTypeName(superInterface.classOrInterfaceType().Identifier());
+
+                        if (superQualifiedInterfaceName.charAt(0) != '*')
+                            superInternalTypeNameSet.add(superQualifiedInterfaceName);
+                    }
+                }
+
+                if (!superInternalTypeNameSet.isEmpty()) {
+                    superTypeNamesMap.put(internalTypeName, superInternalTypeNameSet);
+                }
             }
         }
 
@@ -197,19 +201,31 @@ public class JavaFileIndexerProvider extends AbstractIndexerProvider {
 
         public void enterFieldDeclaration(JavaParser.FieldDeclarationContext ctx) {
             for (JavaParser.VariableDeclaratorContext declaration : ctx.variableDeclarators().variableDeclarator()) {
-                String name = declaration.variableDeclaratorId().Identifier().getText();
-                fieldDeclarationSet.add(name);
+                TerminalNode identifier = declaration.variableDeclaratorId().Identifier();
+
+                if (identifier != null) {
+                    String name = identifier.getText();
+                    fieldDeclarationSet.add(name);
+                }
             }
         }
 
         public void enterMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
-            String name = ctx.Identifier().getText();
-            methodDeclarationSet.add(name);
+            TerminalNode identifier = ctx.Identifier();
+
+            if (identifier != null) {
+                String name = identifier.getText();
+                methodDeclarationSet.add(name);
+            }
         }
 
         public void enterInterfaceMethodDeclaration(JavaParser.InterfaceMethodDeclarationContext ctx) {
-            String name = ctx.Identifier().getText();
-            methodDeclarationSet.add(name);
+            TerminalNode identifier = ctx.Identifier();
+
+            if (identifier != null) {
+                String name = identifier.getText();
+                methodDeclarationSet.add(name);
+            }
         }
 
         public void enterConstructorDeclaration(JavaParser.ConstructorDeclarationContext ctx) {
@@ -282,15 +298,18 @@ public class JavaFileIndexerProvider extends AbstractIndexerProvider {
         protected TerminalNode getRightTerminalNode(ParseTree pt) {
             if (pt instanceof ParserRuleContext) {
                 List<ParseTree> children = ((ParserRuleContext)pt).children;
-                int size = children.size();
 
-                if (size > 0) {
-                    ParseTree last = children.get(size - 1);
+                if (children != null) {
+                    int size = children.size();
 
-                    if (last instanceof TerminalNode) {
-                        return (TerminalNode) last;
-                    } else {
-                        return getRightTerminalNode(last);
+                    if (size > 0) {
+                        ParseTree last = children.get(size - 1);
+
+                        if (last instanceof TerminalNode) {
+                            return (TerminalNode) last;
+                        } else {
+                            return getRightTerminalNode(last);
+                        }
                     }
                 }
             }

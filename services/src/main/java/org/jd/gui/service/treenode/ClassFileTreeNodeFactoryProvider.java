@@ -21,6 +21,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
 public class ClassFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFactoryProvider {
     protected static final ImageIcon CLASS_FILE_ICON = new ImageIcon(ClassFileTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/classf_obj.png"));
@@ -36,6 +37,15 @@ public class ClassFileTreeNodeFactoryProvider extends AbstractTypeFileTreeNodeFa
     }
 
     @Override public String[] getSelectors() { return appendSelectors("*:file:*.class"); }
+
+    @Override
+    public Pattern getPathPattern() {
+        if (externalPathPattern == null) {
+            return Pattern.compile("^((?!module-info\\.class).)*$");
+        } else {
+            return externalPathPattern;
+        }
+    }
 
     @Override
     @SuppressWarnings("unchecked")

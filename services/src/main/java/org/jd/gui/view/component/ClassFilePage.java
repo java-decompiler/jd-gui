@@ -84,7 +84,6 @@ public class ClassFilePage extends TypePage {
 
             // Decompile class file
             DECOMPILER.decompile(loader, printer, entryInternalName, configuration);
-            setText(printer.getStringBuffer().toString());
         } catch (Throwable t) {
             assert ExceptionUtil.printStackTrace(t);
             setText("// INTERNAL ERROR //");
@@ -152,6 +151,11 @@ public class ClassFilePage extends TypePage {
             } else {
                 setMaxLineNumber(maxLineNumber);
             }
+        }
+
+        @Override
+        public void end() {
+            setText(stringBuffer.toString());
         }
 
         // --- Add strings --- //

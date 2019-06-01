@@ -171,23 +171,21 @@ public class AbstractTextPage extends JPanel implements LineNumberNavigable, Con
 
         if (!foldsExpanded) {
             try {
-                Rectangle r = textArea.modelToView(start);
+                Rectangle rec = textArea.modelToView(start);
 
-                if (r != null) {
+                if (rec != null) {
                     // Visible
-                    setCaretPositionAndCenter(start, end, r);
+                    setCaretPositionAndCenter(start, end, rec);
                 } else {
                     // Not visible yet
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            try {
-                                Rectangle r = textArea.modelToView(start);
-                                if (r != null) {
-                                    setCaretPositionAndCenter(start, end, r);
-                                }
-                            } catch (BadLocationException e) {
-                                assert ExceptionUtil.printStackTrace(e);
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            Rectangle r = textArea.modelToView(start);
+                            if (r != null) {
+                                setCaretPositionAndCenter(start, end, r);
                             }
+                        } catch (BadLocationException e) {
+                            assert ExceptionUtil.printStackTrace(e);
                         }
                     });
                 }

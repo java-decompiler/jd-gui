@@ -26,7 +26,7 @@ public class JmodContainerFactoryProvider implements ContainerFactory {
         if (rootPath.toUri().toString().toLowerCase().endsWith(".jmod!/")) {
             return true;
         } else {
-            // Extension: accept uncompressed WAR file containing a folder 'WEB-INF'
+            // Extension: accept uncompressed JMOD file containing a folder 'classes'
             try {
                 return rootPath.getFileSystem().provider().getScheme().equals("file") && Files.exists(rootPath.resolve("classes"));
             } catch (InvalidPathException e) {
