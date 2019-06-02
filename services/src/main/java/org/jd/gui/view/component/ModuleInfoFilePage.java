@@ -123,7 +123,7 @@ public class ModuleInfoFilePage extends ClassFilePage {
                 switch (currentTokenType) {
                     case Token.NULL:
                         currentTokenStart = i;   // Starting a new token here.
-                        if (RSyntaxUtilities.isLetter(c) || c=='_') {
+                        if (RSyntaxUtilities.isLetter(c) || (c == '_')) {
                             currentTokenType = Token.IDENTIFIER;
                         } else {
                             currentTokenType = Token.WHITESPACE;
@@ -131,14 +131,14 @@ public class ModuleInfoFilePage extends ClassFilePage {
                         break;
                     default: // Should never happen
                     case Token.WHITESPACE:
-                        if (RSyntaxUtilities.isLetterOrDigit(c) || c=='_') {
+                        if (RSyntaxUtilities.isLetter(c) || (c == '_')) {
                             addToken(text, currentTokenStart, i-1, Token.WHITESPACE, newStartOffset+currentTokenStart);
                             currentTokenStart = i;
                             currentTokenType = Token.IDENTIFIER;
                         }
                         break;
                     case Token.IDENTIFIER:
-                        if (!RSyntaxUtilities.isLetterOrDigit(c) && c!='_') {
+                        if (!RSyntaxUtilities.isLetterOrDigit(c) && (c != '_') && (c != '.')) {
                             addToken(text, currentTokenStart, i-1, Token.IDENTIFIER, newStartOffset+currentTokenStart);
                             currentTokenStart = i;
                             currentTokenType = Token.WHITESPACE;
