@@ -5,7 +5,7 @@ buildscript {
     dependencies {
         classpath 'com.netflix.nebula:gradle-ospackage-plugin:5.3.0'    // RPM & DEB support
         classpath 'edu.sc.seis.gradle:launch4j:2.4.4'
-		classpath 'net.sf.proguard:proguard-gradle:6.1.0'
+        classpath 'net.sf.proguard:proguard-gradle:6.1.0'
     }
 }
 
@@ -15,8 +15,8 @@ apply plugin: 'edu.sc.seis.launch4j'
 apply plugin: 'nebula.ospackage'
 
 // Common configuration //
-rootProject.version='1.5.1'
-rootProject.ext.set('jdCoreVersion', '1.0.2')
+rootProject.version='1.5.2'
+rootProject.ext.set('jdCoreVersion', '1.0.3')
 targetCompatibility = '1.8'
 
 allprojects {
@@ -45,9 +45,9 @@ allprojects {
 
 // 'cleanIdea' task extension //
 cleanIdea.doFirst {
-  delete project.name + '.iws'
-  delete 'out'
-  followSymlinks = true
+    delete project.name + '.iws'
+    delete 'out'
+    followSymlinks = true
 }
 
 // All in one JAR file //
