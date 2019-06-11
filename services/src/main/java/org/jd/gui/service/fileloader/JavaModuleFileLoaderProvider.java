@@ -11,7 +11,7 @@ import org.jd.gui.api.API;
 
 import java.io.File;
 
-public class JmodFileLoaderProvider extends ZipFileLoaderProvider {
+public class JavaModuleFileLoaderProvider extends ZipFileLoaderProvider {
     protected static final String[] EXTENSIONS = { "jmod" };
 
     @Override public String[] getExtensions() { return EXTENSIONS; }

@@ -144,21 +144,22 @@ public class MainTabbedPanel<T extends JComponent & UriGettable> extends TabbedP
             pageChangedListenersEnabled = false;
             // Search & display main tab
             T page = showPage(uri);
+
             if (page != null) {
-                if (!uri.equals(page.getUri()) && (page instanceof UriOpenable)) {
+                if (page instanceof UriOpenable) {
                     // Enable page changed event
                     pageChangedListenersEnabled = true;
                     // Search & display sub tab
                     return ((UriOpenable)page).openUri(uri);
                 }
                 return true;
-            } else {
-                return false;
             }
         } finally {
             // Enable page changed event
             pageChangedListenersEnabled = true;
         }
+
+        return false;
     }
 
     // --- PageChangedListener --- //

@@ -19,11 +19,20 @@ import java.util.concurrent.Future;
 
 public class IndexesUtil {
     public static boolean containsInternalTypeName(Collection<Future<Indexes>> collectionOfFutureIndexes, String internalTypeName) {
+        return contains(collectionOfFutureIndexes, "typeDeclarations", internalTypeName);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Container.Entry> findInternalTypeName(Collection<Future<Indexes>> collectionOfFutureIndexes, String internalTypeName) {
+        return find(collectionOfFutureIndexes, "typeDeclarations", internalTypeName);
+    }
+
+    public static boolean contains(Collection<Future<Indexes>> collectionOfFutureIndexes, String indexName, String key) {
         try {
             for (Future<Indexes> futureIndexes : collectionOfFutureIndexes) {
                 if (futureIndexes.isDone()) {
-                    Map<String, Collection> index = futureIndexes.get().getIndex("typeDeclarations");
-                    if ((index != null) && (index.get(internalTypeName) != null)) {
+                    Map<String, Collection> index = futureIndexes.get().getIndex(indexName);
+                    if ((index != null) && (index.get(key) != null)) {
                         return true;
                     }
                 }
@@ -36,15 +45,15 @@ public class IndexesUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Container.Entry> findInternalTypeName(Collection<Future<Indexes>> collectionOfFutureIndexes, String internalTypeName) {
+    public static List<Container.Entry> find(Collection<Future<Indexes>> collectionOfFutureIndexes, String indexName, String key) {
         ArrayList<Container.Entry> entries = new ArrayList<>();
 
         try {
             for (Future<Indexes> futureIndexes : collectionOfFutureIndexes) {
                 if (futureIndexes.isDone()) {
-                    Map<String, Collection> index = futureIndexes.get().getIndex("typeDeclarations");
+                    Map<String, Collection> index = futureIndexes.get().getIndex(indexName);
                     if (index != null) {
-                        Collection<Container.Entry> collection = index.get(internalTypeName);
+                        Collection<Container.Entry> collection = index.get(key);
                         if (collection != null) {
                             entries.addAll(collection);
                         }

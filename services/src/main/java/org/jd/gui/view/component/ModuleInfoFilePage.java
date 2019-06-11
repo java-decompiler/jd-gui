@@ -8,13 +8,28 @@
 package org.jd.gui.view.component;
 
 import org.fife.ui.rsyntaxtextarea.*;
+import org.fife.ui.rtextarea.Marker;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
+import org.jd.gui.api.model.Indexes;
 import org.jd.gui.util.decompiler.ContainerLoader;
+import org.jd.gui.util.decompiler.StringBuilderPrinter;
 import org.jd.gui.util.exception.ExceptionUtil;
+import org.jd.gui.util.index.IndexesUtil;
 
 import javax.swing.text.Segment;
-import java.util.Map;
+import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.jd.core.v1.api.printer.Printer.MODULE;
+import static org.jd.core.v1.api.printer.Printer.PACKAGE;
+import static org.jd.core.v1.api.printer.Printer.TYPE;
 
 public class ModuleInfoFilePage extends ClassFilePage {
     public static final String SYNTAX_STYLE_JAVA_MODULE = "text/java-module";
@@ -29,6 +44,7 @@ public class ModuleInfoFilePage extends ClassFilePage {
         super(api, entry);
     }
 
+    @Override
     public void decompile(Map<String, String> preferences) {
         try {
             // Clear ...
@@ -59,9 +75,199 @@ public class ModuleInfoFilePage extends ClassFilePage {
         }
     }
 
+    @Override
     public String getSyntaxStyle() { return SYNTAX_STYLE_JAVA_MODULE; }
 
-    public class ModuleInfoFilePrinter extends ClassFilePrinter {
+    @Override
+    protected void openHyperlink(int x, int y, HyperlinkData hyperlinkData) {
+        HyperlinkReferenceData hyperlinkReferenceData = (HyperlinkReferenceData)hyperlinkData;
+
+        if (hyperlinkReferenceData.reference.enabled) {
+            try {
+                // Save current position in history
+                Point location = textArea.getLocationOnScreen();
+                int offset = textArea.viewToModel(new Point(x - location.x, y - location.y));
+                URI uri = entry.getUri();
+                api.addURI(new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), "position=" + offset, null));
+
+                // Open link
+                ModuleInfoReferenceData moduleInfoReferenceData = (ModuleInfoReferenceData)hyperlinkReferenceData.reference;
+                List<Container.Entry> entries;
+                String fragment;
+
+                switch (moduleInfoReferenceData.type) {
+                    case TYPE:
+                        entries = IndexesUtil.findInternalTypeName(collectionOfFutureIndexes, fragment = moduleInfoReferenceData.typeName);
+                        break;
+                    case PACKAGE:
+                        entries = IndexesUtil.find(collectionOfFutureIndexes, "packageDeclarations", moduleInfoReferenceData.typeName);
+                        fragment = null;
+                        break;
+                    default: // MODULE
+                        entries = IndexesUtil.find(collectionOfFutureIndexes, "javaModuleDeclarations", moduleInfoReferenceData.name);
+                        fragment = moduleInfoReferenceData.typeName;
+                        break;
+                }
+
+                if (entries.contains(entry)) {
+                    api.openURI(uri);
+                } else {
+                    String rootUri = entry.getContainer().getRoot().getUri().toString();
+                    ArrayList<Container.Entry> sameContainerEntries = new ArrayList<>();
+
+                    for (Container.Entry entry : entries) {
+                        if (entry.getUri().toString().startsWith(rootUri)) {
+                            sameContainerEntries.add(entry);
+                        }
+                    }
+
+                    if (sameContainerEntries.size() > 0) {
+                        api.openURI(x, y, sameContainerEntries, null, fragment);
+                    } else if (entries.size() > 0) {
+                        api.openURI(x, y, entries, null, fragment);
+                    }
+                }
+            } catch (URISyntaxException e) {
+                assert ExceptionUtil.printStackTrace(e);
+            }
+        }
+    }
+
+    // --- UriOpenable --- //
+    @Override
+    public boolean openUri(URI uri) {
+        ArrayList<DocumentRange> ranges = new ArrayList<>();
+        String fragment = uri.getFragment();
+        String query = uri.getQuery();
+
+        Marker.clearMarkAllHighlights(textArea);
+
+        if ((fragment != null) && (declarations.size() == 1)) {
+            DeclarationData declaration = declarations.entrySet().iterator().next().getValue();
+
+            if (fragment.equals(declaration.typeName)) {
+                ranges.add(new DocumentRange(declaration.startPosition, declaration.endPosition));
+            }
+        }
+
+        if (query != null) {
+            Map<String, String> parameters = parseQuery(query);
+
+            String highlightFlags = parameters.get("highlightFlags");
+            String highlightPattern = parameters.get("highlightPattern");
+
+            if ((highlightFlags != null) && (highlightPattern != null)) {
+                String regexp = createRegExp(highlightPattern);
+                Pattern pattern = Pattern.compile(regexp + ".*");
+
+                boolean t = (highlightFlags.indexOf('t') != -1); // Highlight types
+                boolean M = (highlightFlags.indexOf('M') != -1); // Highlight modules
+
+                if (highlightFlags.indexOf('d') != -1) {
+                    // Highlight declarations
+                    for (Map.Entry<String, DeclarationData> entry : declarations.entrySet()) {
+                        DeclarationData declaration = entry.getValue();
+
+                        if (M) {
+                            matchAndAddDocumentRange(pattern, declaration.name, declaration.startPosition, declaration.endPosition, ranges);
+                        }
+                    }
+                }
+
+                if (highlightFlags.indexOf('r') != -1) {
+                    // Highlight references
+                    for (Map.Entry<Integer, HyperlinkData> entry : hyperlinks.entrySet()) {
+                        HyperlinkData hyperlink = entry.getValue();
+                        ReferenceData reference = ((HyperlinkReferenceData)hyperlink).reference;
+                        ModuleInfoReferenceData moduleInfoReferenceData = (ModuleInfoReferenceData)reference;
+
+                        if (t && (moduleInfoReferenceData.type == TYPE)) {
+                            matchAndAddDocumentRange(pattern, getMostInnerTypeName(moduleInfoReferenceData.typeName), hyperlink.startPosition, hyperlink.endPosition, ranges);
+                        }
+                        if (M && (moduleInfoReferenceData.type == MODULE)) {
+                            matchAndAddDocumentRange(pattern, moduleInfoReferenceData.name, hyperlink.startPosition, hyperlink.endPosition, ranges);
+                        }
+                    }
+                }
+            }
+        }
+
+        if ((ranges != null) && !ranges.isEmpty()) {
+            textArea.setMarkAllHighlightColor(SELECT_HIGHLIGHT_COLOR);
+            Marker.markAll(textArea, ranges);
+            ranges.sort(null);
+            setCaretPositionAndCenter(ranges.get(0));
+        }
+
+        return true;
+    }
+
+    // --- IndexesChangeListener --- //
+    @Override
+    public void indexesChanged(Collection<Future<Indexes>> collectionOfFutureIndexes) {
+        // Update the list of containers
+        this.collectionOfFutureIndexes = collectionOfFutureIndexes;
+        // Refresh links
+        boolean refresh = false;
+
+        for (ReferenceData reference : references) {
+            ModuleInfoReferenceData moduleInfoReferenceData = (ModuleInfoReferenceData)reference;
+            boolean enabled = false;
+
+            try {
+                for (Future<Indexes> futureIndexes : collectionOfFutureIndexes) {
+                    if (futureIndexes.isDone()) {
+                        Map<String, Collection> index;
+                        String key;
+
+                        switch (moduleInfoReferenceData.type) {
+                            case TYPE:
+                                index = futureIndexes.get().getIndex("typeDeclarations");
+                                key = reference.typeName;
+                                break;
+                            case PACKAGE:
+                                index = futureIndexes.get().getIndex("packageDeclarations");
+                                key = reference.typeName;
+                                break;
+                            default: // MODULE
+                                index = futureIndexes.get().getIndex("javaModuleDeclarations");
+                                key = reference.name;
+                                break;
+                        }
+
+                        if ((index != null) && (index.get(key) != null)) {
+                            enabled = true;
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                assert ExceptionUtil.printStackTrace(e);
+            }
+
+            if (reference.enabled != enabled) {
+                reference.enabled = enabled;
+                refresh = true;
+            }
+        }
+
+        if (refresh) {
+            textArea.repaint();
+        }
+    }
+
+    protected static class ModuleInfoReferenceData extends ReferenceData {
+        public int type;
+
+        public ModuleInfoReferenceData(int type, String typeName, String name, String descriptor, String owner) {
+            super(typeName, name, descriptor, owner);
+            this.type = type;
+        }
+    }
+
+    public class ModuleInfoFilePrinter extends StringBuilderPrinter {
+        protected HashMap<String, ReferenceData> referencesCache = new HashMap<>();
+
         @Override
         public void start(int maxLineNumber, int majorVersion, int minorVersion) {}
 
@@ -69,6 +275,27 @@ public class ModuleInfoFilePage extends ClassFilePage {
         public void end() {
             setText(stringBuffer.toString());
             initLineNumbers();
+        }
+
+        @Override
+        public void printDeclaration(int type, String internalTypeName, String name, String descriptor) {
+            declarations.put(internalTypeName, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalTypeName, name, descriptor));
+            super.printDeclaration(type, internalTypeName, name, descriptor);
+        }
+
+        @Override
+        public void printReference(int type, String internalTypeName, String name, String descriptor, String ownerInternalName) {
+            String key = (type == MODULE) ? name : internalTypeName;
+            ReferenceData reference = referencesCache.get(key);
+
+            if (reference == null) {
+                reference = new ModuleInfoReferenceData(type, internalTypeName, name, descriptor, ownerInternalName);
+                referencesCache.put(key, reference);
+                references.add(reference);
+            }
+
+            addHyperlink(new HyperlinkReferenceData(stringBuffer.length(), name.length(), reference));
+            super.printReference(type, internalTypeName, name, descriptor, ownerInternalName);
         }
     }
 

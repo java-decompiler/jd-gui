@@ -10,8 +10,8 @@ org.jd.gui.service.treenode.HtmlFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JarFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JavaFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JavascriptFileTreeNodeFactoryProvider
-org.jd.gui.service.treenode.JmodFileTreeNodeFactoryProvider
-org.jd.gui.service.treenode.JmodPackageTreeNodeFactoryProvider
+org.jd.gui.service.treenode.JavaModuleFileTreeNodeFactoryProvider
+org.jd.gui.service.treenode.JavaModulePackageTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JsonFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.JspFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.ManifestFileTreeNodeFactoryProvider

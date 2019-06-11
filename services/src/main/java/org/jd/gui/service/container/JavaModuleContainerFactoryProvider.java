@@ -9,7 +9,7 @@ package org.jd.gui.service.container;
 
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
-import org.jd.gui.model.container.JmodContainer;
+import org.jd.gui.model.container.JavaModuleContainer;
 import org.jd.gui.spi.ContainerFactory;
 import org.jd.gui.util.exception.ExceptionUtil;
 
@@ -17,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
-public class JmodContainerFactoryProvider implements ContainerFactory {
+public class JavaModuleContainerFactoryProvider implements ContainerFactory {
     @Override
     public String getType() { return "jmod"; }
 
@@ -38,6 +38,6 @@ public class JmodContainerFactoryProvider implements ContainerFactory {
 
     @Override
     public Container make(API api, Container.Entry parentEntry, Path rootPath) {
-        return new JmodContainer(api, parentEntry, rootPath);
+        return new JavaModuleContainer(api, parentEntry, rootPath);
     }
 }

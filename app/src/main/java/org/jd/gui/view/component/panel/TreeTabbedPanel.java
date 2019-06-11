@@ -108,9 +108,9 @@ public class TreeTabbedPanel<T extends DefaultMutableTreeNode & ContainerEntryGe
         tabbedPanel.setMinimumSize(new Dimension(150, 10));
         tabbedPanel.tabbedPane.addChangeListener(e -> pageChanged());
 
-		setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
-		JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tree), tabbedPanel);
+        JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(tree), tabbedPanel);
         splitter.setResizeWeight(0.2);
 
         add(splitter, BorderLayout.CENTER);
@@ -230,15 +230,28 @@ public class TreeTabbedPanel<T extends DefaultMutableTreeNode & ContainerEntryGe
     public boolean openUri(URI uri) {
         try {
             URI baseUri = new URI(uri.getScheme(), uri.getHost(), uri.getPath(), null);
-            DefaultMutableTreeNode baseNode = searchTreeNode(baseUri, (DefaultMutableTreeNode)tree.getModel().getRoot());
 
-            if ((baseNode != null) && showPage(uri, baseUri, baseNode)) {
-                DefaultMutableTreeNode node = searchTreeNode(uri, baseNode);
+            if (this.uri.equals(baseUri)) {
+                return true;
+            } else {
+                DefaultMutableTreeNode node = searchTreeNode(baseUri, (DefaultMutableTreeNode) tree.getModel().getRoot());
+
+                if (showPage(uri, baseUri, node)) {
+                    DefaultMutableTreeNode childNode = searchTreeNode(uri, node);
+                    if (childNode != null) {
+                        node = childNode;
+                    }
+                }
 
                 if (node != null) {
                     try {
                         // Disable tree node changed listener
                         treeNodeChangedEnabled = false;
+                        // Populate and expand node
+                        if (!(node instanceof PageCreator) && (node instanceof TreeNodeExpandable)) {
+                            ((TreeNodeExpandable) node).populateTreeNode(api);
+                            tree.expandPath(new TreePath(node.getPath()));
+                        }
                         // Select tree node
                         TreePath treePath = new TreePath(node.getPath());
                         tree.setSelectionPath(treePath);
@@ -247,8 +260,8 @@ public class TreeTabbedPanel<T extends DefaultMutableTreeNode & ContainerEntryGe
                         // Enable tree node changed listener
                         treeNodeChangedEnabled = true;
                     }
+                    return true;
                 }
-                return true;
             }
         } catch (URISyntaxException e) {
             assert ExceptionUtil.printStackTrace(e);

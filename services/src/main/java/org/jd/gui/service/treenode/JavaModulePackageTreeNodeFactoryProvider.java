@@ -9,7 +9,7 @@ package org.jd.gui.service.treenode;
 
 import java.util.regex.Pattern;
 
-public class JmodPackageTreeNodeFactoryProvider extends PackageTreeNodeFactoryProvider {
+public class JavaModulePackageTreeNodeFactoryProvider extends PackageTreeNodeFactoryProvider {
 
     @Override public String[] getSelectors() { return appendSelectors("jmod:dir:*"); }
 

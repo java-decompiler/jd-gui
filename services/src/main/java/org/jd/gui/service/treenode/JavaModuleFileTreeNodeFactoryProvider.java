@@ -16,7 +16,7 @@ import org.jd.gui.view.data.TreeNodeBean;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
 
-public class JmodFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvider {
+public class JavaModuleFileTreeNodeFactoryProvider extends ZipFileTreeNodeFactoryProvider {
     @Override public String[] getSelectors() { return appendSelectors("*:file:*.jmod"); }
 
     @Override

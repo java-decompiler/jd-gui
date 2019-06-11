@@ -26,24 +26,25 @@ public class UriUtil {
      *  file://codebase/a/b/c/D$E.class => file://codebase/a/b/c/D.class#typeDeclaration=D$E
      */
     public static URI createURI(API api, Collection<Future<Indexes>> collectionOfFutureIndexes, Container.Entry entry, String query, String fragment) {
-        TypeFactory typeFactory = TypeFactoryService.getInstance().get(entry);
+        URI uri = entry.getUri();
 
-        if (typeFactory != null) {
-            Type type = typeFactory.make(api, entry, fragment);
+        try {
+            String path = uri.getPath();
+            TypeFactory typeFactory = TypeFactoryService.getInstance().get(entry);
 
-            if (type != null) {
-                URI uri = entry.getUri();
-                String path = getOuterPath(collectionOfFutureIndexes, entry, type);
+            if (typeFactory != null) {
+                Type type = typeFactory.make(api, entry, fragment);
 
-                try {
-                    return new URI(uri.getScheme(), uri.getHost(), path, query, fragment);
-                } catch (URISyntaxException e) {
-                    assert ExceptionUtil.printStackTrace(e);
+                if (type != null) {
+                    path = getOuterPath(collectionOfFutureIndexes, entry, type);
                 }
             }
-        }
 
-        return null;
+            return new URI(uri.getScheme(), uri.getHost(), path, query, fragment);
+        } catch (URISyntaxException e) {
+            assert ExceptionUtil.printStackTrace(e);
+            return uri;
+        }
     }
 
     @SuppressWarnings("unchecked")

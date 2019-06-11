@@ -77,10 +77,10 @@ public abstract class AbstractIndexerProvider implements Indexer {
         }
     }
 
-    public Pattern getPathPattern() { return externalPathPattern; }
+    @Override public Pattern getPathPattern() { return externalPathPattern; }
 
     @SuppressWarnings("unchecked")
-    protected static void addToIndex(Indexes indexes, String indexName, Set<String> set, Container.Entry entry) {
+    protected static void addToIndexes(Indexes indexes, String indexName, Set<String> set, Container.Entry entry) {
         if (set.size() > 0) {
             Map<String, Collection> index = indexes.getIndex(indexName);
 

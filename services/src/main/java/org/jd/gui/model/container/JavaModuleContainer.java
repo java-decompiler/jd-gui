@@ -12,8 +12,8 @@ import org.jd.gui.api.model.Container;
 
 import java.nio.file.Path;
 
-public class JmodContainer extends GenericContainer {
-    public JmodContainer(API api, Container.Entry parentEntry, Path rootPath) {
+public class JavaModuleContainer extends GenericContainer {
+    public JavaModuleContainer(API api, Container.Entry parentEntry, Path rootPath) {
         super(api, parentEntry, rootPath);
     }
 

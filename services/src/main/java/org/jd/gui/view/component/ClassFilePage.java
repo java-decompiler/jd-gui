@@ -169,45 +169,45 @@ public class ClassFilePage extends TypePage {
         }
 
         @Override
-        public void printDeclaration(int flags, String internalTypeName, String name, String descriptor) {
+        public void printDeclaration(int type, String internalTypeName, String name, String descriptor) {
             if (internalTypeName == null) internalTypeName = "null";
             if (name == null) name = "null";
             if (descriptor == null) descriptor = "null";
 
-            switch (flags) {
-                case TYPE_FLAG:
+            switch (type) {
+                case TYPE:
                     TypePage.DeclarationData data = new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalTypeName, null, null);
                     declarations.put(internalTypeName, data);
                     typeDeclarations.put(stringBuffer.length(), data);
                     break;
-                case CONSTRUCTOR_FLAG:
+                case CONSTRUCTOR:
                     declarations.put(internalTypeName + "-<init>-" + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalTypeName, "<init>", descriptor));
                     break;
                 default:
                     declarations.put(internalTypeName + '-' + name + '-' + descriptor, new TypePage.DeclarationData(stringBuffer.length(), name.length(), internalTypeName, name, descriptor));
                     break;
             }
-            super.printDeclaration(flags, internalTypeName, name, descriptor);
+            super.printDeclaration(type, internalTypeName, name, descriptor);
         }
 
         @Override
-        public void printReference(int flags, String internalTypeName, String name, String descriptor, String ownerInternalName) {
+        public void printReference(int type, String internalTypeName, String name, String descriptor, String ownerInternalName) {
             if (internalTypeName == null) internalTypeName = "null";
             if (name == null) name = "null";
             if (descriptor == null) descriptor = "null";
 
-            switch (flags) {
-                case TYPE_FLAG:
+            switch (type) {
+                case TYPE:
                     addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalTypeName, null, null, ownerInternalName)));
                     break;
-                case CONSTRUCTOR_FLAG:
+                case CONSTRUCTOR:
                     addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalTypeName, "<init>", descriptor, ownerInternalName)));
                     break;
                 default:
                     addHyperlink(new TypePage.HyperlinkReferenceData(stringBuffer.length(), name.length(), newReferenceData(internalTypeName, name, descriptor, ownerInternalName)));
                     break;
             }
-            super.printReference(flags, internalTypeName, name, descriptor, ownerInternalName);
+            super.printReference(type, internalTypeName, name, descriptor, ownerInternalName);
         }
 
         @Override
