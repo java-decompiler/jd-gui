@@ -13,15 +13,13 @@ import java.util.regex.Pattern;
 public class MetainfDirectoryTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
     protected static final ImageIcon ICON = new ImageIcon(MetainfDirectoryTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/inf_obj.png"));
 
-    @Override public String[] getSelectors() { return appendSelectors("jar:dir:*", "war:dir:*", "ear:dir:*"); }
-
-    @Override
-    public Pattern getPathPattern() {
-        if (externalPathPattern == null) {
-            return Pattern.compile("(WEB-INF|(WEB-INF\\/classes\\/)?META-IN(F|F\\/.*))");
-        } else {
-            return externalPathPattern;
-        }
+    @Override public String[] getSelectors() {
+        return appendSelectors(
+                "jar:dir:META-INF",
+                "war:dir:WEB-INF",
+                "war:dir:WEB-INF/classes/META-INF",
+                "ear:dir:META-INF",
+                "jmod:dir:classes/META-INF");
     }
 
     @Override public ImageIcon getIcon() { return ICON; }

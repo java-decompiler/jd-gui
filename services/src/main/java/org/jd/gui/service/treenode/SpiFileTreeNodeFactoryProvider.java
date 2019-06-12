@@ -9,14 +9,15 @@ package org.jd.gui.service.treenode;
 
 import java.util.regex.Pattern;
 
-public class JavaModulePackageTreeNodeFactoryProvider extends PackageTreeNodeFactoryProvider {
-
-    @Override public String[] getSelectors() { return appendSelectors("jmod:dir:*"); }
+public class SpiFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
+    @Override public String[] getSelectors() {
+        return appendSelectors("*:file:*");
+    }
 
     @Override
     public Pattern getPathPattern() {
         if (externalPathPattern == null) {
-            return Pattern.compile("classes\\/(?!META-INF)..*");
+            return Pattern.compile("(.*\\/)?META-INF\\/services\\/.*");
         } else {
             return externalPathPattern;
         }

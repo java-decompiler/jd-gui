@@ -21,6 +21,7 @@ org.jd.gui.service.treenode.ModuleInfoFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.PackageTreeNodeFactoryProvider
 org.jd.gui.service.treenode.PropertiesFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.SqlFileTreeNodeFactoryProvider
+org.jd.gui.service.treenode.SpiFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.TextFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.WarFileTreeNodeFactoryProvider
 org.jd.gui.service.treenode.WarPackageTreeNodeFactoryProvider
