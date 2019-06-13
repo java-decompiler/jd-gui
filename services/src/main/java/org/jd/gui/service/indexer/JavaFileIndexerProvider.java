@@ -43,15 +43,15 @@ public class JavaFileIndexerProvider extends AbstractIndexerProvider {
             ANTLRJavaParser.parse(new ANTLRInputStream(inputStream), listener);
 
             // Append sets to indexes
-            addToIndex(indexes, "typeDeclarations", listener.getTypeDeclarationSet(), entry);
-            addToIndex(indexes, "constructorDeclarations", listener.getConstructorDeclarationSet(), entry);
-            addToIndex(indexes, "methodDeclarations", listener.getMethodDeclarationSet(), entry);
-            addToIndex(indexes, "fieldDeclarations", listener.getFieldDeclarationSet(), entry);
-            addToIndex(indexes, "typeReferences", listener.getTypeReferenceSet(), entry);
-            addToIndex(indexes, "constructorReferences", listener.getConstructorReferenceSet(), entry);
-            addToIndex(indexes, "methodReferences", listener.getMethodReferenceSet(), entry);
-            addToIndex(indexes, "fieldReferences", listener.getFieldReferenceSet(), entry);
-            addToIndex(indexes, "strings", listener.getStringSet(), entry);
+            addToIndexes(indexes, "typeDeclarations", listener.getTypeDeclarationSet(), entry);
+            addToIndexes(indexes, "constructorDeclarations", listener.getConstructorDeclarationSet(), entry);
+            addToIndexes(indexes, "methodDeclarations", listener.getMethodDeclarationSet(), entry);
+            addToIndexes(indexes, "fieldDeclarations", listener.getFieldDeclarationSet(), entry);
+            addToIndexes(indexes, "typeReferences", listener.getTypeReferenceSet(), entry);
+            addToIndexes(indexes, "constructorReferences", listener.getConstructorReferenceSet(), entry);
+            addToIndexes(indexes, "methodReferences", listener.getMethodReferenceSet(), entry);
+            addToIndexes(indexes, "fieldReferences", listener.getFieldReferenceSet(), entry);
+            addToIndexes(indexes, "strings", listener.getStringSet(), entry);
 
             // Populate map [super type name : [sub type name]]
             Map<String, Collection> index = indexes.getIndex("subTypeNames");

@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.Collection;
 
 public class DirectoryTreeNodeFactoryProvider extends AbstractTreeNodeFactoryProvider {
-	protected static final ImageIcon ICON = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/folder.gif"));
+    protected static final ImageIcon ICON = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/folder.gif"));
     protected static final ImageIcon OPEN_ICON = new ImageIcon(DirectoryTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/folder_open.png"));
 
     @Override public String[] getSelectors() { return appendSelectors("*:dir:*"); }

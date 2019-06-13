@@ -11,6 +11,8 @@ import org.jd.gui.api.API;
 import org.jd.gui.api.feature.ContainerEntryGettable;
 import org.jd.gui.api.feature.UriGettable;
 import org.jd.gui.api.model.Container;
+import org.jd.gui.api.model.Type;
+import org.jd.gui.spi.TypeFactory;
 import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.view.component.ModuleInfoFilePage;
 import org.jd.gui.view.data.TreeNodeBean;
@@ -18,9 +20,11 @@ import org.jd.gui.view.data.TreeNodeBean;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 public class ModuleInfoFileTreeNodeFactoryProvider extends ClassFileTreeNodeFactoryProvider {
+    protected static final ImageIcon MODULE_FILE_ICON = new ImageIcon(ClassFileTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/module_obj.png"));
     protected static final Factory FACTORY = new Factory();
 
     static {
@@ -41,7 +45,33 @@ public class ModuleInfoFileTreeNodeFactoryProvider extends ClassFileTreeNodeFact
     public <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry) {
         int lastSlashIndex = entry.getPath().lastIndexOf('/');
         String label = entry.getPath().substring(lastSlashIndex+1);
-        return (T)new FileTreeNode(entry, new TreeNodeBean(label, CLASS_FILE_ICON), FACTORY);
+        return (T)new ModuleInfoFileTreeNode(entry, new TreeNodeBean(label, CLASS_FILE_ICON), FACTORY);
+    }
+
+    protected static class ModuleInfoFileTreeNode extends FileTreeNode {
+        public ModuleInfoFileTreeNode(Container.Entry entry, Object userObject, PageAndTipFactory pageAndTipFactory) {
+            super(entry, null, userObject, pageAndTipFactory);
+        }
+
+        // --- TreeNodeExpandable --- //
+        @Override
+        public void populateTreeNode(API api) {
+            if (!initialized) {
+                removeAllChildren();
+                // Create type node
+                TypeFactory typeFactory = api.getTypeFactory(entry);
+
+                if (typeFactory != null) {
+                    Collection<Type> types = typeFactory.make(api, entry);
+
+                    for (Type type : types) {
+                        add(new BaseTreeNode(entry, type.getName(), new TreeNodeBean(type.getDisplayTypeName(), MODULE_FILE_ICON), factory));
+                    }
+                }
+
+                initialized = true;
+            }
+        }
     }
 
     protected static class Factory implements AbstractTypeFileTreeNodeFactoryProvider.PageAndTipFactory {

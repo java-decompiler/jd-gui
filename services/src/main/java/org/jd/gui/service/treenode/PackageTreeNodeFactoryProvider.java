@@ -18,11 +18,21 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
 import java.util.Collection;
+import java.util.regex.Pattern;
 
 public class PackageTreeNodeFactoryProvider extends DirectoryTreeNodeFactoryProvider {
     protected static final ImageIcon ICON = new ImageIcon(PackageTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/package_obj.png"));
 
     @Override public String[] getSelectors() { return appendSelectors("jar:dir:*"); }
+
+    @Override
+    public Pattern getPathPattern() {
+        if (externalPathPattern == null) {
+            return Pattern.compile("(META-INF\\/versions\\/.*)|(?!META-INF)..*");
+        } else {
+            return externalPathPattern;
+        }
+    }
 
     @Override
     @SuppressWarnings("unchecked")

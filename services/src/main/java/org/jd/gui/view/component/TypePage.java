@@ -343,23 +343,7 @@ public abstract class TypePage extends CustomLineNumbersPage implements UriGetta
             String typeName = reference.typeName;
             boolean enabled;
 
-            if (reference.name != null) {
-                try {
-                    // Recursive search
-                    typeName = searchTypeHavingMember(typeName, reference.name, reference.descriptor, entry);
-                    if (typeName != null) {
-                        // Replace type with the real type having the referenced member
-                        reference.typeName = typeName;
-                        enabled = true;
-                    } else {
-                        enabled = false;
-                    }
-                } catch (Error e) {
-                    // Catch StackOverflowError or OutOfMemoryError
-                    assert ExceptionUtil.printStackTrace(e);
-                    enabled = false;
-                }
-            } else {
+            if (reference.name == null) {
                 enabled = false;
 
                 try {
@@ -374,6 +358,22 @@ public abstract class TypePage extends CustomLineNumbersPage implements UriGetta
                     }
                 } catch (Exception e) {
                     assert ExceptionUtil.printStackTrace(e);
+                }
+            } else {
+                try {
+                    // Recursive search
+                    typeName = searchTypeHavingMember(typeName, reference.name, reference.descriptor, entry);
+                    if (typeName != null) {
+                        // Replace type with the real type having the referenced member
+                        reference.typeName = typeName;
+                        enabled = true;
+                    } else {
+                        enabled = false;
+                    }
+                } catch (Error e) {
+                    // Catch StackOverflowError or OutOfMemoryError
+                    assert ExceptionUtil.printStackTrace(e);
+                    enabled = false;
                 }
             }
 
@@ -505,7 +505,7 @@ public abstract class TypePage extends CustomLineNumbersPage implements UriGetta
         }
     }
 
-    public static class ReferenceData {
+    protected static class ReferenceData {
         public String typeName;
         /**
          * Field or method name or null for type
@@ -525,7 +525,7 @@ public abstract class TypePage extends CustomLineNumbersPage implements UriGetta
          */
         public boolean enabled = false;
 
-        ReferenceData(String typeName, String name, String descriptor, String owner) {
+        public ReferenceData(String typeName, String name, String descriptor, String owner) {
             this.typeName = typeName;
             this.name = name;
             this.descriptor = descriptor;

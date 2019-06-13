@@ -16,9 +16,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.regex.Pattern;
 
 public interface TreeNodeFactory {
-	String[] getSelectors();
+    String[] getSelectors();
 
     Pattern getPathPattern();
 
-	<T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry);
+    <T extends DefaultMutableTreeNode & ContainerEntryGettable & UriGettable> T make(API api, Container.Entry entry);
 }

@@ -211,10 +211,10 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
     }
 
     protected void filter(Indexes indexes, String pattern, int flags, Set<Container.Entry> matchingEntries) {
-        boolean declarations = ((flags & SearchInConstantPoolsView.SEARCH_TYPE_DECLARATION) != 0);
-        boolean references = ((flags & SearchInConstantPoolsView.SEARCH_TYPE_REFERENCE) != 0);
+        boolean declarations = ((flags & SearchInConstantPoolsView.SEARCH_DECLARATION) != 0);
+        boolean references = ((flags & SearchInConstantPoolsView.SEARCH_REFERENCE) != 0);
 
-        if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_TYPE) != 0) {
+        if ((flags & SearchInConstantPoolsView.SEARCH_TYPE) != 0) {
             if (declarations)
                 match(indexes, "typeDeclarations", pattern,
                       SearchInConstantPoolsController::matchTypeEntriesWithChar,
@@ -225,7 +225,7 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
                       SearchInConstantPoolsController::matchTypeEntriesWithString, matchingEntries);
         }
 
-        if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_CONSTRUCTOR) != 0) {
+        if ((flags & SearchInConstantPoolsView.SEARCH_CONSTRUCTOR) != 0) {
             if (declarations)
                 match(indexes, "constructorDeclarations", pattern,
                       SearchInConstantPoolsController::matchTypeEntriesWithChar,
@@ -236,7 +236,7 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
                       SearchInConstantPoolsController::matchTypeEntriesWithString, matchingEntries);
         }
 
-        if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_METHOD) != 0) {
+        if ((flags & SearchInConstantPoolsView.SEARCH_METHOD) != 0) {
             if (declarations)
                 match(indexes, "methodDeclarations", pattern,
                       SearchInConstantPoolsController::matchWithChar,
@@ -247,7 +247,7 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
                       SearchInConstantPoolsController::matchWithString, matchingEntries);
         }
 
-        if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_FIELD) != 0) {
+        if ((flags & SearchInConstantPoolsView.SEARCH_FIELD) != 0) {
             if (declarations)
                 match(indexes, "fieldDeclarations", pattern,
                       SearchInConstantPoolsController::matchWithChar,
@@ -258,11 +258,22 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
                       SearchInConstantPoolsController::matchWithString, matchingEntries);
         }
 
-        if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_STRING) != 0) {
+        if ((flags & SearchInConstantPoolsView.SEARCH_STRING) != 0) {
             if (declarations || references)
                 match(indexes, "strings", pattern,
                       SearchInConstantPoolsController::matchWithChar,
                       SearchInConstantPoolsController::matchWithString, matchingEntries);
+        }
+
+        if ((flags & SearchInConstantPoolsView.SEARCH_MODULE) != 0) {
+            if (declarations)
+                match(indexes, "javaModuleDeclarations", pattern,
+                        SearchInConstantPoolsController::matchWithChar,
+                        SearchInConstantPoolsController::matchWithString, matchingEntries);
+            if (references)
+                match(indexes, "javaModuleReferences", pattern,
+                        SearchInConstantPoolsController::matchWithChar,
+                        SearchInConstantPoolsController::matchWithString, matchingEntries);
         }
     }
 
@@ -275,29 +286,29 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
 
         if (patternLength > 0) {
             String key = String.valueOf(indexes.hashCode()) + "***" + indexName + "***" + pattern;
-            Map<String, Collection> matchedTypes = cache.get(key);
+            Map<String, Collection> matchedEntries = cache.get(key);
 
-            if (matchedTypes == null) {
+            if (matchedEntries == null) {
                 Map<String, Collection> index = indexes.getIndex(indexName);
 
                 if (patternLength == 1) {
-                    matchedTypes = matchWithCharFunction.apply(pattern.charAt(0), index);
+                    matchedEntries = matchWithCharFunction.apply(pattern.charAt(0), index);
                 } else {
                     String lastKey = key.substring(0, key.length() - 1);
                     Map<String, Collection> lastMatchedTypes = cache.get(lastKey);
                     if (lastMatchedTypes != null) {
-                        matchedTypes = matchWithStringFunction.apply(pattern, lastMatchedTypes);
+                        matchedEntries = matchWithStringFunction.apply(pattern, lastMatchedTypes);
                     } else {
-                        matchedTypes = matchWithStringFunction.apply(pattern, index);
+                        matchedEntries = matchWithStringFunction.apply(pattern, index);
                     }
                 }
 
                 // Cache matchingEntries
-                cache.put(key, matchedTypes);
+                cache.put(key, matchedEntries);
             }
 
-            if (matchedTypes != null) {
-                for (Collection<Container.Entry> entries : matchedTypes.values()) {
+            if (matchedEntries != null) {
+                for (Collection<Container.Entry> entries : matchedEntries.values()) {
                     matchingEntries.addAll(entries);
                 }
             }
@@ -306,7 +317,7 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
 
     protected static Map<String, Collection> matchTypeEntriesWithChar(char c, Map<String, Collection> index) {
         if ((c == '*') || (c == '?')) {
-            return Collections.emptyMap();
+            return index;
         } else {
             Map<String, Collection> map = new HashMap<>();
 
@@ -345,13 +356,13 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
 
     protected static Map<String, Collection> matchWithChar(char c, Map<String, Collection> index) {
         if ((c == '*') || (c == '?')) {
-            return Collections.emptyMap();
+            return index;
         } else {
             Map<String, Collection> map = new HashMap<>();
 
-            for (String typeName : index.keySet()) {
-                if (!typeName.isEmpty() && (typeName.charAt(0) == c)) {
-                    map.put(typeName, index.get(typeName));
+            for (String key : index.keySet()) {
+                if (!key.isEmpty() && (key.charAt(0) == c)) {
+                    map.put(key, index.get(key));
                 }
             }
 
@@ -363,9 +374,9 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
         Pattern p = createPattern(pattern);
         Map<String, Collection> map = new HashMap<>();
 
-        for (String typeName : index.keySet()) {
-            if (p.matcher(typeName).matches()) {
-                map.put(typeName, index.get(typeName));
+        for (String key : index.keySet()) {
+            if (p.matcher(key).matches()) {
+                map.put(key, index.get(key));
             }
         }
 
@@ -419,20 +430,22 @@ public class SearchInConstantPoolsController implements IndexesChangeListener {
             sbPattern.append(pattern);
             sbPattern.append("&highlightFlags=");
 
-            if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_DECLARATION) != 0)
+            if ((flags & SearchInConstantPoolsView.SEARCH_DECLARATION) != 0)
                 sbPattern.append('d');
-            if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_REFERENCE) != 0)
+            if ((flags & SearchInConstantPoolsView.SEARCH_REFERENCE) != 0)
                 sbPattern.append('r');
-            if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_TYPE) != 0)
+            if ((flags & SearchInConstantPoolsView.SEARCH_TYPE) != 0)
                 sbPattern.append('t');
-            if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_CONSTRUCTOR) != 0)
+            if ((flags & SearchInConstantPoolsView.SEARCH_CONSTRUCTOR) != 0)
                 sbPattern.append('c');
-            if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_METHOD) != 0)
+            if ((flags & SearchInConstantPoolsView.SEARCH_METHOD) != 0)
                 sbPattern.append('m');
-            if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_FIELD) != 0)
+            if ((flags & SearchInConstantPoolsView.SEARCH_FIELD) != 0)
                 sbPattern.append('f');
-            if ((flags & SearchInConstantPoolsView.SEARCH_TYPE_STRING) != 0)
+            if ((flags & SearchInConstantPoolsView.SEARCH_STRING) != 0)
                 sbPattern.append('s');
+            if ((flags & SearchInConstantPoolsView.SEARCH_MODULE) != 0)
+                sbPattern.append('M');
 
             // TODO In a future release, add 'highlightScope' to display search results in correct type and inner-type
             // def type = TypeFactoryService.instance.get(entry)?.make(api, entry, null)
