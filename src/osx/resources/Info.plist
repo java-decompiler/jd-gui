@@ -5,16 +5,16 @@
 		<key>CFBundleDevelopmentRegion</key>		<string>English</string>
 		<key>CFBundleExecutable</key>				<string>universalJavaApplicationStub.sh</string>
 		<key>CFBundleName</key>						<string>JD-GUI</string>
-		<key>CFBundleGetInfoString</key>			<string>JD-GUI version ${VERSION}, Copyright 2008-2019 Emmanuel Dupuy</string>
+		<key>CFBundleGetInfoString</key>			<string>JD-GUI version ${VERSION}, Copyright 2008, 2019 Emmanuel Dupuy</string>
 		<key>CFBundleIconFile</key>					<string>jd-gui.icns</string>
 		<key>CFBundleIdentifier</key>				<string>jd.jd-gui</string>
 		<key>CFBundleInfoDictionaryVersion</key>	<string>6.0</string>
 		<key>CFBundlePackageType</key>				<string>APPL</string>
-		<key>CFBundleLongVersionString</key>		<string>${VERSION}, Copyright 2008-2019 Emmanuel Dupuy</string>
+		<key>CFBundleLongVersionString</key>		<string>${VERSION}, Copyright 2008, 2019 Emmanuel Dupuy</string>
 		<key>CFBundleShortVersionString</key>		<string>${VERSION}</string>
 		<key>CSResourcesFileMapped</key>			<true/>
 		<key>LSRequiresCarbon</key>					<true/>
-		<key>NSHumanReadableCopyright</key>			<string>Copyright 2008-2019 Emmanuel Dupuy</string>
+		<key>NSHumanReadableCopyright</key>			<string>Copyright 2008, 2019 Emmanuel Dupuy</string>
 		<key>NSPrincipalClass</key>					<string>NSApplication</string>
 		<key>NSHighResolutionCapable</key>			<true/>
 		<key>CFBundleDocumentTypes</key>
@@ -23,6 +23,10 @@
 				<key>CFBundleTypeExtensions</key>
 				<array>
 					<string>class</string>
+				</array>
+				<key>CFBundleTypeMIMETypes</key>
+				<array>
+					<string>application/java</string>
 				</array>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
 				<key>CFBundleTypeName</key>			<string>Class File</string>
@@ -34,6 +38,10 @@
 				<array>
 					<string>java</string>
 				</array>
+				<key>CFBundleTypeMIMETypes</key>
+				<array>
+					<string>text/plain</string>
+				</array>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
 				<key>CFBundleTypeName</key>			<string>Java File</string>
 				<key>LSIsAppleDefaultForType</key>	<false/>
@@ -43,6 +51,10 @@
 				<key>CFBundleTypeExtensions</key>
 				<array>
 					<string>jar</string>
+				</array>
+				<key>CFBundleTypeMIMETypes</key>
+				<array>
+					<string>application/java-archive</string>
 				</array>
 				<key>CFBundleTypeName</key>			<string>Jar File</string>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
@@ -54,6 +66,10 @@
 				<array>
 					<string>war</string>
 				</array>
+				<key>CFBundleTypeMIMETypes</key>
+				<array>
+					<string>application/java-archive</string>
+				</array>
 				<key>CFBundleTypeName</key>			<string>War File</string>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
 				<key>LSIsAppleDefaultForType</key>	<false/>
@@ -64,6 +80,10 @@
 				<array>
 					<string>ear</string>
 				</array>
+				<key>CFBundleTypeMIMETypes</key>
+				<array>
+					<string>application/java-archive</string>
+				</array>
 				<key>CFBundleTypeName</key>			<string>Ear File</string>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
 				<key>LSIsAppleDefaultForType</key>	<false/>
@@ -72,7 +92,35 @@
 			<dict>
 				<key>CFBundleTypeExtensions</key>
 				<array>
+					<string>aar</string>
+				</array>
+				<key>CFBundleTypeName</key>			<string>Android archive File</string>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>	<false/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
+					<string>jmod</string>
+				</array>
+				<key>CFBundleTypeMIMETypes</key>
+				<array>
+					<string>application/java-archive</string>
+				</array>
+				<key>CFBundleTypeName</key>			<string>Java module File</string>
+				<key>CFBundleTypeRole</key>			<string>Viewer</string>
+				<key>LSIsAppleDefaultForType</key>	<false/>
+				<key>LSTypeIsPackage</key>			<false/>
+			</dict>
+			<dict>
+				<key>CFBundleTypeExtensions</key>
+				<array>
 					<string>zip</string>
+				</array>
+				<key>CFBundleTypeMIMETypes</key>
+				<array>
+					<string>application/zip</string>
 				</array>
 				<key>CFBundleTypeName</key>			<string>Zip File</string>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
@@ -84,6 +132,10 @@
 				<array>
 					<string>log</string>
 					<string>txt</string>
+				</array>
+				<key>CFBundleTypeMIMETypes</key>
+				<array>
+					<string>text/plain</string>
 				</array>
 				<key>CFBundleTypeName</key>			<string>Log File</string>
 				<key>CFBundleTypeRole</key>			<string>Viewer</string>
