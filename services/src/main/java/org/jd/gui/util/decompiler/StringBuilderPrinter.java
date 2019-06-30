@@ -29,10 +29,7 @@ public class StringBuilderPrinter implements Printer {
     public int getMinorVersion() { return minorVersion; }
     public StringBuilder getStringBuffer() { return stringBuffer; }
 
-    public void append(char c) { stringBuffer.append(c); }
-    public void append(String s) { stringBuffer.append(s); }
-
-    protected void printEscape(String s) {
+    protected void escape(String s) {
         if (unicodeEscape && (s != null)) {
             int length = s.length();
 
@@ -40,30 +37,30 @@ public class StringBuilderPrinter implements Printer {
                 char c = s.charAt(i);
 
                 if (c == '\t') {
-                    append(c);
+                    stringBuffer.append(c);
                 } else if (c < 32) {
                     // Write octal format
-                    append("\\0");
-                    append((char) ('0' + (c >> 3)));
-                    append((char) ('0' + (c & 0x7)));
+                    stringBuffer.append("\\0");
+                    stringBuffer.append((char) ('0' + (c >> 3)));
+                    stringBuffer.append((char) ('0' + (c & 0x7)));
                 } else if (c > 127) {
                     // Write octal format
-                    append("\\u");
+                    stringBuffer.append("\\u");
 
                     int z = (c >> 12);
-                    append((char) ((z <= 9) ? ('0' + z) : (('A' - 10) + z)));
+                    stringBuffer.append((char) ((z <= 9) ? ('0' + z) : (('A' - 10) + z)));
                     z = ((c >> 8) & 0xF);
-                    append((char) ((z <= 9) ? ('0' + z) : (('A' - 10) + z)));
+                    stringBuffer.append((char) ((z <= 9) ? ('0' + z) : (('A' - 10) + z)));
                     z = ((c >> 4) & 0xF);
-                    append((char) ((z <= 9) ? ('0' + z) : (('A' - 10) + z)));
+                    stringBuffer.append((char) ((z <= 9) ? ('0' + z) : (('A' - 10) + z)));
                     z = (c & 0xF);
-                    append((char) ((z <= 9) ? ('0' + z) : (('A' - 10) + z)));
+                    stringBuffer.append((char) ((z <= 9) ? ('0' + z) : (('A' - 10) + z)));
                 } else {
-                    append(c);
+                    stringBuffer.append(c);
                 }
             }
         } else {
-            append(s);
+            stringBuffer.append(s);
         }
     }
 
@@ -78,20 +75,20 @@ public class StringBuilderPrinter implements Printer {
 
     @Override public void end() {}
 
-    @Override public void printText(String text) { printEscape(text); }
-    @Override public void printNumericConstant(String constant) { append(constant); }
-    @Override public void printStringConstant(String constant, String ownerInternalName) { append(constant); }
-    @Override public void printKeyword(String keyword) { append(keyword); }
+    @Override public void printText(String text) { escape(text); }
+    @Override public void printNumericConstant(String constant) { escape(constant); }
+    @Override public void printStringConstant(String constant, String ownerInternalName) { escape(constant); }
+    @Override public void printKeyword(String keyword) { stringBuffer.append(keyword); }
 
-    @Override public void printDeclaration(int type, String internalTypeName, String name, String descriptor) { append(name); }
-    @Override public void printReference(int type, String internalTypeName, String name, String descriptor, String ownerInternalName) { append(name); }
+    @Override public void printDeclaration(int type, String internalTypeName, String name, String descriptor) { escape(name); }
+    @Override public void printReference(int type, String internalTypeName, String name, String descriptor, String ownerInternalName) { escape(name); }
 
     @Override public void indent() { indentationCount++; }
     @Override public void unindent() { if (indentationCount > 0) indentationCount--; }
 
-    @Override public void startLine(int lineNumber) { for (int i=0; i<indentationCount; i++) append(TAB); }
-    @Override public void endLine() { append(NEWLINE); }
-    @Override public void extraLine(int count) { if (realignmentLineNumber) while (count-- > 0) append(NEWLINE); }
+    @Override public void startLine(int lineNumber) { for (int i=0; i<indentationCount; i++) stringBuffer.append(TAB); }
+    @Override public void endLine() { stringBuffer.append(NEWLINE); }
+    @Override public void extraLine(int count) { if (realignmentLineNumber) while (count-- > 0) stringBuffer.append(NEWLINE); }
 
     @Override public void startMarker(int type) {}
     @Override public void endMarker(int type) {}
