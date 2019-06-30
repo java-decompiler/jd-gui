@@ -97,7 +97,7 @@ public class AboutView {
             hbox.add(Box.createHorizontalGlue());
 
             hbox = Box.createHorizontalBox();
-            hbox.add(new JLabel("Copyright © 2008-2019 Emmanuel Dupuy"));
+            hbox.add(new JLabel("Copyright © 2008, 2019 Emmanuel Dupuy"));
             hbox.add(Box.createHorizontalGlue());
             subvbox.add(hbox);
 
