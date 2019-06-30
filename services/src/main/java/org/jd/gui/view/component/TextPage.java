@@ -22,6 +22,7 @@ import java.io.OutputStreamWriter;
 public class TextPage extends AbstractTextPage implements ContentCopyable, ContentSelectable, ContentSavable {
 
     // --- ContentCopyable --- //
+    @Override
     public void copy() {
         if (textArea.getSelectionStart() == textArea.getSelectionEnd()) {
             getToolkit().getSystemClipboard().setContents(new StringSelection(""), null);
@@ -31,13 +32,16 @@ public class TextPage extends AbstractTextPage implements ContentCopyable, Conte
     }
 
     // --- ContentSelectable --- //
+    @Override
     public void selectAll() {
         textArea.selectAll();
     }
 
     // --- ContentSavable --- //
+    @Override
     public String getFileName() { return "file.txt"; }
 
+    @Override
     public void save(API api, OutputStream os) {
         try (OutputStreamWriter writer = new OutputStreamWriter(new NewlineOutputStream(os), "UTF-8")) {
             writer.write(textArea.getText());
