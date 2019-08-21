@@ -12,21 +12,24 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.jd.core.v1.ClassFileToJavaSourceDecompiler;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
-import org.jd.gui.util.decompiler.ClassPathLoader;
-import org.jd.gui.util.decompiler.ContainerLoader;
-import org.jd.gui.util.decompiler.NopPrinter;
-import org.jd.gui.util.decompiler.StringBuilderPrinter;
+import org.jd.gui.util.decompiler.*;
 import org.jd.gui.util.exception.ExceptionUtil;
+import org.jd.gui.util.io.NewlineOutputStream;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ClassFilePage extends TypePage {
     protected static final String ESCAPE_UNICODE_CHARACTERS   = "ClassFileDecompilerPreferences.escapeUnicodeCharacters";
     protected static final String REALIGN_LINE_NUMBERS        = "ClassFileDecompilerPreferences.realignLineNumbers";
+    protected static final String WRITE_LINE_NUMBERS          = "ClassFileSaverPreferences.writeLineNumbers";
+    protected static final String WRITE_METADATA              = "ClassFileSaverPreferences.writeMetadata";
+    protected static final String JD_CORE_VERSION             = "JdGuiPreferences.jdCoreVersion";
 
     protected static final ClassFileToJavaSourceDecompiler DECOMPILER = new ClassFileToJavaSourceDecompiler();
 
@@ -97,18 +100,102 @@ public class ClassFilePage extends TypePage {
         return (v == null) ? defaultValue : Boolean.valueOf(v);
     }
 
+    @Override
     public String getSyntaxStyle() { return SyntaxConstants.SYNTAX_STYLE_JAVA; }
 
     // --- ContentSavable --- //
+    @Override
     public String getFileName() {
         String path = entry.getPath();
         int index = path.lastIndexOf('.');
         return path.substring(0, index) + ".java";
     }
 
+    @Override
+    public void save(API api, OutputStream os) {
+        try {
+            // Init preferences
+            Map<String, String> preferences = api.getPreferences();
+            boolean realignmentLineNumbers = getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, true);
+            boolean unicodeEscape = getPreferenceValue(preferences, ESCAPE_UNICODE_CHARACTERS, false);
+            boolean showLineNumbers = getPreferenceValue(preferences, WRITE_LINE_NUMBERS, true);
+
+            Map<String, Object> configuration = new HashMap<>();
+            configuration.put("realignLineNumbers", realignmentLineNumbers);
+
+            // Init loader
+            ContainerLoader loader = new ContainerLoader(entry);
+
+            // Init printer
+            LineNumberStringBuilderPrinter printer = new LineNumberStringBuilderPrinter();
+            printer.setRealignmentLineNumber(realignmentLineNumbers);
+            printer.setUnicodeEscape(unicodeEscape);
+            printer.setShowLineNumbers(showLineNumbers);
+
+            // Format internal name
+            String entryPath = entry.getPath();
+            assert entryPath.endsWith(".class");
+            String entryInternalName = entryPath.substring(0, entryPath.length() - 6); // 6 = ".class".length()
+
+            // Decompile class file
+            DECOMPILER.decompile(loader, printer, entryInternalName, configuration);
+
+            StringBuilder stringBuffer = printer.getStringBuffer();
+
+            // Metadata
+            if (getPreferenceValue(preferences, WRITE_METADATA, true)) {
+                // Add location
+                String location =
+                        new File(entry.getUri()).getPath()
+                                // Escape "\ u" sequence to prevent "Invalid unicode" errors
+                                .replaceAll("(^|[^\\\\])\\\\u", "\\\\\\\\u");
+                stringBuffer.append("\n\n/* Location:              ");
+                stringBuffer.append(location);
+                // Add Java compiler version
+                int majorVersion = printer.getMajorVersion();
+
+                if (majorVersion >= 45) {
+                    stringBuffer.append("\n * Java compiler version: ");
+
+                    if (majorVersion >= 49) {
+                        stringBuffer.append(majorVersion - (49 - 5));
+                    } else {
+                        stringBuffer.append(majorVersion - (45 - 1));
+                    }
+
+                    stringBuffer.append(" (");
+                    stringBuffer.append(majorVersion);
+                    stringBuffer.append('.');
+                    stringBuffer.append(printer.getMinorVersion());
+                    stringBuffer.append(')');
+                }
+                // Add JD-Core version
+                stringBuffer.append("\n * JD-Core Version:       ");
+                stringBuffer.append(preferences.get(JD_CORE_VERSION));
+                stringBuffer.append("\n */");
+            }
+
+            try (PrintStream ps = new PrintStream(new NewlineOutputStream(os), true, "UTF-8")) {
+                ps.print(stringBuffer.toString());
+            } catch (IOException e) {
+                assert ExceptionUtil.printStackTrace(e);
+            }
+        } catch (Throwable t) {
+            assert ExceptionUtil.printStackTrace(t);
+
+            try (OutputStreamWriter writer = new OutputStreamWriter(os, Charset.defaultCharset())) {
+                writer.write("// INTERNAL ERROR //");
+            } catch (IOException ee) {
+                assert ExceptionUtil.printStackTrace(ee);
+            }
+        }
+    }
+
     // --- LineNumberNavigable --- //
+    @Override
     public int getMaximumLineNumber() { return maximumLineNumber; }
 
+    @Override
     public void goToLineNumber(int lineNumber) {
         int textAreaLineNumber = getTextAreaLineNumber(lineNumber);
         if (textAreaLineNumber > 0) {
@@ -122,9 +209,11 @@ public class ClassFilePage extends TypePage {
         }
     }
 
+    @Override
     public boolean checkLineNumber(int lineNumber) { return lineNumber <= maximumLineNumber; }
 
     // --- PreferencesChangeListener --- //
+    @Override
     public void preferencesChanged(Map<String, String> preferences) {
         DefaultCaret caret = (DefaultCaret)textArea.getCaret();
         int updatePolicy = caret.getUpdatePolicy();
@@ -220,6 +309,7 @@ public class ClassFilePage extends TypePage {
             super.endLine();
             textAreaLineNumber++;
         }
+        @Override
         public void extraLine(int count) {
             super.extraLine(count);
             if (realignmentLineNumber) {

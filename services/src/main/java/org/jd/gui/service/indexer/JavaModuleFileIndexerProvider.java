@@ -32,6 +32,7 @@ public class JavaModuleFileIndexerProvider extends AbstractIndexerProvider {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected static void index(API api, Container.Entry entry, Indexes indexes, Map<String, Collection> packageDeclarationIndex) {
         for (Container.Entry e : entry.getChildren()) {
             if (e.isDirectory()) {

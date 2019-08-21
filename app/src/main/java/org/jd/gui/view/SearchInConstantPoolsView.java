@@ -250,7 +250,6 @@ public class SearchInConstantPoolsView<T extends DefaultMutableTreeNode & Contai
                     if (selectedTreeNode != null) {
                         selectedTypeCallback.accept(selectedTreeNode.getUri(), searchInConstantPoolsEnterTextField.getText(), getFlags());
                     }
-                    searchInConstantPoolsDialog.setVisible(false);
                 }
             };
             searchInConstantPoolsOpenButton.addActionListener(searchInConstantPoolsOpenActionListener);

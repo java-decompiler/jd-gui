@@ -16,43 +16,23 @@ import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.io.NewlineOutputStream;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Manifest;
 
 public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
     protected static final String ESCAPE_UNICODE_CHARACTERS = "ClassFileDecompilerPreferences.escapeUnicodeCharacters";
-    protected static final String REALIGN_LINE_NUMBERS = "ClassFileDecompilerPreferences.realignLineNumbers";
-    protected static final String WRITE_LINE_NUMBERS = "ClassFileSaverPreferences.writeLineNumbers";
-    protected static final String WRITE_METADATA = "ClassFileSaverPreferences.writeMetadata";
+    protected static final String REALIGN_LINE_NUMBERS      = "ClassFileDecompilerPreferences.realignLineNumbers";
+    protected static final String WRITE_LINE_NUMBERS        = "ClassFileSaverPreferences.writeLineNumbers";
+    protected static final String WRITE_METADATA            = "ClassFileSaverPreferences.writeMetadata";
+    protected static final String JD_CORE_VERSION           = "JdGuiPreferences.jdCoreVersion";
 
     protected static final ClassFileToJavaSourceDecompiler DECOMPILER = new ClassFileToJavaSourceDecompiler();
 
     protected ContainerLoader loader = new ContainerLoader();
     protected LineNumberStringBuilderPrinter printer = new LineNumberStringBuilderPrinter();
-    protected String jdCoreVersion = "SNAPSHOT";
-
-    public ClassFileSourceSaverProvider() {
-        try {
-            Enumeration<URL> enumeration = ClassFileSourceSaverProvider.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
-
-            while (enumeration.hasMoreElements()) {
-                try (InputStream is = enumeration.nextElement().openStream()) {
-                    String attribute = new Manifest(is).getMainAttributes().getValue("JD-Core-Version");
-                    if (attribute != null) {
-                        jdCoreVersion = attribute;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            assert ExceptionUtil.printStackTrace(e);
-        }
-    }
 
     @Override public String[] getSelectors() { return appendSelectors("*:file:*.class"); }
 
@@ -144,7 +124,7 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
                 }
                 // Add JD-Core version
                 stringBuffer.append("\n * JD-Core Version:       ");
-                stringBuffer.append(jdCoreVersion);
+                stringBuffer.append(preferences.get(JD_CORE_VERSION));
                 stringBuffer.append("\n */");
             }
 

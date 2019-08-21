@@ -15,16 +15,15 @@ import org.jd.gui.util.exception.ExceptionUtil;
 import javax.swing.*;
 import javax.xml.stream.*;
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.jar.Manifest;
 
 public class ConfigurationXmlPersisterProvider implements ConfigurationPersister {
     protected static final String ERROR_BACKGROUND_COLOR = "JdGuiPreferences.errorBackgroundColor";
+    protected static final String JD_CORE_VERSION = "JdGuiPreferences.jdCoreVersion";
 
     protected static final File FILE = getConfigFile();
 
@@ -57,6 +56,7 @@ public class ConfigurationXmlPersisterProvider implements ConfigurationPersister
         return new File(Constants.CONFIG_FILENAME);
     }
 
+    @Override
     public Configuration load() {
         // Default values
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -170,9 +170,31 @@ public class ConfigurationXmlPersisterProvider implements ConfigurationPersister
             config.getPreferences().put(ERROR_BACKGROUND_COLOR, "0xFF6666");
         }
 
+        config.getPreferences().put(JD_CORE_VERSION, getJdCoreVersion());
+
         return config;
     }
 
+    protected String getJdCoreVersion() {
+        try {
+            Enumeration<URL> enumeration = ConfigurationXmlPersisterProvider.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+
+            while (enumeration.hasMoreElements()) {
+                try (InputStream is = enumeration.nextElement().openStream()) {
+                    String attribute = new Manifest(is).getMainAttributes().getValue("JD-Core-Version");
+                    if (attribute != null) {
+                        return attribute;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            assert ExceptionUtil.printStackTrace(e);
+        }
+
+        return "SNAPSHOT";
+    }
+
+    @Override
     public void save(Configuration configuration) {
         Point l = configuration.getMainWindowLocation();
         Dimension s = configuration.getMainWindowSize();

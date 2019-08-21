@@ -15,8 +15,8 @@ apply plugin: 'edu.sc.seis.launch4j'
 apply plugin: 'nebula.ospackage'
 
 // Common configuration //
-rootProject.version='1.5.2'
-rootProject.ext.set('jdCoreVersion', '1.0.3')
+rootProject.version='1.6.3'
+rootProject.ext.set('jdCoreVersion', '1.0.7')
 targetCompatibility = '1.8'
 
 allprojects {
@@ -31,10 +31,7 @@ allprojects {
     }
 
     repositories {
-        mavenCentral()
-        maven {
-            url 'https://raw.github.com/java-decompiler/mvn-repo/master'
-        }
+        jcenter()
     }
 
     configurations {
