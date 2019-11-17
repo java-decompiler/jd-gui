@@ -105,6 +105,7 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: 'jar') {
     injars jar.archivePath
     outjars 'build/libs/' + project.name + '-' + project.version + '-min.jar'
     libraryjars System.getProperty('java.home') + '/lib/rt.jar'
+    libraryjars System.getProperty('java.home') + '/jmods/'
 }
 
 // Java executable wrapper for Windows //
