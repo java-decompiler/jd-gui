@@ -6,3 +6,4 @@ Exec=java -jar /opt/jd-gui/jd-gui.jar
 Type=Application
 Icon=jd-gui
 MimeType=application/java;application/java-vm;application/java-archive
+StartupWMClass=org-jd-gui-App
