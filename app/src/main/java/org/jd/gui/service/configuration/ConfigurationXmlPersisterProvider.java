@@ -28,6 +28,15 @@ public class ConfigurationXmlPersisterProvider implements ConfigurationPersister
     protected static final File FILE = getConfigFile();
 
     protected static File getConfigFile() {
+        String configFilePath = System.getProperty(Constants.CONFIG_FILENAME);
+
+        if (configFilePath != null) {
+            File configFile = new File(configFilePath);
+            if (configFile.exists()) {
+                return configFile;
+            }
+        }
+
         if (PlatformService.getInstance().isLinux()) {
             // See: http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
             String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
