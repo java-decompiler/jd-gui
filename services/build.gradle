@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 dependencies {
-    compile 'com.fifesoft:rsyntaxtextarea:2.5.6'
+    compile 'com.fifesoft:rsyntaxtextarea:3.0.4'
     compile 'org.ow2.asm:asm:7.1'
     compile 'org.jd:jd-core:' + parent.jdCoreVersion
     compile project(':api')

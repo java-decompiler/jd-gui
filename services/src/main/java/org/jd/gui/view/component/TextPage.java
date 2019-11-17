@@ -27,7 +27,7 @@ public class TextPage extends AbstractTextPage implements ContentCopyable, Conte
         if (textArea.getSelectionStart() == textArea.getSelectionEnd()) {
             getToolkit().getSystemClipboard().setContents(new StringSelection(""), null);
         } else {
-            textArea.copyAsRtf();
+            textArea.copyAsStyledText();
         }
     }
 
