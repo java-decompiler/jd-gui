@@ -1,4 +1,5 @@
 # Order is important : 'GenericContainerFactoryProvider' must be the last
+org.jd.gui.service.container.KarContainerFactoryProvider
 org.jd.gui.service.container.JavaModuleContainerFactoryProvider
 org.jd.gui.service.container.EarContainerFactoryProvider
 org.jd.gui.service.container.WarContainerFactoryProvider

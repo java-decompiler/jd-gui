@@ -4,6 +4,7 @@ org.jd.gui.service.fileloader.EarFileLoaderProvider
 org.jd.gui.service.fileloader.JarFileLoaderProvider
 org.jd.gui.service.fileloader.JavaFileLoaderProvider
 org.jd.gui.service.fileloader.JavaModuleFileLoaderProvider
+org.jd.gui.service.fileloader.KarFileLoaderProvider
 org.jd.gui.service.fileloader.LogFileLoaderProvider
 org.jd.gui.service.fileloader.WarFileLoaderProvider
 org.jd.gui.service.fileloader.ZipFileLoaderProvider
