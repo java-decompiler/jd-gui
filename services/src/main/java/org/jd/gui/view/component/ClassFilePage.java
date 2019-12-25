@@ -64,7 +64,7 @@ public class ClassFilePage extends TypePage {
             strings.clear();
 
             // Init preferences
-            boolean realignmentLineNumbers = getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, true);
+            boolean realignmentLineNumbers = getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, false);
             boolean unicodeEscape = getPreferenceValue(preferences, ESCAPE_UNICODE_CHARACTERS, false);
 
             Map<String, Object> configuration = new HashMap<>();
@@ -116,7 +116,7 @@ public class ClassFilePage extends TypePage {
         try {
             // Init preferences
             Map<String, String> preferences = api.getPreferences();
-            boolean realignmentLineNumbers = getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, true);
+            boolean realignmentLineNumbers = getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, false);
             boolean unicodeEscape = getPreferenceValue(preferences, ESCAPE_UNICODE_CHARACTERS, false);
             boolean showLineNumbers = getPreferenceValue(preferences, WRITE_LINE_NUMBERS, true);
 
