@@ -170,7 +170,7 @@ public class GenericContainer implements Container {
             tmpFile.deleteOnExit();
             Files.copy(fsPath, tmpPath);
 
-            FileSystem subFileSystem = FileSystems.newFileSystem(tmpPath, null);
+            FileSystem subFileSystem = FileSystems.newFileSystem(tmpPath, (ClassLoader) null);
 
             if (subFileSystem != null) {
                 Iterator<Path> rootDirectories = subFileSystem.getRootDirectories().iterator();
