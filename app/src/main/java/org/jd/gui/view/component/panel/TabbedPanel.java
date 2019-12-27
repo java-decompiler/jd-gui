@@ -131,7 +131,7 @@ public class TabbedPanel<T extends JComponent & UriGettable> extends JPanel impl
         while (i-- > 0) {
             T page = (T)tabbedPane.getComponentAt(i);
             String u2 = page.getUri().getPath();
-            if (u1.startsWith(u2)) {
+            if (!u2.isEmpty() && u1.startsWith(u2)) {
                 tabbedPane.setSelectedIndex(i);
                 return page;
             }
