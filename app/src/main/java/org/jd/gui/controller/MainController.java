@@ -35,6 +35,7 @@ import org.jd.gui.view.MainView;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
+import org.jd.gui.view.component.FileChooser;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -155,7 +156,7 @@ public class MainController implements API {
                 // Set drop files transfer handler
                 mainFrame.setTransferHandler(new FilesTransferHandler());
                 // Background class loading
-                new JFileChooser().addChoosableFileFilter(new FileNameExtensionFilter("", "dummy"));
+                new FileChooser().addChoosableFileFilter(new FileNameExtensionFilter("", "dummy"));
                 FileSystemView.getFileSystemView().isFileSystemRoot(new File("dummy"));
                 new JLayer();
             });
@@ -183,7 +184,7 @@ public class MainController implements API {
 
         String description = sb.toString();
         String[] array = extensions.toArray(new String[0]);
-        JFileChooser chooser = new JFileChooser();
+        FileChooser chooser = new FileChooser();
 
         chooser.removeChoosableFileFilter(chooser.getFileFilter());
         chooser.addChoosableFileFilter(new FileNameExtensionFilter("All files (" + description + ")", array));
@@ -195,7 +196,7 @@ public class MainController implements API {
 
         chooser.setCurrentDirectory(configuration.getRecentLoadDirectory());
 
-        if (chooser.showOpenDialog(mainView.getMainFrame()) == JFileChooser.APPROVE_OPTION) {
+        if (chooser.showOpenDialog(mainView.getMainFrame()) == FileChooser.APPROVE_OPTION) {
             configuration.setRecentLoadDirectory(chooser.getCurrentDirectory());
             openFile(chooser.getSelectedFile());
         }
@@ -207,12 +208,12 @@ public class MainController implements API {
 
     protected void onSaveSource() {
         if (currentPage instanceof ContentSavable) {
-            JFileChooser chooser = new JFileChooser();
+            FileChooser chooser = new FileChooser();
             JFrame mainFrame = mainView.getMainFrame();
 
             chooser.setSelectedFile(new File(configuration.getRecentSaveDirectory(), ((ContentSavable)currentPage).getFileName()));
 
-            if (chooser.showSaveDialog(mainFrame) == JFileChooser.APPROVE_OPTION) {
+            if (chooser.showSaveDialog(mainFrame) == FileChooser.APPROVE_OPTION) {
                 File selectedFile = chooser.getSelectedFile();
 
                 configuration.setRecentSaveDirectory(chooser.getCurrentDirectory());
@@ -245,12 +246,12 @@ public class MainController implements API {
 
             if (currentPanel instanceof SourcesSavable) {
                 SourcesSavable sourcesSavable = (SourcesSavable)currentPanel;
-                JFileChooser chooser = new JFileChooser();
+                FileChooser chooser = new FileChooser();
                 JFrame mainFrame = mainView.getMainFrame();
 
                 chooser.setSelectedFile(new File(configuration.getRecentSaveDirectory(), sourcesSavable.getSourceFileName()));
 
-                if (chooser.showSaveDialog(mainFrame) == JFileChooser.APPROVE_OPTION) {
+                if (chooser.showSaveDialog(mainFrame) == FileChooser.APPROVE_OPTION) {
                     File selectedFile = chooser.getSelectedFile();
 
                     configuration.setRecentSaveDirectory(chooser.getCurrentDirectory());
