@@ -173,6 +173,9 @@ public class MainController implements API {
         StringBuilder sb = new StringBuilder();
         ArrayList<String> extensions = new ArrayList<>(loaders.keySet());
 
+        // ignore DirectoryLoaderProvider
+        extensions.remove("");
+
         extensions.sort(null);
 
         for (String extension : extensions) {
