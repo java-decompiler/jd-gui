@@ -63,6 +63,20 @@ public class ContainerPanelFactoryProvider implements PanelFactory {
             tree.setModel(new DefaultTreeModel(root));
         }
 
+        // dengjingren@foxmail.com
+        @Override
+        public void removeNotify() {
+            super.removeNotify();
+            try {
+                // see ZipFileLoaderProvider#load
+                URI fsUri = new URI("jar:" + uri.getScheme(), uri.getHost(), uri.getPath() + "!/", null);
+                FileSystem fs = FileSystems.getFileSystem(fsUri);
+                fs.close();
+            } catch (Exception ignored) {
+
+            }
+        }
+
         // --- ContentIndexable --- //
         @Override
         public Indexes index(API api) {
