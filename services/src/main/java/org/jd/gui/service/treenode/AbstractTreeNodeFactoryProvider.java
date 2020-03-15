@@ -10,6 +10,8 @@ package org.jd.gui.service.treenode;
 import org.jd.gui.spi.TreeNodeFactory;
 import org.jd.gui.util.exception.ExceptionUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -28,6 +30,16 @@ public abstract class AbstractTreeNodeFactoryProvider implements TreeNodeFactory
         Properties properties = new Properties();
         Class clazz = this.getClass();
 
+        // Added by cddjr <dengjingren@foxmail.com>
+        // https://github.com/java-decompiler/jd-gui/issues/291
+        Properties extProp = readExternalProperties(
+                new File(System.getProperty("user.dir") + File.separator
+                        + clazz.getSimpleName() + ".properties"));
+        if (extProp != null) {
+            init(extProp);
+            return;
+        }
+
         try (InputStream is = clazz.getClassLoader().getResourceAsStream(clazz.getName().replace('.', '/') + ".properties")) {
             if (is != null) {
                 properties.load(is);
@@ -37,6 +49,17 @@ public abstract class AbstractTreeNodeFactoryProvider implements TreeNodeFactory
         }
 
         init(properties);
+    }
+
+    protected Properties readExternalProperties(File file) {
+        try (InputStream is = new FileInputStream(file)) {
+            Properties properties = new Properties();
+            properties.load(is);
+            return properties;
+        } catch (IOException e) {
+            assert ExceptionUtil.printStackTrace(e);
+        }
+        return null;
     }
 
     protected void init(Properties properties) {
