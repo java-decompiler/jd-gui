@@ -121,9 +121,6 @@ public class MainController implements API {
         SwingUtil.invokeLater(() -> {
             // Show main frame
             mainView.show(configuration.getMainWindowLocation(), configuration.getMainWindowSize(), configuration.isMainWindowMaximize());
-            if (!files.isEmpty()) {
-                openFiles(files);
-            }
         });
 
         // Background initializations
@@ -158,6 +155,13 @@ public class MainController implements API {
                 new JFileChooser().addChoosableFileFilter(new FileNameExtensionFilter("", "dummy"));
                 FileSystemView.getFileSystemView().isFileSystemRoot(new File("dummy"));
                 new JLayer();
+
+                // Open files after initialization
+                // Added by cddjr <dengjingren@foxmail.com>
+                // https://github.com/java-decompiler/jd-gui/issues/280
+                if (!files.isEmpty()) {
+                    openFiles(files);
+                }
             });
         }, 400, TimeUnit.MILLISECONDS);
 
