@@ -52,6 +52,10 @@ public abstract class AbstractTypeFileLoaderProvider extends AbstractFileLoaderP
                 try {
                     // Open page
                     pathSuffix = file.getAbsolutePath().substring(rootFile.getAbsolutePath().length()).replace(File.separator, "/");
+                    if (!pathSuffix.startsWith("/")) {
+                        // e.g. D:\foo.class or /foo.class -> expected "/foo.class" but was "foo.class"
+                        pathSuffix = "/" + pathSuffix;
+                    }
                     URI rootUri = rootFile.toURI();
                     URI uri = new URI(rootUri.getScheme(), rootUri.getHost(), rootUri.getPath() + '!' + pathSuffix, null);
                     ((UriOpenable)mainPanel).openUri(uri);

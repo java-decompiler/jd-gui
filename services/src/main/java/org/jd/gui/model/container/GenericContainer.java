@@ -141,6 +141,12 @@ public class GenericContainer implements Container {
                 } catch (IOException e) {
                     assert ExceptionUtil.printStackTrace(e);
                 }
+                // Make sure NotNull
+                // Added by cddjr <dengjingren@foxmail.com>
+                // https://github.com/java-decompiler/jd-gui/issues/280
+                if (children == null) {
+                    children = Collections.emptyList();
+                }
             }
             return children;
         }
