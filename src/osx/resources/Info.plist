@@ -3,7 +3,7 @@
 <plist version="1.0">
 	<dict>
 		<key>CFBundleDevelopmentRegion</key>		<string>English</string>
-		<key>CFBundleExecutable</key>				<string>universalJavaApplicationStub.sh</string>
+		<key>CFBundleExecutable</key>				<string>universalJavaApplicationStub</string>
 		<key>CFBundleName</key>						<string>JD-GUI</string>
 		<key>CFBundleGetInfoString</key>			<string>JD-GUI version ${VERSION}, Copyright 2008, 2019 Emmanuel Dupuy</string>
 		<key>CFBundleIconFile</key>					<string>jd-gui.icns</string>
