@@ -161,7 +161,7 @@ distributions {
         }
         into('JD-GUI.app/Contents/MacOS') {
             from('src/osx/resources') {
-                include 'universalJavaApplicationStub.sh'
+                include 'universalJavaApplicationStub'
                 fileMode 0755
             }
         }
