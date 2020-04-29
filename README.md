@@ -1,3 +1,5 @@
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/java-decompiler/jd-gui) 
+
 # JD-GUI
 
 JD-GUI, a standalone graphical utility that displays Java sources from CLASS files.
