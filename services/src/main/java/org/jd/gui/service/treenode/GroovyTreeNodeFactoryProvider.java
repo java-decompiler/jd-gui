@@ -1,10 +1,9 @@
 /*
  * Copyright (c) 2008-2019 Emmanuel Dupuy.
  * This project is distributed under the GPLv3 license.
- * This is a Copyleft license that gives the user the right to use, 
+ * This is a Copyleft license that gives the user the right to use,
  * copy and modify the code freely for non-commercial purposes.
  */
-
 package org.jd.gui.service.treenode;
 
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -18,10 +17,10 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
 
-public class PropertiesFileTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
-    protected static final ImageIcon ICON = new ImageIcon(PropertiesFileTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/ascii_obj.png"));
+public class GroovyTreeNodeFactoryProvider extends TextFileTreeNodeFactoryProvider {
+    protected static final ImageIcon ICON = new ImageIcon(GroovyTreeNodeFactoryProvider.class.getClassLoader().getResource("org/jd/gui/images/groovy_obj.png"));
 
-    @Override public String[] getSelectors() { return appendSelectors("*:file:*.properties", "*:file:*.cfg"); }
+    @Override public String[] getSelectors() { return appendSelectors("*:file:*.groovy"); }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -29,7 +28,7 @@ public class PropertiesFileTreeNodeFactoryProvider extends TextFileTreeNodeFacto
         int lastSlashIndex = entry.getPath().lastIndexOf("/");
         String label = entry.getPath().substring(lastSlashIndex+1);
         String location = new File(entry.getUri()).getPath();
-        return (T)new TreeNode(entry, new TreeNodeBean(label, "Location: " + location, ICON));
+        return (T)new GroovyTreeNodeFactoryProvider.TreeNode(entry, new TreeNodeBean(label, "Location: " + location, ICON));
     }
 
     protected static class TreeNode extends TextFileTreeNodeFactoryProvider.TreeNode {
@@ -40,9 +39,7 @@ public class PropertiesFileTreeNodeFactoryProvider extends TextFileTreeNodeFacto
         @SuppressWarnings("unchecked")
         public <T extends JComponent & UriGettable> T createPage(API api) {
             return (T)new TextFileTreeNodeFactoryProvider.Page(entry) {
-                @Override public String getSyntaxStyle() {
-                    return SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE;
-                }
+                @Override public String getSyntaxStyle() { return SyntaxConstants.SYNTAX_STYLE_GROOVY; }
             };
         }
     }
