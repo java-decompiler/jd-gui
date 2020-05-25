@@ -7,6 +7,7 @@
 
 package org.jd.gui.view.component;
 
+import com.sun.deploy.util.StringUtils;
 import org.jd.gui.api.API;
 import org.jd.gui.api.feature.IndexesChangeListener;
 import org.jd.gui.api.feature.UriGettable;
@@ -16,23 +17,59 @@ import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.index.IndexesUtil;
 import org.jd.gui.util.io.TextReader;
 
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 public class ManifestFilePage extends HyperlinkPage implements UriGettable, IndexesChangeListener {
     protected API api;
     protected Container.Entry entry;
     protected Collection<Future<Indexes>> collectionOfFutureIndexes = Collections.emptyList();
+    protected boolean beautify = false;
+    protected JCheckBox beautifyCheckbox;
 
     public ManifestFilePage(API api, Container.Entry entry) {
+        beautifyCheckbox = new JCheckBox();
+        beautifyCheckbox.setText("Beautify");
+        beautifyCheckbox.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                beautify = beautifyCheckbox.isSelected();
+                buildText(entry);
+            }
+        });
+        add(beautifyCheckbox, BorderLayout.NORTH);
         this.api = api;
         this.entry = entry;
+        buildText(entry);
+    }
+
+    private void buildText(Container.Entry entry) {
         // Load content file
         String text = TextReader.getText(entry.getInputStream());
+        if (beautify) {
+            Manifest manifest = new Manifest();
+            try {
+                manifest.read(entry.getInputStream());
+                StringWriter stringWriter = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(stringWriter);
+                dumpManifestHeaders(manifest, printWriter);
+                text = stringWriter.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         // Parse hyperlinks. Docs:
         // - http://docs.oracle.com/javase/7/docs/technotes/guides/jar/jar.html
         // - http://docs.oracle.com/javase/7/docs/api/java/lang/instrument/package-summary.html
@@ -207,5 +244,61 @@ public class ManifestFilePage extends HyperlinkPage implements UriGettable, Inde
             this.fragment = fragment;
         }
     }
+
+    public static PrintWriter dumpManifestHeaders(Manifest manifest, PrintWriter out) throws IOException {
+
+        Attributes mainAttributes = manifest.getMainAttributes();
+        Map<String, String> sortedMainAttributes = getSortedAttributes(mainAttributes);
+        for (Map.Entry<String,String> attributeEntry : sortedMainAttributes.entrySet()) {
+            out.print(attributeEntry.getKey());
+            out.print(": ");
+            out.println(dumpValue(attributeEntry.getValue()));
+        }
+
+        for (Map.Entry<String, Attributes> entryAttributes : manifest.getEntries().entrySet()) {
+            out.println("");
+            out.println("Entry: " + entryAttributes.getKey());
+            Map<String, String> sortedEntryAttributes = getSortedAttributes(entryAttributes.getValue());
+            for (Map.Entry<String,String> attributeEntry : sortedEntryAttributes.entrySet()) {
+                out.print(attributeEntry.getKey());
+                out.print(": ");
+                out.println(dumpValue(attributeEntry.getValue()));
+            }
+        }
+        return out;
+    }
+
+    private static Map<String, String> getSortedAttributes(Attributes mainAttributes) {
+        Map<String,String> sortedMainAttributes = new TreeMap<String,String>();
+        for (Map.Entry<Object,Object> attributeEntry : mainAttributes.entrySet()) {
+            Attributes.Name attributeName = (Attributes.Name) attributeEntry.getKey();
+            sortedMainAttributes.put(attributeName.toString(), (String) attributeEntry.getValue());
+        }
+        return sortedMainAttributes;
+    }
+
+    private static String dumpValue(String value) {
+        StringTokenizer valueTokenizer = new StringTokenizer(value, "\",", true);
+        boolean inString = false;
+        List<String> valueParts = new ArrayList<>();
+        StringBuilder currentPart = new StringBuilder();
+        while (valueTokenizer.hasMoreTokens()) {
+            String currentToken = valueTokenizer.nextToken();
+            if ("\"".equals(currentToken)) {
+                inString = !inString;
+                currentPart.append(currentToken);
+            } else if (",".equals(currentToken) && !inString) {
+                valueParts.add(currentPart.toString());
+                currentPart = new StringBuilder();
+            } else {
+                currentPart.append(currentToken);
+            }
+        }
+        if (currentPart.length() > 0) {
+            valueParts.add(currentPart.toString());
+        }
+        return StringUtils.join(valueParts, ",\n  ");
+    }
+
 }
 
