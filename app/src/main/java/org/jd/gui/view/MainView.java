@@ -354,6 +354,8 @@ public class MainView<T extends JComponent & UriGettable> implements UriOpenable
         invokeLater(() -> {
             findPanel.setVisible(true);
             findComboBox.requestFocus();
+			// Selects previously searched term
+			findComboBox.getEditor().selectAll();
         });
     }
 
