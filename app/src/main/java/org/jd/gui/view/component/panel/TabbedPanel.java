@@ -58,12 +58,24 @@ public class TabbedPanel<T extends JComponent & UriGettable> extends JPanel impl
         ToolTipManager.sharedInstance().registerComponent(tabPanel);
         tabPanel.addMouseListener(new MouseAdapter() {
             @Override public void mousePressed(MouseEvent e) { showPopupTabMenu(e); }
-            @Override public void mouseReleased(MouseEvent e) { showPopupTabMenu(e); }
+            @Override public void mouseReleased(MouseEvent e) { 
+                showPopupTabMenu(e);
+                closeTab(e);
+            }
             protected void showPopupTabMenu(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     int index = tabPanel.indexAtLocation(e.getX(), e.getY());
                     if (index != -1) {
                         new PopupTabMenu(tabPanel.getComponentAt(index)).show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+            
+            private void closeTab(MouseEvent e) {
+                if (SwingUtilities.isMiddleMouseButton(e)) {
+                    int index = tabPanel.indexAtLocation(e.getX(), e.getY());
+                    if (index != -1) {
+                        tabPanel.removeTabAt(index);
                     }
                 }
             }
