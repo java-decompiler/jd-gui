@@ -228,7 +228,7 @@ if [ -n "$JAVA_HOME" ] ; then
 # check for specified JVMversion in "/usr/libexec/java_home" symlinks
 elif [ ! -z ${JVMVersion} ] && [ -x /usr/libexec/java_home ] && /usr/libexec/java_home -F; then
 
-	if /usr/libexec/java_home -F -v ${JVMVersion}; then
+	if /usr/libexec/java_home -v ${JVMVersion} 2> /dev/null; then
 		JAVACMD="`/usr/libexec/java_home -F -v ${JVMVersion} 2> /dev/null`/bin/java"
 	else
 		# display error message with applescript
