@@ -228,8 +228,8 @@ if [ -n "$JAVA_HOME" ] ; then
 # check for specified JVMversion in "/usr/libexec/java_home" symlinks
 elif [ ! -z ${JVMVersion} ] && [ -x /usr/libexec/java_home ] && /usr/libexec/java_home -F; then
 
-	if /usr/libexec/java_home -F -v ${JVMVersion}; then
-		JAVACMD="`/usr/libexec/java_home -F -v ${JVMVersion} 2> /dev/null`/bin/java"
+	if /usr/libexec/java_home -v ${JVMVersion}; then
+		JAVACMD="`/usr/libexec/java_home -v ${JVMVersion} 2> /dev/null`/bin/java"
 	else
 		# display error message with applescript
 		osascript -e "tell application \"System Events\" to display dialog \"ERROR launching '${CFBundleName}'\n\nNo suitable Java version found on your system!\nThis program requires Java ${JVMVersion}\nMake sure you install the required Java version.\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
