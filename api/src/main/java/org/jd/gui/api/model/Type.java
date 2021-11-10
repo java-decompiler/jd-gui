@@ -1,6 +1,8 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.api.model;
@@ -9,60 +11,60 @@ import javax.swing.*;
 import java.util.Collection;
 
 public interface Type {
-    public final static int FLAG_PUBLIC = 1;
-    public final static int FLAG_PRIVATE = 2;
-    public final static int FLAG_PROTECTED = 4;
-    public final static int FLAG_STATIC = 8;
-    public final static int FLAG_FINAL = 16;
-    public final static int FLAG_VARARGS = 128;
-    public final static int FLAG_INTERFACE = 512;
-    public final static int FLAG_ABSTRACT = 1024;
-    public final static int FLAG_ANNOTATION = 8192;
-    public final static int FLAG_ENUM = 16384;
+    int FLAG_PUBLIC = 1;
+    int FLAG_PRIVATE = 2;
+    int FLAG_PROTECTED = 4;
+    int FLAG_STATIC = 8;
+    int FLAG_FINAL = 16;
+    int FLAG_VARARGS = 128;
+    int FLAG_INTERFACE = 512;
+    int FLAG_ABSTRACT = 1024;
+    int FLAG_ANNOTATION = 8192;
+    int FLAG_ENUM = 16384;
 
-    public int getFlags();
+    int getFlags();
 
-    public String getName();
+    String getName();
 
-    public String getSuperName();
+    String getSuperName();
 
-    public String getOuterName();
+    String getOuterName();
 
-    public String getDisplayTypeName();
+    String getDisplayTypeName();
 
-    public String getDisplayInnerTypeName();
+    String getDisplayInnerTypeName();
 
-    public String getDisplayPackageName();
+    String getDisplayPackageName();
 
-    public Icon getIcon();
+    Icon getIcon();
 
-    public Collection<Type> getInnerTypes();
+    Collection<Type> getInnerTypes();
 
-    public Collection<Field> getFields();
+    Collection<Field> getFields();
 
-    public Collection<Method> getMethods();
+    Collection<Method> getMethods();
 
-    public interface Field {
-        public int getFlags();
+    interface Field {
+        int getFlags();
 
-        public String getName();
+        String getName();
 
-        public String getDescriptor();
+        String getDescriptor();
 
-        public String getDisplayName();
+        String getDisplayName();
 
-        public Icon getIcon();
+        Icon getIcon();
     }
 
-    public interface Method {
-        public int getFlags();
+    interface Method {
+        int getFlags();
 
-        public String getName();
+        String getName();
 
-        public String getDescriptor();
+        String getDescriptor();
 
-        public String getDisplayName();
+        String getDisplayName();
 
-        public Icon getIcon();
+        Icon getIcon();
     }
 }

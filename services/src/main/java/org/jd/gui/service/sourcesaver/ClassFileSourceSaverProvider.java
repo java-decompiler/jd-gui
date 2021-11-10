@@ -1,59 +1,40 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.service.sourcesaver;
 
-import jd.core.CoreConstants;
-import jd.core.Decompiler;
-import jd.core.process.DecompilerImpl;
+import org.jd.core.v1.ClassFileToJavaSourceDecompiler;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.util.decompiler.ContainerLoader;
-import org.jd.gui.util.decompiler.GuiPreferences;
-import org.jd.gui.util.decompiler.PlainTextPrinter;
+import org.jd.gui.util.decompiler.LineNumberStringBuilderPrinter;
+import org.jd.gui.util.exception.ExceptionUtil;
 import org.jd.gui.util.io.NewlineOutputStream;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
-    protected static final String ESCAPE_UNICODE_CHARACTERS = "ClassFileSaverPreferences.escapeUnicodeCharacters";
-    protected static final String OMIT_THIS_PREFIX = "ClassFileSaverPreferences.omitThisPrefix";
-    protected static final String WRITE_DEFAULT_CONSTRUCTOR = "ClassFileSaverPreferences.writeDefaultConstructor";
-    protected static final String REALIGN_LINE_NUMBERS = "ClassFileSaverPreferences.realignLineNumbers";
-    protected static final String WRITE_LINE_NUMBERS = "ClassFileSaverPreferences.writeLineNumbers";
-    protected static final String WRITE_METADATA = "ClassFileSaverPreferences.writeMetadata";
+    protected static final String ESCAPE_UNICODE_CHARACTERS = "ClassFileDecompilerPreferences.escapeUnicodeCharacters";
+    protected static final String REALIGN_LINE_NUMBERS      = "ClassFileDecompilerPreferences.realignLineNumbers";
+    protected static final String WRITE_LINE_NUMBERS        = "ClassFileSaverPreferences.writeLineNumbers";
+    protected static final String WRITE_METADATA            = "ClassFileSaverPreferences.writeMetadata";
+    protected static final String JD_CORE_VERSION           = "JdGuiPreferences.jdCoreVersion";
 
-    protected static final Decompiler DECOMPILER = new DecompilerImpl();
+    protected static final ClassFileToJavaSourceDecompiler DECOMPILER = new ClassFileToJavaSourceDecompiler();
 
-    protected GuiPreferences preferences = new GuiPreferences();
     protected ContainerLoader loader = new ContainerLoader();
-    protected PlainTextPrinter printer = new PlainTextPrinter();
-    protected ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    protected LineNumberStringBuilderPrinter printer = new LineNumberStringBuilderPrinter();
 
-    /**
-     * @return local + optional external selectors
-     */
-    @Override
-    public String[] getSelectors() {
-        List<String> externalSelectors = getExternalSelectors();
-
-        if (externalSelectors == null) {
-            return new String[] { "*:file:*.class" };
-        } else {
-            int size = externalSelectors.size();
-            String[] selectors = new String[size+1];
-            externalSelectors.toArray(selectors);
-            selectors[size] = "*:file:*.class";
-            return selectors;
-        }
-    }
+    @Override public String[] getSelectors() { return appendSelectors("*:file:*.class"); }
 
     @Override
     public String getSourcePath(Container.Entry entry) {
@@ -88,77 +69,83 @@ public class ClassFileSourceSaverProvider extends AbstractSourceSaverProvider {
                 listener.pathSaved(path);
             }
             // Init preferences
-            Map<String, String> p = api.getPreferences();
-            preferences.setUnicodeEscape(getPreferenceValue(p, ESCAPE_UNICODE_CHARACTERS, false));
-            preferences.setShowPrefixThis(! getPreferenceValue(p, OMIT_THIS_PREFIX, false));
-            preferences.setShowDefaultConstructor(getPreferenceValue(p, WRITE_DEFAULT_CONSTRUCTOR, false));
-            preferences.setRealignmentLineNumber(getPreferenceValue(p, REALIGN_LINE_NUMBERS, true));
-            preferences.setShowLineNumbers(getPreferenceValue(p, WRITE_LINE_NUMBERS, true));
+            Map<String, String> preferences = api.getPreferences();
+            boolean realignmentLineNumbers = getPreferenceValue(preferences, REALIGN_LINE_NUMBERS, true);
+            boolean unicodeEscape = getPreferenceValue(preferences, ESCAPE_UNICODE_CHARACTERS, false);
+            boolean showLineNumbers = getPreferenceValue(preferences, WRITE_LINE_NUMBERS, true);
+
+            Map<String, Object> configuration = new HashMap<>();
+            configuration.put("realignLineNumbers", realignmentLineNumbers);
 
             // Init loader
             loader.setEntry(entry);
 
             // Init printer
-            baos.reset();
-            PrintStream ps = new PrintStream(baos, true, "UTF-8");
-            printer.setPrintStream(ps);
-            printer.setPreferences(preferences);
+            printer.setRealignmentLineNumber(realignmentLineNumbers);
+            printer.setUnicodeEscape(unicodeEscape);
+            printer.setShowLineNumbers(showLineNumbers);
+
+            // Format internal name
+            String entryPath = entry.getPath();
+            assert entryPath.endsWith(".class");
+            String entryInternalName = entryPath.substring(0, entryPath.length() - 6); // 6 = ".class".length()
 
             // Decompile class file
-            DECOMPILER.decompile(preferences, loader, printer, entry.getPath());
+            DECOMPILER.decompile(loader, printer, entryInternalName, configuration);
+
+            StringBuilder stringBuffer = printer.getStringBuffer();
 
             // Metadata
-            if (getPreferenceValue(p, WRITE_METADATA, true)) {
+            if (getPreferenceValue(preferences, WRITE_METADATA, true)) {
                 // Add location
                 String location =
                     new File(entry.getUri()).getPath()
                     // Escape "\ u" sequence to prevent "Invalid unicode" errors
                     .replaceAll("(^|[^\\\\])\\\\u", "\\\\\\\\u");
-                ps.print("\n\n/* Location:              ");
-                ps.print(location);
+                stringBuffer.append("\n\n/* Location:              ");
+                stringBuffer.append(location);
                 // Add Java compiler version
                 int majorVersion = printer.getMajorVersion();
 
                 if (majorVersion >= 45) {
-                    ps.print("\n * Java compiler version: ");
+                    stringBuffer.append("\n * Java compiler version: ");
 
                     if (majorVersion >= 49) {
-                        ps.print(majorVersion - (49 - 5));
+                        stringBuffer.append(majorVersion - (49 - 5));
                     } else {
-                        ps.print(majorVersion - (45 - 1));
+                        stringBuffer.append(majorVersion - (45 - 1));
                     }
 
-                    ps.print(" (");
-                    ps.print(majorVersion);
-                    ps.print('.');
-                    ps.print(printer.getMinorVersion());
-                    ps.print(')');
+                    stringBuffer.append(" (");
+                    stringBuffer.append(majorVersion);
+                    stringBuffer.append('.');
+                    stringBuffer.append(printer.getMinorVersion());
+                    stringBuffer.append(')');
                 }
                 // Add JD-Core version
-                ps.print("\n * JD-Core Version:       ");
-                ps.print(CoreConstants.JD_CORE_VERSION);
-                ps.print("\n */");
+                stringBuffer.append("\n * JD-Core Version:       ");
+                stringBuffer.append(preferences.get(JD_CORE_VERSION));
+                stringBuffer.append("\n */");
             }
 
-            try (OutputStream os = new NewlineOutputStream(Files.newOutputStream(path))) {
-                baos.writeTo(os);
-            } catch (IOException ignore) {
+            try (PrintStream ps = new PrintStream(new NewlineOutputStream(Files.newOutputStream(path)), true, "UTF-8")) {
+                ps.print(stringBuffer.toString());
+            } catch (IOException e) {
+                assert ExceptionUtil.printStackTrace(e);
             }
-        } catch (Exception ignore) {
+        } catch (Throwable t) {
+            assert ExceptionUtil.printStackTrace(t);
+
             try (BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset())) {
                 writer.write("// INTERNAL ERROR //");
-            } catch (IOException ignoreAgain) {
+            } catch (IOException ee) {
+                assert ExceptionUtil.printStackTrace(ee);
             }
         }
     }
 
     protected static boolean getPreferenceValue(Map<String, String> preferences, String key, boolean defaultValue) {
         String v = preferences.get(key);
-
-        if (v == null) {
-            return defaultValue;
-        } else {
-            return Boolean.valueOf(v);
-        }
+        return (v == null) ? defaultValue : Boolean.valueOf(v);
     }
 }

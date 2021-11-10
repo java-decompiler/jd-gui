@@ -1,6 +1,8 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.api.model;
@@ -10,28 +12,28 @@ import java.net.URI;
 import java.util.Collection;
 
 public interface Container {
-    public String getType();
+    String getType();
 
-    public Entry getRoot();
+    Entry getRoot();
 
     /**
      * File or directory
      */
-    public interface Entry {
-        public Container getContainer();
+    interface Entry {
+        Container getContainer();
 
-        public Entry getParent();
+        Entry getParent();
 
-        public URI getUri();
+        URI getUri();
 
-        public String getPath();
+        String getPath();
 
-        public boolean isDirectory();
+        boolean isDirectory();
 
-        public long length();
+        long length();
 
-        public InputStream getInputStream();
+        InputStream getInputStream();
 
-        public Collection<Entry> getChildren();
+        Collection<Entry> getChildren();
     }
 }

@@ -1,6 +1,9 @@
 # Java
 *.class
 
+# JD
+debug*
+
 # JD-GUI
 src-generated/
 jd-gui.cfg

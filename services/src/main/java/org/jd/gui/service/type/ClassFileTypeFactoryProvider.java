@@ -1,57 +1,49 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.service.type;
 
-import groovyjarjarasm.asm.ClassReader;
-import groovyjarjarasm.asm.Opcodes;
-import groovyjarjarasm.asm.tree.ClassNode;
-import groovyjarjarasm.asm.tree.FieldNode;
-import groovyjarjarasm.asm.tree.InnerClassNode;
-import groovyjarjarasm.asm.tree.MethodNode;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Type;
+import org.jd.gui.util.exception.ExceptionUtil;
+import org.objectweb.asm.*;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
     static {
         // Early class loading
-        JavaType.class.getName();
+        try {
+            Class.forName(JavaType.class.getName());
+        } catch (Exception e) {
+            assert ExceptionUtil.printStackTrace(e);
+        }
     }
 
     // Create cache
     protected Cache<URI, JavaType> cache = new Cache<>();
 
-    /**
-     * @return local + optional external selectors
-     */
-    public String[] getSelectors() {
-        List<String> externalSelectors = getExternalSelectors();
+    @Override public String[] getSelectors() { return appendSelectors("*:file:*.class"); }
 
-        if (externalSelectors == null) {
-            return new String[] { "*:file:*.class" };
-        } else {
-            int size = externalSelectors.size();
-            String[] selectors = new String[size+1];
-            externalSelectors.toArray(selectors);
-            selectors[size] = "*:file:*.class";
-            return selectors;
-        }
-    }
-
+    @Override
     public Collection<Type> make(API api, Container.Entry entry) {
         return Collections.singletonList(make(api, entry, null));
     }
 
+    @Override
     public Type make(API api, Container.Entry entry, String fragment) {
         URI key = entry.getUri();
 
@@ -96,7 +88,8 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
 
                                 try (InputStream is2 = entry.getInputStream()) {
                                     classReader = new ClassReader(is2);
-                                } catch (IOException ignore) {
+                                } catch (IOException e) {
+                                    assert ExceptionUtil.printStackTrace(e);
                                     return null;
                                 }
                                 break;
@@ -116,7 +109,8 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
                 }
 
                 type = new JavaType(entry, classReader, -1);
-            } catch (IOException ignore) {
+            } catch (IOException e) {
+                assert ExceptionUtil.printStackTrace(e);
                 type = null;
             }
 
@@ -126,8 +120,6 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
     }
 
     static class JavaType implements Type {
-
-        protected ClassNode classNode;
         protected Container.Entry entry;
         protected int access;
         protected String name;
@@ -138,63 +130,114 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
         protected String displayInnerTypeName;
         protected String displayPackageName;
 
-        protected List<Type> innerTypes = null;
-        protected List<Type.Field> fields = null;
-        protected List<Type.Method> methods = null;
+        protected List<Type> innerTypes;
+        protected List<Type.Field> fields = new ArrayList<>();
+        protected List<Type.Method> methods = new ArrayList<>();
 
         @SuppressWarnings("unchecked")
-        protected JavaType(Container.Entry entry, ClassReader classReader, int outerAccess) {
-            this.classNode = new ClassNode();
+        protected JavaType(Container.Entry entry, ClassReader classReader, final int outerAccess) {
             this.entry = entry;
 
-            classReader.accept(classNode, ClassReader.SKIP_CODE|ClassReader.SKIP_DEBUG|ClassReader.SKIP_FRAMES);
+            ClassVisitor classAndInnerClassesVisitor = new ClassVisitor(Opcodes.ASM7) {
+                @Override
+                public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+                    JavaType.this.access = (outerAccess == -1) ? access : outerAccess;
+                    JavaType.this.name = name;
+                    JavaType.this.superName = ((access & Opcodes.ACC_INTERFACE) != 0) && "java/lang/Object".equals(superName) ? null : superName;
+                }
 
-            this.access = (outerAccess == -1) ? classNode.access : outerAccess;
-            this.name = classNode.name;
+                @Override
+                public void visitInnerClass(String name, String outerName, String innerName, int access) {
+                    if (JavaType.this.name.equals(name)) {
+                        // Inner class path found
+                        JavaType.this.outerName = outerName;
+                        JavaType.this.displayInnerTypeName = innerName;
+                    } else if (((access & (Opcodes.ACC_SYNTHETIC|Opcodes.ACC_BRIDGE)) == 0) && JavaType.this.name.equals(outerName)) {
+                        Container.Entry innerEntry = getEntry(name);
 
-            this.superName = ((access & Opcodes.ACC_INTERFACE) != 0) && "java/lang/Object".equals(classNode.superName) ? null : classNode.superName;
-            this.outerName = null;
-            this.displayInnerTypeName = null;
-
-            int indexDollar = name.lastIndexOf('$');
-
-            if (indexDollar != -1) {
-                int indexSeparator = name.lastIndexOf('/');
-                if (indexDollar > indexSeparator) {
-                    for (final InnerClassNode innerClassNode : (List<InnerClassNode>)classNode.innerClasses) {
-                        if (name.equals(innerClassNode.name)) {
-                            // Inner class path found
-                            if (innerClassNode.outerName != null) {
-                                this.outerName = innerClassNode.outerName;
-                                this.displayInnerTypeName = this.name.substring(this.outerName.length() + 1);
+                        if (innerEntry != null) {
+                            try (InputStream is = innerEntry.getInputStream()) {
+                                ClassReader classReader = new ClassReader(is);
+                                if (innerTypes == null) {
+                                    innerTypes = new ArrayList<>();
+                                }
+                                innerTypes.add(new JavaType(innerEntry, classReader, access));
+                            } catch (IOException e) {
+                                assert ExceptionUtil.printStackTrace(e);
                             }
                         }
                     }
                 }
-            }
+            };
+
+            classReader.accept(classAndInnerClassesVisitor, ClassReader.SKIP_CODE|ClassReader.SKIP_DEBUG|ClassReader.SKIP_FRAMES);
 
             int lastPackageSeparatorIndex = name.lastIndexOf('/');
 
             if (lastPackageSeparatorIndex == -1) {
-                this.displayPackageName = "";
-                this.displayTypeName = (this.outerName == null) ? this.name : null;
+                displayPackageName = "";
+
+                if (outerName == null) {
+                    displayTypeName = name;
+                } else {
+                    displayTypeName = getDisplayTypeName(outerName, 0) + '.' + displayInnerTypeName;
+                }
             } else {
-                this.displayPackageName = this.name.substring(0, lastPackageSeparatorIndex).replace('/', '.');
-                this.displayTypeName = (this.outerName == null) ? this.name.substring(lastPackageSeparatorIndex+1) : null;
-            }
-        }
+                displayPackageName = name.substring(0, lastPackageSeparatorIndex).replace('/', '.');
 
-        public int getFlags() { return access; }
-        public String getName() { return name; }
-        public String getSuperName() { return superName; }
-        public String getOuterName() { return outerName; }
-        public String getDisplayPackageName() { return displayPackageName; }
+                if (outerName == null) {
+                    displayTypeName = name;
+                } else {
+                    displayTypeName = getDisplayTypeName(outerName, lastPackageSeparatorIndex) + '.' + displayInnerTypeName;
+                }
 
-        public String getDisplayTypeName() {
-            if (displayTypeName == null) {
-                displayTypeName = getDisplayTypeName(outerName, displayPackageName.length()) + '.' + displayInnerTypeName;
+                displayTypeName = displayTypeName.substring(lastPackageSeparatorIndex+1);
             }
-            return displayTypeName;
+
+            ClassVisitor fieldsAndMethodsVisitor = new ClassVisitor(Opcodes.ASM7) {
+                @Override
+                public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+                    if ((access & (Opcodes.ACC_SYNTHETIC|Opcodes.ACC_ENUM)) == 0) {
+                        fields.add(new Type.Field() {
+                            public int getFlags() { return access; }
+                            public String getName() { return name; }
+                            public String getDescriptor() { return descriptor; }
+                            public Icon getIcon() { return getFieldIcon(access); }
+
+                            public String getDisplayName() {
+                                StringBuilder sb = new StringBuilder();
+                                sb.append(name).append(" : ");
+                                writeSignature(sb, descriptor, descriptor.length(), 0, false);
+                                return sb.toString();
+                            }
+                        });
+                    }
+                    return null;
+                }
+
+                @Override
+                public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+                    if ((access & (Opcodes.ACC_SYNTHETIC|Opcodes.ACC_ENUM|Opcodes.ACC_BRIDGE)) == 0) {
+                        methods.add(new Type.Method() {
+                            public int getFlags() { return access; }
+                            public String getName() { return name; }
+                            public String getDescriptor() { return descriptor; }
+                            public Icon getIcon() { return getMethodIcon(access); }
+
+                            public String getDisplayName() {
+                                boolean isInnerClass = (JavaType.this.displayInnerTypeName != null);
+                                String constructorName = isInnerClass ? JavaType.this.displayInnerTypeName : JavaType.this.displayTypeName;
+                                StringBuilder sb = new StringBuilder();
+                                writeMethodSignature(sb, JavaType.this.access, access, isInnerClass, constructorName, name, descriptor);
+                                return sb.toString();
+                            }
+                        });
+                    }
+                    return null;
+                }
+            };
+
+            classReader.accept(fieldsAndMethodsVisitor, ClassReader.SKIP_CODE|ClassReader.SKIP_DEBUG|ClassReader.SKIP_FRAMES);
         }
 
         @SuppressWarnings("unchecked")
@@ -202,121 +245,80 @@ public class ClassFileTypeFactoryProvider extends AbstractTypeFactoryProvider {
             int indexDollar = name.lastIndexOf('$');
 
             if (indexDollar > packageLength) {
-                Container.Entry outerEntry = getEntry(name);
+                Container.Entry entry = getEntry(name);
 
-                if (outerEntry != null) {
-                    try (InputStream is = outerEntry.getInputStream()) {
+                if (entry != null) {
+                    try (InputStream is = entry.getInputStream()) {
                         ClassReader classReader = new ClassReader(is);
-                        ClassNode classNode = new ClassNode();
-                        classReader.accept(classNode, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+                        InnerClassVisitor classVisitor = new InnerClassVisitor(name);
 
-                        for (final InnerClassNode innerClassNode : (List<InnerClassNode>)classNode.innerClasses) {
-                            if (name.equals(innerClassNode.name)) {
-                                // Inner class path found => Recursive call
-                                return getDisplayTypeName(innerClassNode.outerName, packageLength) + '.' + innerClassNode.innerName;
-                            }
+                        classReader.accept(classVisitor, ClassReader.SKIP_CODE|ClassReader.SKIP_DEBUG|ClassReader.SKIP_FRAMES);
+
+                        String outerName = classVisitor.getOuterName();
+
+                        if (outerName != null) {
+                            // Inner class path found => Recursive call
+                            return getDisplayTypeName(outerName, packageLength) + '.' + classVisitor.getInnerName();
                         }
-                    } catch (IOException ignore) {
+                    } catch (IOException e) {
+                        assert ExceptionUtil.printStackTrace(e);
                     }
                 }
             }
 
-            return packageLength > 0 ? name.substring(packageLength+1) : name;
-        }
-
-        public String getDisplayInnerTypeName() { return displayInnerTypeName; }
-        public Icon getIcon() { return getTypeIcon(access); }
-
-        @SuppressWarnings("unchecked")
-        public List<Type> getInnerTypes() {
-            if (innerTypes == null) {
-                innerTypes = new ArrayList<>(classNode.innerClasses.size());
-
-                for (final InnerClassNode innerClassNode : (List<InnerClassNode>)classNode.innerClasses) {
-                    if (((innerClassNode.access & (Opcodes.ACC_SYNTHETIC|Opcodes.ACC_BRIDGE)) == 0) && this.name.equals(innerClassNode.outerName)) {
-                        Container.Entry innerEntry = getEntry(innerClassNode.name);
-
-                        if (innerEntry != null) {
-                            try (InputStream is = innerEntry.getInputStream()) {
-                                ClassReader classReader = new ClassReader(is);
-                                innerTypes.add(new JavaType(innerEntry, classReader, innerClassNode.access));
-                            } catch (IOException ignore) {
-                            }
-                        }
-                    }
-                }
-            }
-            return innerTypes;
+            return name;
         }
 
         protected Container.Entry getEntry(String typeName) {
             String pathToFound = typeName + ".class";
 
-            for (Container.Entry e : entry.getParent().getChildren()) {
-                if (e.getPath().equals(pathToFound)) {
-                    return e;
+            for (Container.Entry entry : entry.getParent().getChildren()) {
+                if (entry.getPath().equals(pathToFound)) {
+                    return entry;
                 }
             }
 
             return null;
         }
 
-        @SuppressWarnings("unchecked")
-        public List<Type.Field> getFields() {
-            if (fields == null) {
-                fields = new ArrayList<>(classNode.fields.size());
+        @Override public int getFlags() { return access; }
+        @Override public String getName() { return name; }
+        @Override public String getSuperName() { return superName; }
+        @Override public String getOuterName() { return outerName; }
+        @Override public String getDisplayPackageName() { return displayPackageName; }
+        @Override public String getDisplayTypeName() { return displayTypeName; }
+        @Override public String getDisplayInnerTypeName() { return displayInnerTypeName; }
+        @Override public Icon getIcon() { return getTypeIcon(access); }
+        @Override public List<Type> getInnerTypes() { return innerTypes; }
+        @Override public List<Type.Field> getFields() { return fields; }
+        @Override public List<Type.Method> getMethods() { return methods; }
+    }
 
-                for (final FieldNode fieldNode : (List<FieldNode>)classNode.fields) {
-                    if ((fieldNode.access & (Opcodes.ACC_SYNTHETIC|Opcodes.ACC_ENUM)) == 0) {
-                        fields.add(new Type.Field() {
-                            public int getFlags() { return fieldNode.access; }
-                            public String getName() { return fieldNode.name; }
-                            public String getDescriptor() { return fieldNode.desc; }
-                            public Icon getIcon() { return getFieldIcon(fieldNode.access); }
+    protected static class InnerClassVisitor extends ClassVisitor {
+        protected String name;
+        protected String outerName;
+        protected String innerName;
 
-                            public String getDisplayName() {
-                                StringBuffer sb = new StringBuffer();
-                                sb.append(fieldNode.name).append(" : ");
-                                writeSignature(sb, fieldNode.desc, fieldNode.desc.length(), 0, false);
-                                return sb.toString();
-                            }
-                        });
-                    }
-                }
-            }
-            return fields;
+        public InnerClassVisitor(String name) {
+            super(Opcodes.ASM7);
+            this.name = name;
         }
 
-        @SuppressWarnings("unchecked")
-        public List<Type.Method> getMethods() {
-            if (methods == null) {
-                methods = new ArrayList<>(classNode.methods.size());
-
-                for (final MethodNode methodNode : (List<MethodNode>)classNode.methods) {
-                    if ((methodNode.access & (Opcodes.ACC_SYNTHETIC|Opcodes.ACC_ENUM|Opcodes.ACC_BRIDGE)) == 0) {
-                        methods.add(new Type.Method() {
-                            public int getFlags() { return methodNode.access; }
-                            public String getName() { return methodNode.name; }
-                            public String getDescriptor() { return methodNode.desc; }
-                            public Icon getIcon() { return getMethodIcon(methodNode.access); }
-
-                            public String getDisplayName() {
-                                String constructorName = displayInnerTypeName;
-                                boolean isInnerClass = (constructorName != null);
-
-                                if (constructorName == null)
-                                    constructorName = getDisplayTypeName();
-
-                                StringBuffer sb = new StringBuffer();
-                                writeMethodSignature(sb, access, methodNode.access, isInnerClass, constructorName, methodNode.name, methodNode.desc);
-                                return sb.toString();
-                            }
-                        });
-                    }
-                }
+        @Override
+        public void visitInnerClass(String name, String outerName, String innerName, int access) {
+            if (this.name.equals(name)) {
+                // Inner class path found
+                this.outerName = outerName;
+                this.innerName = innerName;
             }
+        }
 
-            return methods;
+        public String getOuterName() {
+            return outerName;
+        }
+
+        public String getInnerName() {
+            return innerName;
         }
     }
 }

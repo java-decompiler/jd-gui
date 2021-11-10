@@ -1,31 +1,36 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.spi;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 
 public interface PreferencesPanel {
-    public String getPreferencesGroupTitle();
+    String getPreferencesGroupTitle();
 
-    public String getPreferencesPanelTitle();
+    String getPreferencesPanelTitle();
 
-    public void init(Color errorBackgroundColor);
+    JComponent getPanel();
 
-    public boolean isActivated();
+    void init(Color errorBackgroundColor);
 
-    public void loadPreferences(Map<String, String> preferences);
+    boolean isActivated();
 
-    public void savePreferences(Map<String, String> preferences);
+    void loadPreferences(Map<String, String> preferences);
 
-    public boolean arePreferencesValid();
+    void savePreferences(Map<String, String> preferences);
 
-    public void addPreferencesChangeListener(PreferencesPanelChangeListener listener);
+    boolean arePreferencesValid();
 
-    public interface PreferencesPanelChangeListener {
-        public void preferencesPanelChanged(PreferencesPanel source);
+    void addPreferencesChangeListener(PreferencesPanelChangeListener listener);
+
+    interface PreferencesPanelChangeListener {
+        void preferencesPanelChanged(PreferencesPanel source);
     }
 }

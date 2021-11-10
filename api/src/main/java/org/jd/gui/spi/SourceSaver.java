@@ -1,6 +1,8 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.spi;
@@ -12,18 +14,18 @@ import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 public interface SourceSaver {
-    public String[] getSelectors();
+    String[] getSelectors();
 
-    public Pattern getPathPattern();
+    Pattern getPathPattern();
 
-    public String getSourcePath(Container.Entry entry);
+    String getSourcePath(Container.Entry entry);
 
-    public int getFileCount(API api, Container.Entry entry);
+    int getFileCount(API api, Container.Entry entry);
 
     /**
      * Check parent path, build source file name, create NIO path and save the content.
      */
-    public void save(API api, Controller controller, Listener listener, Path rootPath, Container.Entry entry);
+    void save(API api, Controller controller, Listener listener, Path rootPath, Container.Entry entry);
 
     /**
      * Save content:
@@ -32,13 +34,13 @@ public interface SourceSaver {
      * <li>For directory, call 'save' for each children.</li>
      * </ul>
      */
-    public void saveContent(API api, Controller controller, Listener listener, Path rootPath, Path path, Container.Entry entry);
+    void saveContent(API api, Controller controller, Listener listener, Path rootPath, Path path, Container.Entry entry);
 
-    public interface Controller {
-        public boolean isCancelled();
+    interface Controller {
+        boolean isCancelled();
     }
 
-    public interface Listener {
-        public void pathSaved(Path path);
+    interface Listener {
+        void pathSaved(Path path);
     }
 }

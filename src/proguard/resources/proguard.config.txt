@@ -1,0 +1,40 @@
+# java -jar proguard.jar @proguard.config.txt
+
+#-injars       jd-gui-1.4.2.jar
+#-outjars      jd-gui-1.4.2-min.jar
+#-libraryjars  C:/Program Files/Java/jre1.8.0_121/lib/rt.jar
+#-printmapping myapplication.map
+
+-keep public class org.jd.gui.App {
+    public static void main(java.lang.String[]);
+}
+
+-keep public class org.jd.gui.OsxApp {
+    public static void main(java.lang.String[]);
+}
+
+-dontwarn com.apple.eawt.**
+-keepattributes Signature
+
+-keep public interface org.jd.gui.api.** {*;}
+-keep public interface org.jd.gui.spi.** {*;}
+-keep public class * extends org.jd.gui.spi.*
+
+-keep class org.fife.ui.rsyntaxtextarea.TokenTypes {public static final <fields>;}
+-keep class org.fife.ui.rsyntaxtextarea.DefaultTokenMakerFactory
+
+-keep class org.fife.ui.rsyntaxtextarea.modes.CSSTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.DtdTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.HTMLTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.JavaScriptTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.JavaTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.JsonTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.JSPTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.PlainTextTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.PropertiesFileTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.SQLTokenMaker
+-keep class org.fife.ui.rsyntaxtextarea.modes.XMLTokenMaker
+
+-adaptresourcefilenames ErrorStrip.properties
+-adaptresourcefilenames RSyntaxTextArea.properties
+-adaptresourcefilenames FocusableTip.properties

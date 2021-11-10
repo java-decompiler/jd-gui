@@ -1,6 +1,8 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.api;
@@ -16,35 +18,46 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 public interface API {
-    public boolean openURI(URI uri);
+    boolean openURI(URI uri);
 
-    public boolean openURI(int x, int y, Collection<Container.Entry> entries, String query, String fragment);
+    boolean openURI(int x, int y, Collection<Container.Entry> entries, String query, String fragment);
 
-    public void addURI(URI uri);
+    void addURI(URI uri);
 
-    public <T extends JComponent & UriGettable> void addPanel(String title, Icon icon, String tip, T component);
+    <T extends JComponent & UriGettable> void addPanel(String title, Icon icon, String tip, T component);
 
-    public Collection<Action> getContextualActions(Container.Entry entry, String fragment);
+    Collection<Action> getContextualActions(Container.Entry entry, String fragment);
 
-    public UriLoader getUriLoader(URI uri);
+    UriLoader getUriLoader(URI uri);
 
-    public FileLoader getFileLoader(File file);
+    FileLoader getFileLoader(File file);
 
-    public ContainerFactory getContainerFactory(Path rootPath);
+    ContainerFactory getContainerFactory(Path rootPath);
 
-    public PanelFactory getMainPanelFactory(Container container);
+    PanelFactory getMainPanelFactory(Container container);
 
-    public TreeNodeFactory getTreeNodeFactory(Container.Entry entry);
+    TreeNodeFactory getTreeNodeFactory(Container.Entry entry);
 
-    public TypeFactory getTypeFactory(Container.Entry entry);
+    TypeFactory getTypeFactory(Container.Entry entry);
 
-    public Indexer getIndexer(Container.Entry entry);
+    Indexer getIndexer(Container.Entry entry);
 
-    public SourceSaver getSourceSaver(Container.Entry entry);
+    SourceSaver getSourceSaver(Container.Entry entry);
 
-    public Map<String, String> getPreferences();
+    Map<String, String> getPreferences();
 
-    public Collection<Indexes> getCollectionOfIndexes();
+    Collection<Future<Indexes>> getCollectionOfFutureIndexes();
+
+    interface LoadSourceListener {
+        void sourceLoaded(String source);
+    }
+
+    String getSource(Container.Entry entry);
+
+    void loadSource(Container.Entry entry, LoadSourceListener listener);
+
+    File loadSourceFile(Container.Entry entry);
 }

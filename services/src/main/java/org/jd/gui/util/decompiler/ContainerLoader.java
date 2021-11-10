@@ -1,17 +1,22 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.util.decompiler;
 
-import jd.core.loader.Loader;
-import jd.core.loader.LoaderException;
+import org.jd.core.v1.api.loader.Loader;
+import org.jd.core.v1.api.loader.LoaderException;
 import org.jd.gui.api.model.Container;
 
-import java.io.DataInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ContainerLoader implements Loader {
+    protected byte[] buffer = new byte[1024 * 4];
     protected Container.Entry entry;
 
     public ContainerLoader() { this.entry = null; }
@@ -19,23 +24,47 @@ public class ContainerLoader implements Loader {
         this.entry = entry;
     }
 
+    public void setEntry(Container.Entry e) { this.entry = e; }
+
     protected Container.Entry getEntry(String internalPath) {
+        String path = internalPath + ".class";
+
+        if (entry.getPath().equals(path)) {
+            return entry;
+        }
         for (Container.Entry e : entry.getParent().getChildren()) {
-            if (e.getPath().equals(internalPath)) {
+            if (e.getPath().equals(path)) {
                 return e;
             }
         }
         return null;
     }
 
-    public void setEntry(Container.Entry e) { this.entry = e; }
-
     // --- Loader --- //
-    public DataInputStream load(String internalPath) throws LoaderException {
-        return new DataInputStream(getEntry(internalPath).getInputStream());
+    @Override
+    public boolean canLoad(String internalName) {
+        return getEntry(internalName) != null;
     }
 
-    public boolean canLoad(String internalPath) {
-        return getEntry(internalPath) != null;
+    @Override
+    public byte[] load(String internalName) throws LoaderException {
+        Container.Entry entry = getEntry(internalName);
+
+        if (entry == null) {
+            return null;
+        } else {
+            try (InputStream input=entry.getInputStream(); ByteArrayOutputStream output=new ByteArrayOutputStream()) {
+                int len = input.read(buffer);
+
+                while (len > 0) {
+                    output.write(buffer, 0, len);
+                    len = input.read(buffer);
+                }
+
+                return output.toByteArray();
+            } catch (IOException e) {
+                throw new LoaderException(e);
+            }
+        }
     }
 }

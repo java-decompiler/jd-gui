@@ -1,12 +1,15 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.service.type;
 
 import org.jd.gui.api.model.Type;
 import org.jd.gui.spi.TypeFactory;
+import org.jd.gui.util.exception.ExceptionUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +21,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public abstract class AbstractTypeFactoryProvider implements TypeFactory {
-
     protected List<String> externalSelectors;
     protected Pattern externalPathPattern;
 
@@ -33,7 +35,8 @@ public abstract class AbstractTypeFactoryProvider implements TypeFactory {
             if (is != null) {
                 properties.load(is);
             }
-        } catch (IOException ignore) {
+        } catch (IOException e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
 
         init(properties);
@@ -47,16 +50,34 @@ public abstract class AbstractTypeFactoryProvider implements TypeFactory {
         externalPathPattern = (pathRegExp == null) ? null : Pattern.compile(pathRegExp);
     }
 
-    protected List<String> getExternalSelectors() { return externalSelectors; }
-    protected Pattern getExternalPathPattern() { return externalPathPattern; }
-
-    public String[] getSelectors() {
-        return (externalSelectors==null) ? null : externalSelectors.toArray(new String[externalSelectors.size()]);
+    protected String[] appendSelectors(String selector) {
+        if (externalSelectors == null) {
+            return new String[] { selector };
+        } else {
+            int size = externalSelectors.size();
+            String[] array = new String[size+1];
+            externalSelectors.toArray(array);
+            array[size] = selector;
+            return array;
+        }
     }
+
+    protected String[] appendSelectors(String... selectors) {
+        if (externalSelectors == null) {
+            return selectors;
+        } else {
+            int size = externalSelectors.size();
+            String[] array = new String[size+selectors.length];
+            externalSelectors.toArray(array);
+            System.arraycopy(selectors, 0, array, size, selectors.length);
+            return array;
+        }
+    }
+
     public Pattern getPathPattern() { return externalPathPattern; }
 
     // Signature writers
-    protected static int writeSignature(StringBuffer sb, String descriptor, int  length, int index, boolean varargsFlag) {
+    protected static int writeSignature(StringBuilder sb, String descriptor, int  length, int index, boolean varargsFlag) {
         while (true) {
             // Print array : '[[?' ou '[L[?;'
             int dimensionLength = 0;
@@ -168,7 +189,7 @@ public abstract class AbstractTypeFactoryProvider implements TypeFactory {
     }
 
     protected static void writeMethodSignature(
-            StringBuffer sb, int typeAccess, int methodAccess, boolean isInnerClass,
+            StringBuilder sb, int typeAccess, int methodAccess, boolean isInnerClass,
             String constructorName, String methodName, String descriptor) {
         if (methodName.equals("<clinit>")) {
             sb.append("{...}");

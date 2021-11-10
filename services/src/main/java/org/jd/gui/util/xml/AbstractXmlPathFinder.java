@@ -1,20 +1,25 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.util.xml;
+
+import org.jd.gui.util.exception.ExceptionUtil;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.StringReader;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public abstract class AbstractXmlPathFinder {
-
     protected HashMap<String, HashSet<String>> tagNameToPaths = new HashMap<>();
-    protected StringBuffer sb = new StringBuffer(200);
+    protected StringBuilder sb = new StringBuilder(200);
 
     public AbstractXmlPathFinder(Collection<String> paths) {
         for (String path : paths) {
@@ -78,7 +83,8 @@ public abstract class AbstractXmlPathFinder {
                     break;
                 }
             }
-        } catch (XMLStreamException ignore) {
+        } catch (XMLStreamException e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
     }
 

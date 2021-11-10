@@ -1,19 +1,27 @@
 /*
- * Copyright (c) 2008-2015 Emmanuel Dupuy
- * This program is made available under the terms of the GPLv3 License.
+ * Copyright (c) 2008-2019 Emmanuel Dupuy.
+ * This project is distributed under the GPLv3 license.
+ * This is a Copyleft license that gives the user the right to use,
+ * copy and modify the code freely for non-commercial purposes.
  */
 
 package org.jd.gui.service.indexer;
 
-import groovyjarjarasm.asm.*;
-import groovyjarjarasm.asm.signature.SignatureReader;
-import groovyjarjarasm.asm.signature.SignatureVisitor;
 import org.jd.gui.api.API;
 import org.jd.gui.api.model.Container;
 import org.jd.gui.api.model.Indexes;
+import org.jd.gui.util.exception.ExceptionUtil;
+import org.objectweb.asm.*;
+import org.objectweb.asm.signature.SignatureReader;
+import org.objectweb.asm.signature.SignatureVisitor;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import static org.objectweb.asm.ClassReader.*;
 
 /**
  * Unsafe thread implementation of class file indexer.
@@ -31,31 +39,21 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
     protected HashSet<String> superTypeNameSet = new HashSet<>();
     protected HashSet<String> descriptorSet = new HashSet<>();
 
-    protected ClassIndexer classIndexer = new ClassIndexer(
-        typeDeclarationSet, constructorDeclarationSet, methodDeclarationSet,
-        fieldDeclarationSet, typeReferenceSet, superTypeNameSet, descriptorSet);
-    protected SignatureIndexer signatureIndexer = new SignatureIndexer(typeReferenceSet);
+    protected ClassIndexer classIndexer = new ClassIndexer();
+    protected SignatureIndexer signatureIndexer = new SignatureIndexer();
 
-    /**
-     * @return local + optional external selectors
-     */
-    public String[] getSelectors() {
-        List<String> externalSelectors = getExternalSelectors();
+    @Override public String[] getSelectors() { return appendSelectors("*:file:*.class"); }
 
-        if (externalSelectors == null) {
-            return new String[] { "*:file:*.class" };
+    @Override
+    public Pattern getPathPattern() {
+        if (externalPathPattern == null) {
+            return Pattern.compile("^((?!module-info\\.class).)*$");
         } else {
-            int size = externalSelectors.size();
-            String[] selectors = new String[size+1];
-            externalSelectors.toArray(selectors);
-            selectors[size] = "*:file:*.class";
-            return selectors;
+            return externalPathPattern;
         }
     }
 
-    /**
-     * Index format : @see jd.gui.spi.Indexer
-     */
+    @Override
     @SuppressWarnings("unchecked")
     public void index(API api, Container.Entry entry, Indexes indexes) {
         // Cleaning sets...
@@ -74,7 +72,7 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         try (InputStream inputStream = entry.getInputStream()) {
             // Index field, method, interfaces & super type
             ClassReader classReader = new ClassReader(inputStream);
-            classReader.accept(classIndexer, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
+            classReader.accept(classIndexer, SKIP_CODE|SKIP_DEBUG|SKIP_FRAMES);
 
             // Index descriptors
             for (String descriptor : descriptorSet) {
@@ -136,15 +134,15 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
             String typeName = classIndexer.name;
 
             // Append sets to indexes
-            addToIndex(indexes, "typeDeclarations", typeDeclarationSet, entry);
-            addToIndex(indexes, "constructorDeclarations", constructorDeclarationSet, entry);
-            addToIndex(indexes, "methodDeclarations", methodDeclarationSet, entry);
-            addToIndex(indexes, "fieldDeclarations", fieldDeclarationSet, entry);
-            addToIndex(indexes, "typeReferences", typeReferenceSet, entry);
-            addToIndex(indexes, "constructorReferences", constructorReferenceSet, entry);
-            addToIndex(indexes, "methodReferences", methodReferenceSet, entry);
-            addToIndex(indexes, "fieldReferences", fieldReferenceSet, entry);
-            addToIndex(indexes, "strings", stringSet, entry);
+            addToIndexes(indexes, "typeDeclarations", typeDeclarationSet, entry);
+            addToIndexes(indexes, "constructorDeclarations", constructorDeclarationSet, entry);
+            addToIndexes(indexes, "methodDeclarations", methodDeclarationSet, entry);
+            addToIndexes(indexes, "fieldDeclarations", fieldDeclarationSet, entry);
+            addToIndexes(indexes, "typeReferences", typeReferenceSet, entry);
+            addToIndexes(indexes, "constructorReferences", constructorReferenceSet, entry);
+            addToIndexes(indexes, "methodReferences", methodReferenceSet, entry);
+            addToIndexes(indexes, "fieldReferences", fieldReferenceSet, entry);
+            addToIndexes(indexes, "strings", stringSet, entry);
 
             // Populate map [super type name : [sub type name]]
             if (superTypeNameSet.size() > 0) {
@@ -154,49 +152,28 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
                     index.get(superTypeName).add(typeName);
                 }
             }
-
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            assert ExceptionUtil.printStackTrace(e);
         }
     }
 
-    protected static class ClassIndexer extends ClassVisitor {
-        protected HashSet<String> typeDeclarationSet;
-        protected HashSet<String> constructorDeclarationSet;
-        protected HashSet<String> methodDeclarationSet;
-        protected HashSet<String> fieldDeclarationSet;
-        protected HashSet<String> typeReferenceSet;
-        protected HashSet<String> superTypeNameSet;
-        protected HashSet<String> descriptorSet;
-
-        protected AnnotationIndexer annotationIndexer;
-        protected FieldIndexer fieldIndexer;
-        protected MethodIndexer methodIndexer;
+    protected class ClassIndexer extends ClassVisitor {
+        protected AnnotationIndexer annotationIndexer = new AnnotationIndexer();
+        protected FieldIndexer fieldIndexer = new FieldIndexer(annotationIndexer);
+        protected MethodIndexer methodIndexer = new MethodIndexer(annotationIndexer);
 
         protected String name;
 
-        public ClassIndexer(
-                HashSet<String> typeDeclarationSet, HashSet<String> constructorDeclarationSet,
-                HashSet<String> methodDeclarationSet, HashSet<String> fieldDeclarationSet,
-                HashSet<String> typeReferenceSet, HashSet<String> superTypeNameSet, HashSet<String> descriptorSet) {
-            super(Opcodes.ASM5);
+        public ClassIndexer() { super(Opcodes.ASM7); }
 
-            this.typeDeclarationSet = typeDeclarationSet;
-            this.constructorDeclarationSet = constructorDeclarationSet;
-            this.methodDeclarationSet = methodDeclarationSet;
-            this.fieldDeclarationSet = fieldDeclarationSet;
-            this.typeReferenceSet = typeReferenceSet;
-            this.superTypeNameSet = superTypeNameSet;
-            this.descriptorSet = descriptorSet;
-
-            this.annotationIndexer = new AnnotationIndexer(descriptorSet);
-            this.fieldIndexer = new FieldIndexer(descriptorSet, annotationIndexer);
-            this.methodIndexer = new MethodIndexer(descriptorSet, annotationIndexer);
-        }
-
+        @Override
         public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
             this.name = name;
             typeDeclarationSet.add(name);
-            superTypeNameSet.add(superName);
+
+            if (superName != null) {
+                superTypeNameSet.add(superName);
+            }
 
             if (interfaces != null) {
                 for (int i=interfaces.length-1; i>=0; i--) {
@@ -205,22 +182,26 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
             }
         }
 
+        @Override
         public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
             descriptorSet.add(desc);
             return annotationIndexer;
         }
 
+        @Override
         public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
             descriptorSet.add(desc);
             return annotationIndexer;
         }
 
+        @Override
         public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
             fieldDeclarationSet.add(name);
             descriptorSet.add(signature==null ? desc : signature);
             return fieldIndexer;
         }
 
+        @Override
         public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
             if ("<init>".equals(name)) {
                 constructorDeclarationSet.add(this.name);
@@ -239,78 +220,66 @@ public class ClassFileIndexerProvider extends AbstractIndexerProvider {
         }
     }
 
-    protected static class SignatureIndexer extends SignatureVisitor {
-        protected HashSet<String> typeReferenceSet;
+    protected class SignatureIndexer extends SignatureVisitor {
+        SignatureIndexer() { super(Opcodes.ASM7); }
 
-        SignatureIndexer(HashSet<String> typeReferenceSet) {
-            super(Opcodes.ASM5);
-            this.typeReferenceSet = typeReferenceSet;
-        }
-
-        public void visitClassType(String name) {
-            typeReferenceSet.add(name);
-        }
+        @Override public void visitClassType(String name) { typeReferenceSet.add(name); }
     }
 
-    protected static class AnnotationIndexer extends AnnotationVisitor {
-        protected HashSet<String> descriptorSet;
+    protected class AnnotationIndexer extends AnnotationVisitor {
+        public AnnotationIndexer() { super(Opcodes.ASM7); }
 
-        public AnnotationIndexer(HashSet<String> descriptorSet) {
-            super(Opcodes.ASM5);
-            this.descriptorSet = descriptorSet;
-        }
+        @Override public void visitEnum(String name, String desc, String value) { descriptorSet.add(desc); }
 
-        public void visitEnum(String name, String desc, String value) {
-            descriptorSet.add(desc);
-        }
-
+        @Override
         public AnnotationVisitor visitAnnotation(String name, String desc) {
             descriptorSet.add(desc);
             return this;
         }
     }
 
-    protected static class FieldIndexer extends FieldVisitor {
-        protected HashSet<String> descriptorSet;
+    protected class FieldIndexer extends FieldVisitor {
         protected AnnotationIndexer annotationIndexer;
 
-        public FieldIndexer(HashSet<String> descriptorSet, AnnotationIndexer annotationInexer) {
-            super(Opcodes.ASM5);
-            this.descriptorSet = descriptorSet;
-            this.annotationIndexer = annotationInexer;
+        public FieldIndexer(AnnotationIndexer annotationIndexer) {
+            super(Opcodes.ASM7);
+            this.annotationIndexer = annotationIndexer;
         }
 
+        @Override
         public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
             descriptorSet.add(desc);
             return annotationIndexer;
         }
 
+        @Override
         public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
             descriptorSet.add(desc);
             return annotationIndexer;
         }
     }
 
-    protected static class MethodIndexer extends MethodVisitor {
-        protected HashSet<String> descriptorSet;
+    protected class MethodIndexer extends MethodVisitor {
         protected AnnotationIndexer annotationIndexer;
 
-        public MethodIndexer(HashSet<String> descriptorSet, AnnotationIndexer annotationIndexer) {
-            super(Opcodes.ASM5);
-            this.descriptorSet = descriptorSet;
+        public MethodIndexer(AnnotationIndexer annotationIndexer) {
+            super(Opcodes.ASM7);
             this.annotationIndexer = annotationIndexer;
         }
 
+        @Override
         public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
             descriptorSet.add(desc);
             return annotationIndexer;
         }
 
+        @Override
         public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible) {
             descriptorSet.add(desc);
             return annotationIndexer;
         }
 
+        @Override
         public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
             descriptorSet.add(desc);
             return annotationIndexer;
