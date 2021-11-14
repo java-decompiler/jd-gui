@@ -286,13 +286,12 @@ elif [ -f "$JAVACMD" ] && [ -x "$JAVACMD" ] ; then
 	#	- main class
 	#	- JVM arguments
 	exec "$JAVACMD" \
-			-cp "${JVMClassPath}" \
 			-Xdock:icon="${ResourcesFolder}/${CFBundleIconFile}" \
 			-Xdock:name="${CFBundleName}" \
 			${JVMOptions:+$JVMOptions }\
 			${JVMDefaultOptions:+$JVMDefaultOptions }\
-			${JVMMainClass}\
-			${JVMArguments:+ $JVMArguments}
+			${JVMArguments:+ $JVMArguments}\
+                        -jar "${JVMClassPath}" \
 
 
 else
