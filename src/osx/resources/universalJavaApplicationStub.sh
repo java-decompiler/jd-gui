@@ -140,7 +140,7 @@ if [ $exitcode -eq 0 ]; then
 
 	# read the Java WorkingDirectory
 	JVMWorkDir=`/usr/libexec/PlistBuddy -c "print ${JavaKey}:WorkingDirectory" "${InfoPlistFile}" 2> /dev/null | xargs`
-	
+
 	# set Working Directory based upon Plist info
 	if [[ ! -z ${JVMWorkDir} ]]; then
 		WorkingDirectory="${JVMWorkDir}"
@@ -224,12 +224,12 @@ fi
 # first check system variable "$JAVA_HOME"
 if [ -n "$JAVA_HOME" ] ; then
 	JAVACMD="$JAVA_HOME/bin/java"
-	
+
 # check for specified JVMversion in "/usr/libexec/java_home" symlinks
 elif [ ! -z ${JVMVersion} ] && [ -x /usr/libexec/java_home ] && /usr/libexec/java_home -F; then
 
-	if /usr/libexec/java_home -F -v ${JVMVersion}; then
-		JAVACMD="`/usr/libexec/java_home -F -v ${JVMVersion} 2> /dev/null`/bin/java"
+	if /usr/libexec/java_home -F -V ${JVMVersion}; then
+		JAVACMD="`/usr/libexec/java_home -F -V ${JVMVersion} 2> /dev/null`/bin/java"
 	else
 		# display error message with applescript
 		osascript -e "tell application \"System Events\" to display dialog \"ERROR launching '${CFBundleName}'\n\nNo suitable Java version found on your system!\nThis program requires Java ${JVMVersion}\nMake sure you install the required Java version.\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
