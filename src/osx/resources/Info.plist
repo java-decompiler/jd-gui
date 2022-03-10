@@ -146,7 +146,7 @@
 		<key>JavaX</key>
 		<dict>
 			<key>MainClass</key>					<string>org.jd.gui.OsxApp</string>
-			<key>JVMVersion</key>					<string>1.8+</string>
+			<key>JVMVersion</key>					<string>1.8;11.0*</string>
 			<key>ClassPath</key>					<string>\$JAVAROOT/${JAR}</string>
 			<key>WorkingDirectory</key>				<string>\$JAVAROOT</string>
 			<key>Properties</key>
