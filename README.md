@@ -17,8 +17,8 @@ for instant access to methods and fields.
 > git clone https://github.com/java-decompiler/jd-gui.git
 > cd jd-gui
 # make sure jd-gui/src/proguard/resources/proguard.config.txt contains the correct path to rj.jar in -libraryjars
-# e.g. on linux /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.332.b09-1.fc35.x86_64/jre/lib/rt.jar
-# on windows C:/Program Files/Java/jre1.8.0_121/lib/rt.jar
+# e.g. on Linux /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.332.b09-1.fc35.x86_64/jre/lib/rt.jar
+# on Windows C:/Program Files/Java/jre1.8.0_121/lib/rt.jar
 # fixes errors like: can't find referenced class java.lang.String
 > ./gradlew build 
 ```
