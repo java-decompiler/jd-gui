@@ -28,7 +28,7 @@ public class InterProcessCommunicationUtil {
             if (classDesc.getName().equals("[Ljava.lang.String;")) {
                 return super.resolveClass(classDesc);
             }
-            throw new RuntimeException(String.format("not support class: %s",classDesc.getName()));
+            throw new RuntimeException(String.format("not support class: %s", classDesc.getName()));
         }
     }
 
@@ -44,9 +44,16 @@ public class InterProcessCommunicationUtil {
                     try (Socket socket = listener.accept();
                          ObjectInputStream ois = new FilterObjectInputStream(socket.getInputStream())) {
                         // Receive args from another JD-GUI instance
-                        String[] args = (String[])ois.readObject();
+                        String[] args = (String[]) ois.readObject();
+
+                        for (String arg : args) {
+                            if (arg.toLowerCase().contains("<html>")) {
+                                throw new RuntimeException(String.format("evil arg: %s", arg));
+                            }
+                        }
+
                         consumer.accept(args);
-                    } catch (IOException|ClassNotFoundException e) {
+                    } catch (IOException | ClassNotFoundException e) {
                         assert ExceptionUtil.printStackTrace(e);
                     }
                 }
