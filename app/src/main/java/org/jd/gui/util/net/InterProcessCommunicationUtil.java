@@ -9,15 +9,29 @@ package org.jd.gui.util.net;
 
 import org.jd.gui.util.exception.ExceptionUtil;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.function.Consumer;
 
 public class InterProcessCommunicationUtil {
+
+    static class FilterObjectInputStream extends ObjectInputStream {
+
+        public FilterObjectInputStream(InputStream in) throws IOException {
+            super(in);
+        }
+
+        @Override
+        protected Class<?> resolveClass(final ObjectStreamClass classDesc) throws IOException, ClassNotFoundException {
+            if (classDesc.getName().equals("[Ljava.lang.String;")) {
+                return super.resolveClass(classDesc);
+            }
+            throw new RuntimeException(String.format("not support class: %s",classDesc.getName()));
+        }
+    }
+
     protected static final int PORT = 2015_6;
 
     public static void listen(final Consumer<String[]> consumer) throws Exception {
@@ -28,7 +42,7 @@ public class InterProcessCommunicationUtil {
             public void run() {
                 while (true) {
                     try (Socket socket = listener.accept();
-                         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream())) {
+                         ObjectInputStream ois = new FilterObjectInputStream(socket.getInputStream())) {
                         // Receive args from another JD-GUI instance
                         String[] args = (String[])ois.readObject();
                         consumer.accept(args);
