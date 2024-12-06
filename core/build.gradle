@@ -1,0 +1,75 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+
+dependencies {
+    testCompile 'commons-codec:commons-codec:1.13'
+    testCompile 'org.apache.commons:commons-collections4:4.1'
+    testCompile 'org.apache.commons:commons-imaging:1.0-alpha1'
+    testCompile 'org.apache.commons:commons-lang3:3.9'
+    testCompile 'com.jakewharton:disklrucache:2.0.2'
+    testCompile 'com.squareup:javapoet:1.11.1'
+    testCompile 'com.squareup:javawriter:2.5.1'
+    testCompile 'joda-time:joda-time:2.10.5'
+    testCompile 'org.joda:joda-convert:2.2.1'
+    testCompile 'org.jsoup:jsoup:1.12.1'
+    testCompile 'junit:junit:4.12'
+    testCompile 'javax.jms:javax.jms-api:2.0.1'
+    testCompile 'javax.mail:javax.mail-api:1.6.2'
+    testCompile 'com.squareup.mimecraft:mimecraft:1.1.1'
+    testCompile 'org.scribe:scribe:1.3.7'
+    testCompile 'com.sparkjava:spark-core:2.9.1'
+    testCompile 'log4j:log4j:1.2.17'
+    testCompile 'com.google.guava:guava:12.0'
+}
+
+version='1.1.4'
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = targetCompatibility = '1.8'
+    options.compilerArgs << '-Xlint:deprecation'
+    options.compilerArgs << '-Xlint:unchecked'
+    options.encoding = 'UTF-8'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes 'JD-Core-Version': version
+    }
+}
+
+// Publication to JCenter Maven repository
+task sourceJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        publicationJdCore(MavenPublication) {
+            groupId 'org.jd'
+            artifactId 'jd-core'
+            version project.version
+            from components.java
+            artifact tasks.sourceJar
+        }
+    }
+}
+
+// 'cleanIdea' task extension //
+cleanIdea.doFirst {
+    delete project.name + '.iws'
+    delete 'out'
+    followSymlinks = true
+}

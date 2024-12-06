@@ -3,7 +3,9 @@ apply plugin: 'java'
 dependencies {
     compile 'com.fifesoft:rsyntaxtextarea:3.0.4'
     compile 'org.ow2.asm:asm:7.1'
-    compile 'org.jd:jd-core:' + parent.jdCoreVersion
+    // put back if jd-core is going to be a separate artifact
+    // compile 'org.jd:jd-core:' + parent.jdCoreVersion
+    compile project(':core')
     compile project(':api')
     testCompile 'junit:junit:4.12'
 }
