@@ -1,10 +1,12 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.netflix.nebula:gradle-ospackage-plugin:5.3.0'    // RPM & DEB support
-        classpath 'edu.sc.seis.gradle:launch4j:2.4.4'
+        classpath files('libs/net.sf.launch4j-3.12.jar')
+        classpath files('libs/com.thoughtworks.xstream-1.4.11.1.jar')
+        classpath files('libs/edu.sc.seis..gradle.launch4j-2.4.6.jar')
         classpath 'net.sf.proguard:proguard-gradle:6.1.0'
     }
 }
@@ -31,7 +33,7 @@ allprojects {
     }
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 
     configurations {
@@ -114,10 +116,10 @@ launch4j {
 
     version = textVersion = project.version
     fileDescription = productName = 'JD-GUI'
-    errTitle 'JD-GUI Windows Wrapper'
-    copyright 'JD-GUI (C) 2008-2019 Emmanuel Dupuy'
-    icon projectDir.path + '/src/launch4j/resources/images/jd-gui.ico'
-    jar projectDir.path + '/' + proguard.outJarFiles[0]
+    errTitle = 'JD-GUI Windows Wrapper'
+    copyright = 'JD-GUI (C) 2008-2019 Emmanuel Dupuy'
+    icon = projectDir.path + '/src/launch4j/resources/images/jd-gui.ico'
+    jar = projectDir.path + '/' + proguard.outJarFiles[0]
     bundledJrePath = '%JAVA_HOME%'
 }
 

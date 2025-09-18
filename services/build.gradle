@@ -3,7 +3,7 @@ apply plugin: 'java'
 dependencies {
     compile 'com.fifesoft:rsyntaxtextarea:3.0.4'
     compile 'org.ow2.asm:asm:7.1'
-    compile 'org.jd:jd-core:' + parent.jdCoreVersion
+    compile files ('../libs/org.jd.jd-core-' +parent.jdCoreVersion+'.jar')
     compile project(':api')
     testCompile 'junit:junit:4.12'
 }
