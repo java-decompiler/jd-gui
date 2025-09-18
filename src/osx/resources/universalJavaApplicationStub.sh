@@ -220,9 +220,15 @@ fi
 #
 # find installed Java versions
 #################################
-
-# first check system variable "$JAVA_HOME"
-if [ -n "$JAVA_HOME" ] ; then
+# As Java 1.8 is old and no more supported, 
+# running this up on new new Java versions doesn't work 
+# and force the user to install Java 8 which override the existing new Java
+# first check system variable "$JAVA_HOME_V8".
+if [ -n "$JAVA_HOME_V8" ] ; then
+	JAVACMD="$JAVA_HOME_V8/bin/java"
+ 
+# check standard system variable "$JAVA_HOME"
+elif [ -n "$JAVA_HOME" ] ; then
 	JAVACMD="$JAVA_HOME/bin/java"
 	
 # check for specified JVMversion in "/usr/libexec/java_home" symlinks
