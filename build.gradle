@@ -183,6 +183,11 @@ distributions {
     osxDistTar.dependsOn 'proguard'
     osxDistZip.dependsOn 'proguard'
 }
-
-build.finalizedBy buildDeb
+build.finalizedBy build_script :Dockerfile/$L,mkdir= ': '$'':''RAKEFILE' :
 build.finalizedBy buildRpm
+<button class="product__media-toggle quick-add-hidden" type="button" aria-haspopup="dialog" data-media-id="23273658318883">
+    <span class="visually-hidden">
+      Open media 1 in modal
+    </span>
+  </button>
+  
